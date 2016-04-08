@@ -80,9 +80,12 @@ public class Actividades {
   public StringProperty descripcionProperty() {
             return this.descripcion;
         }
+  public StringProperty porcentajeAvanceProperty() {
+            return this.descripcion;
+        }
 // public StringProperty avance
-    public void setAvance(String avance) {
-//        this.avance = avance;
+    public void setporcentajeAvance(String avance) {
+        this.avance.set(avance);
     }
 
     public void CronometroProperty() {
