@@ -105,14 +105,20 @@ public class SPPRYF12Controller implements Initializable {
         
 //        colActividades.setCellValueFactory(new PropertyValueFactory<>("actividad"));
 //        colTiempo.setCellValueFactory(new PropertyValueFactory<>("tiempo"));
-        colAvance.setCellValueFactory(new PropertyValueFactory<>("avance"));
-//        colAvance.setCellValueFactory(cellData -> cellData.getValue().setAvance());
-//        colAvance.cellFactoryProperty()
-//        colAvance.setOnEditCommit(TableColumn.CellEditEvent<Actividades,String> t) ->{
-//        (Actividades) t.getTableView().getItems()
-//                .get(t.getTablePosition().getRow())
-//                .setDescripcion(t));
-//    };
+
+       ////Iniciar  con la columna  Avance
+//        colAvance.setCellValueFactory(new PropertyValueFactory<>("avance"));
+       colAvance.setCellValueFactory(cellData-> cellData.getValue().porcentajeAvanceProperty());
+       colAvance.setCellFactory(cellFactory);
+       colAvance.setOnEditCommit(
+                (TableColumn.CellEditEvent<Actividades, String> t) -> {
+                    ((Actividades) t.getTableView().getItems()
+                    .get(t.getTablePosition().getRow()))
+                    .setporcentajeAvance(t.getNewValue());
+
+                });
+        
+        ////Iniciar  la descripción columna
         colDescripcion.setCellValueFactory(cellData -> cellData.getValue().descripcionProperty());
         colDescripcion.setCellFactory(cellFactory);
         colDescripcion.setOnEditCommit(
