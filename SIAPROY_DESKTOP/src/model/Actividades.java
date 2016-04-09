@@ -1,7 +1,28 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *  _______________________________________________________________________
+ * |                    COPYRIGHT (C) BY                                   |
+ * |               DERECHOS RESERVADOS (C) POR                             |
+ * |                LOBO SOFTWARE S.A. DE  C.V.                            |
+ * |                                                                       |
+ * |Ninguna parte de esta obra, parcial o total puede                      | 
+ * |ser reproducida o transmitida, mediante ningun sistema                 |
+ * |o metodo electronico o mecanico (incluyendo el                         |   
+ * |fotocopiado, la grabacion, o cualquier sistema de                      |  
+ * |recuperacion y almacenamiento de informacion),                         |  
+ * |SIN LA AUTORIZACION POR ESCRITO DEL AUTOR.                             |  
+ * |                                                                       |  
+ * |Derechos reservados                                                    |  
+ * |(C) 2012, LOBO SOFTWARE, S.A. DE C.V. (*)                              |  
+ * |                                                                       |  
+ * |Esta obra forma parte del SIAL-CH (C) "CAPITAL HUMANO"                 |  
+ * |                                                                       |  
+ * |(*) Marca registrada por                                               |   
+ * |LOBO SOFTWARE, S.A. DE C.V.                                            |  
+ * |_______________________________________________________________________|  
+ *  Document     : Actividades.java
+ * Created on    : 08 abr 2016 10:23:09 AM
+ * Author        : CCL
+ * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos. 
  */
 package model;
 
@@ -10,7 +31,7 @@ import javafx.beans.property.StringProperty;
 
 /**
  *
- * @author ceciliac
+ * @author Lobo Software
  */
 public class Actividades {
 
