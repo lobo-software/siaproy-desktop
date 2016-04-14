@@ -25,13 +25,8 @@
  Created on    : 08 abr 2016 10:24:19 AM
  Author        : CCL
  Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos.
-<<<<<<< HEAD:SIAPROY_DESKTOP/src/frontEnd/view/SPPRYF12View.fxml
- 11/Apr/2016 16:30 SVA (LOBO_000076): Se modifica la ruta del controller.
-=======
                  13/Apr/2016 11:44 CCL ():Se  reextructuraon componentes dentro de la vista.
->>>>>>> refs/remotes/origin/master:SIAPROY_DESKTOP/src/frontEnd/view/SPPRYF12View.fxml
 -->
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
@@ -192,23 +187,6 @@
          </right>
       </BorderPane>
    </top>
-<<<<<<< HEAD:SIAPROY_DESKTOP/src/frontEnd/view/SPPRYF12View.fxml
-   <center>
-      <TableView fx:id="grdActividades" editable="true" prefHeight="200.0" prefWidth="529.0" BorderPane.alignment="CENTER">
-        <columns>
-            <TableColumn fx:id="colCrononometro" minWidth="0.0" prefWidth="38.0" />
-          <TableColumn fx:id="colProyecto" minWidth="0.0" prefWidth="150.0" text="PROYECTO" />
-          <TableColumn fx:id="colActividades" prefWidth="110.0" text="ACTIVIDADADES" />
-            <TableColumn fx:id="colTiempo" editable="false" prefWidth="108.0" text="TIEMPO" />
-            <TableColumn fx:id="colDescripcion" prefWidth="158.0" text="DESCRIPCIÓN" />
-            <TableColumn fx:id="colAvance" prefWidth="105.0" text="AVANCE %" />
-            <TableColumn fx:id="colFecha" prefWidth="75.0" text="fecha" />
-            <TableColumn fx:id="colActivo" prefWidth="75.0" text="Activo" />
-        </columns>
-      </TableView>
-   </center>
-=======
->>>>>>> refs/remotes/origin/master:SIAPROY_DESKTOP/src/frontEnd/view/SPPRYF12View.fxml
    <bottom>
       <HBox prefHeight="28.0" prefWidth="600.0" spacing="50.0" BorderPane.alignment="CENTER">
          <children>
