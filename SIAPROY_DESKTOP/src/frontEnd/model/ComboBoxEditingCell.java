@@ -19,42 +19,36 @@
  * |(*) Marca registrada por                                               |   
  * |LOBO SOFTWARE, S.A. DE C.V.                                            |  
  * |_______________________________________________________________________|  
- *  Document     : EditingCell.java
- * Created on    : 08 abr 2016 10:21:12 AM
+ *  Document     : ComboBoxEditingCell.java
+ * Created on    : 11 abr 2016 10:34:57 AM
  * Author        : CCL
- * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos.
-                   12/Apr/2016 12:33 CCL (LOBO_000076): Se añaden las funcionalidades a las celdas de los TableView como los combo boxes.
+ * Modifications : 
  */
-<<<<<<< HEAD:SIAPROY_DESKTOP/src/frontEnd/model/EditingCell.java
-=======
- 
->>>>>>> refs/remotes/origin/master:SIAPROY_DESKTOP/src/frontEnd/model/EditingCell.java
 package frontEnd.model;
 
-import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextField;
 
 /**
  *
  * @author Lobo Software
  */
-public class EditingCell extends TableCell<Actividades, String> {
+public class ComboBoxEditingCell extends TableCell<Actividades, Typ> {
+    private ComboBox<Typ> comboBox;
+    private ObservableList<Typ> lista;
 
-    private TextField textField;
-
-    public EditingCell() {
+    public ComboBoxEditingCell(ObservableList<Typ> typData) {
+        lista = typData;
     }
-
     @Override
     public void startEdit() {
         if (!isEmpty()) {
             super.startEdit();
-            createTextField();
+            createComboBox(lista);
             setText(null);
-            setGraphic(textField);
-            textField.selectAll();
+            setGraphic(comboBox);
         }
     }
 
@@ -62,44 +56,61 @@ public class EditingCell extends TableCell<Actividades, String> {
     public void cancelEdit() {
         super.cancelEdit();
 
-        setText((String) getItem());
+        setText(getTyp().getTyp());
         setGraphic(null);
     }
 
     @Override
-    public void updateItem(String item, boolean empty) {
+    public void updateItem(Typ item, boolean empty) {
         super.updateItem(item, empty);
 
         if (empty) {
-            setText(item);
+            setText(null);
             setGraphic(null);
         } else if (isEditing()) {
-            if (textField != null) {
-                textField.setText(getString());
-//                        setGraphic(null);
+            if (comboBox != null) {
+                comboBox.setValue(item);
+
             }
-            setText(null);
-            setGraphic(textField);
+            setText(getTyp().getTyp());
+            setGraphic(comboBox);
         } else {
-            setText(getString());
+            setText(getTyp().getTyp());
             setGraphic(null);
         }
     }
 
-    private void createTextField() {
-        textField = new TextField(getString());
-        textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
-        textField.setOnAction((e) -> commitEdit(textField.getText()));
-        textField.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-            if (!newValue) {
-                System.out.println("Commiting " + textField.getText());
-                commitEdit(textField.getText());
-            }
+    ;
+        private void createComboBox(ObservableList<Typ> lista) {
+        comboBox = new ComboBox<>(lista);
+        comboBoxConverter(comboBox);
+        comboBox.valueProperty().set(getTyp());
+        comboBox.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
+        comboBox.setOnAction((e) -> {
+            System.out.println("Committed: " + comboBox.getSelectionModel().getSelectedItem());
+            commitEdit(comboBox.getSelectionModel().getSelectedItem());
         });
     }
 
-    private String getString() {
-        return getItem() == null ? "" : getItem();
+    private void comboBoxConverter(ComboBox<Typ> comboBox) {
+        // Define rendering of the list of values in ComboBox drop down. 
+        comboBox.setCellFactory((c) -> {
+            return new ListCell<Typ>() {
+                @Override
+                protected void updateItem(Typ item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (item == null || empty) {
+                        setText(null);
+                    } else {
+                        setText(item.getTyp());
+                    }
+                }
+            };
+        });
     }
 
+    private Typ getTyp() {
+        return getItem() == null ? new Typ("") : getItem();
+    }
 }
