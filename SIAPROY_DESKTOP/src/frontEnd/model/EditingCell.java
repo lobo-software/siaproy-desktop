@@ -23,8 +23,10 @@
  * Created on    : 08 abr 2016 10:21:12 AM
  * Author        : CCL
  * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos.
+                   12/Apr/2016 12:33 CCL (LOBO_000076): Se añaden las funcionalidades a las celdas de los TableView como los combo boxes.
  */
-package model;
+ 
+package frontEnd.model;
 
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableCell;
