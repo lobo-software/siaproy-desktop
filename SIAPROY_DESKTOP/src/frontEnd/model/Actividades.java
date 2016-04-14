@@ -24,10 +24,16 @@
  * Author        : CCL
  * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos. 
  */
-package model;
+package frontEnd.model;
 
+import java.util.Date;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.CheckBox;
 
 /**
  *
@@ -38,11 +44,12 @@ public class Actividades {
     private String proyecto;
    
     private String actividad;
-//    private String botonInicio;
     private String tiempo;
-    private final SimpleStringProperty descripcion;
-//    private String avance;
-    private final SimpleStringProperty avance;
+    private  String descripcion;
+    private String avance;
+    private SimpleObjectProperty<Date> fecha;
+    private BooleanProperty activo;
+//    private TplList tplList;
     
 //     public Actividades(){
 //        this.proyecto = "";
@@ -57,29 +64,36 @@ public class Actividades {
 
 
 
-    public Actividades(String proyecto, String actividad, String tiempo, String descripcion, String avance) {
+    public Actividades(String proyecto, String actividad, String tiempo, String descripcion, String avance, Date fecha, String activo) {
         this.proyecto = proyecto;
+//        tplList = new TplList(proyecto);
         this.actividad = actividad;
         this.tiempo = tiempo;
-        this.descripcion = new SimpleStringProperty(descripcion);
-        this.avance = new SimpleStringProperty(avance);
+        this.descripcion = descripcion;
+        this.avance = avance;
+        this.fecha = new SimpleObjectProperty(fecha);
+        this.activo = new SimpleBooleanProperty(activo.equals("S") || activo.equals("A"));
     }
     
+      public void setProyecto(String proyecto) {
+        this.proyecto = proyecto;
+    }
+      
      public String getProyecto() {
         return proyecto;
     }
 
-    public void setProyecto(String proyecto) {
-        this.proyecto = proyecto;
+//     public StringProperty getProyectoProperty(){
+//         return proyecto;
+//     }
+    
+     public void setActividad(String actividad) {
+        this.actividad = actividad;
     }
     
      public String getActividad () {
         return actividad;
     }
-     public void setActividad(String actividad) {
-        this.actividad = actividad;
-    }
-     
      
      public String getTiempo() {
         return tiempo;
@@ -90,23 +104,48 @@ public class Actividades {
     }
     
     public void setDescripcion(String descripcion){
-    this.descripcion.set(descripcion);
+    this.descripcion = descripcion;
 }
     
      public String getDescripcion() {
-        return descripcion.get();
+        return descripcion;
     }
+     
+     public void setFecha(Date fecha){
+         this.fecha.set(fecha);
+     }
+     
+     public Date getFecha(){
+         return fecha.get();
+     }
+     
+     public ObjectProperty getFechaProperty(){
+         return fecha;
+     }
+     
+     public void setActivo(boolean activo){
+         this.activo.set(activo);
+     }
+     
+     public boolean getActivo(){
+         return activo.get();
+     }
+     
+     public BooleanProperty getActivoProperty(){
+         return activo;
+     }
     
 //    
-  public StringProperty descripcionProperty() {
-            return this.descripcion;
-        }
-  public StringProperty porcentajeAvanceProperty() {
-            return this.descripcion;
-        }
+//  public StringProperty descripcionProperty() {
+//            return this.descripcion;
+//        }
 // public StringProperty avance
-    public void setporcentajeAvance(String avance) {
-        this.avance.set(avance);
+    public void setAvance(String avance) {
+        this.avance = avance;
+    }
+    
+    public String getAvance(){
+        return avance;
     }
 
     public void CronometroProperty() {

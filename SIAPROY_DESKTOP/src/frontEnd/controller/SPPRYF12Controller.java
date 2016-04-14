@@ -24,7 +24,7 @@
  * Author        : CCL
  * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos. 
  */
-package controller;
+package frontEnd.controller;
 
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import java.net.URL;
@@ -33,24 +33,25 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.ResourceBundle;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import javafx.util.Callback;
-import model.Actividades;
-import model.EditingCell;
+import frontEnd.model.Actividades;
+import frontEnd.util.SialCheckBoxCellFactory;
+import frontEnd.util.SialComboCellFactory;
+import frontEnd.util.SialDateCellFactory;
+import frontEnd.util.SialStringCellFactory;
+import javafx.beans.property.BooleanProperty;
+import javafx.scene.control.cell.CheckBoxTableCell;
 
 /**
  *
@@ -60,13 +61,10 @@ public class SPPRYF12Controller implements Initializable {
 
     @FXML
     private Label lbFecha;
-
     @FXML
     private DatePicker dtfFechaActual;
-
     @FXML
     private BorderPane layoutSecundario;
-
     @FXML
     private TableView<Actividades> grdActividades;
     @FXML
@@ -79,76 +77,92 @@ public class SPPRYF12Controller implements Initializable {
     private TableColumn<Actividades, String> colTiempo;
     @FXML
     private TableColumn<Actividades, String> colDescripcion;
-
     @FXML
     private TableColumn<Actividades, String> colAvance;
-
     @FXML
     private TextField tfMostrarDescripcion;
-    
-      private String MostrarDescripcion;
-    private Object Atividades;
-
     @FXML
-    private void handleButtonAction(ActionEvent event) {
-        System.out.println("You clicked me!");
-        lbFecha.setText("Hello World!");
-    }
+    private TableColumn<Actividades, Date> colFecha;
+    @FXML
+    private TableColumn<Actividades, Boolean> colActivo;
 
+    private ObservableList<String> datosComboProyecto;
+    private ObservableList<String> datosComboActividades;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        // Mostrar el DatePicker sin textfield y dar formato a la fecha mostrada en la etiqueta.
         dtfFechaActual.setValue(LocalDate.now());
         DatePickerSkin datePickerSkin = new DatePickerSkin((dtfFechaActual));
         Node popupContent = datePickerSkin.getPopupContent();
         layoutSecundario.setRight(popupContent);
         muestraFecha();
-        
-//           col<Person, String> firstNameCol = new TableColumn("Vorname");
-//        firstNameCol.setMinWidth(100);
-//        firstNameCol.setCellValueFactory(cellData -> cellData.getValue().firstNameProperty());
-//        firstNameCol.setCellFactory(cellFactory);
-//        firstNameCol.setOnEditCommit(
-//                (TableColumn.CellEditEvent<Person, String> t) -> {
-//                    ((Person) t.getTableView().getItems()
-//                    .get(t.getTablePosition().getRow()))
-//                    .setFirstName(t.getNewValue());
-//
-//                });
-     
-       grdActividades.setEditable(true);
-        Callback<TableColumn<Actividades, String>, TableCell<Actividades, String>> cellFactory
-                = (TableColumn<Actividades, String> param) -> new EditingCell();
-       
-      
-        colProyecto.setCellValueFactory(new PropertyValueFactory<>("proyecto"));
-        
-//        colActividades.setCellValueFactory(new PropertyValueFactory<>("actividad"));
-//        colTiempo.setCellValueFactory(new PropertyValueFactory<>("tiempo"));
+        //Store proyectos
+        datosComboProyecto = FXCollections.observableArrayList(
+                "DMS_2014 - PROYECTO DE DMS PARA AÑO 2014",
+                "DMS_2015",
+                "DMS_2016"
+        );
+        datosComboActividades = FXCollections.observableArrayList();
+        //Creación de objetos genéricos para el TableView editable
+        SialStringCellFactory<Actividades, String> textFieldCell = new SialStringCellFactory<>();
+        SialComboCellFactory<Actividades, String> comboBoxCell = new SialComboCellFactory<>();
+        SialDateCellFactory<Actividades, Date> datePickerCell = new SialDateCellFactory<>();
+        SialCheckBoxCellFactory<Actividades> checkBoxCell = new SialCheckBoxCellFactory<>();
 
-       ////Iniciar  con la columna  Avance
-//        colAvance.setCellValueFactory(new PropertyValueFactory<>("avance"));
-       colAvance.setCellValueFactory(cellData-> cellData.getValue().porcentajeAvanceProperty());
-       colAvance.setCellFactory(cellFactory);
-       colAvance.setOnEditCommit(
+//        colProyecto.setCellValueFactory(cellData -> cellData.getValue().getProyectoProperty());
+        colProyecto.setCellValueFactory(new PropertyValueFactory<>("proyecto"));
+        colProyecto.setCellFactory(comboBoxCell.creaComboBox(datosComboProyecto));
+        colProyecto.setOnEditCommit(
                 (TableColumn.CellEditEvent<Actividades, String> t) -> {
+                    String[] clave = t.getNewValue().split("-");
+
                     ((Actividades) t.getTableView().getItems()
                     .get(t.getTablePosition().getRow()))
-                    .setporcentajeAvance(t.getNewValue());
+                    .setProyecto(clave[0]);
 
+                    System.out.println("Carga combo secundario (parametro):" + t.getNewValue());
                 });
-        
-        ////Iniciar  la descripción columna
-        colDescripcion.setCellValueFactory(cellData -> cellData.getValue().descripcionProperty());
-        colDescripcion.setCellFactory(cellFactory);
+        colActividades.setCellValueFactory(new PropertyValueFactory<>("actividad"));
+        colActividades.setCellFactory(comboBoxCell.creaComboBoxWithCascade(datosComboProyecto, datosComboActividades));
+        colActividades.setOnEditStart((TableColumn.CellEditEvent<Actividades, String> t) -> {
+            String proyecto = ((Actividades) t.getTableView().getItems()
+                    .get(t.getTablePosition().getRow()))
+                    .getProyecto();
+
+            System.out.println("Carga combo secundario (parametro):" + proyecto);
+        });
+        colDescripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
+        colDescripcion.setCellFactory(textFieldCell.creaTextField());
         colDescripcion.setOnEditCommit(
                 (TableColumn.CellEditEvent<Actividades, String> t) -> {
                     ((Actividades) t.getTableView().getItems()
                     .get(t.getTablePosition().getRow()))
                     .setDescripcion(t.getNewValue());
-
                 });
+        colAvance.setCellValueFactory(new PropertyValueFactory<>("avance"));
+        colAvance.setCellFactory(textFieldCell.creaTextField());
+        colAvance.setOnEditCommit(
+                (TableColumn.CellEditEvent<Actividades, String> t) -> {
+                    ((Actividades) t.getTableView().getItems()
+                    .get(t.getTablePosition().getRow()))
+                    .setAvance(t.getNewValue());
+                });
+        colFecha.setCellValueFactory(cellData -> cellData.getValue().getFechaProperty());
+        colFecha.setCellFactory(datePickerCell.creaDatePicker());
+        colActivo.setCellValueFactory(cellData -> cellData.getValue().getActivoProperty());
+//        colActivo.setCellFactory(CheckBoxTableCell.forTableColumn(colActivo));
+        colActivo.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxCell.creaCheckBoxOneSelection(true, grdActividades, grdActividades.getItems().get(0).getActivoProperty())));
+        
+        
+//        colActivo.setCellFactory(CheckBoxTableCell.forTableColumn(new Callback<Integer, ObservableValue<Boolean>>() {
+//
+//            @Override
+//            public ObservableValue<Boolean> call(Integer param) {
+//                System.out.println("Cours " + grdActividades.getItems().get(param).getActividad() + " changed value to " + grdActividades.getItems().get(param).getActivo());
+//                return grdActividades.getItems().get(param).getActivoProperty();
+//            }
+//        }));
         grdActividades.setItems(cargaRegistrosExistentes());
 
     }
@@ -163,22 +177,19 @@ public class SPPRYF12Controller implements Initializable {
 
     public void agregarActividad() {
     }
-    
 
     public void muestraActividadesRegistradas() {
         ObservableList<Actividades> muestraInfoActividad = grdActividades.getSelectionModel().getSelectedItems();
-         
+
     }
- 
 
     public ObservableList<Actividades> cargaRegistrosExistentes() {
         ObservableList<Actividades> registros = FXCollections.observableArrayList();
-        registros.add(new Actividades("DMS_2016", "REGISTRO ACTIVIDADES", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades("DMS_2016", "REGISTRO ACTIVIDADES", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades("DMS_2016", "REGISTRO ACTIVIDADES", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades("DMS_2016", "REGISTRO ACTIVIDADES", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
+        registros.add(new Actividades("DMS_2014", "INVESTIGACION", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "", new Date(), "S"));
+        registros.add(new Actividades("DMS_2014", "REUNIÓN DE ESTÁNDARES", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100", new Date(), "N"));
+        registros.add(new Actividades("DMS_2015", "APOYO AL EQUIPO DE TRABAJO", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100", new Date(), "A"));
+        registros.add(new Actividades("DMS_2016", "DOCUMENTACIÓN", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100", new Date(), "N"));
         return registros;
     }
-    
-    
+
 }

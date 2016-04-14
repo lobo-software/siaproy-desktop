@@ -24,10 +24,11 @@
  * Author        : CCL
  * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos.
  */
-package model;
+package frontEnd.model;
 
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 
 /**

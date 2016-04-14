@@ -23,8 +23,9 @@
  * Created on    : 08 abr 2016 10:22:36 AM
  * Author        : CCL
  * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos. 
+11/Apr/2016 16:31 SVA (LOBO_000076): Se modifica la ruta del fxml.
  */
-package controller;
+package frontEnd.controller;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -40,7 +41,7 @@ public class SPPRYF12Main extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/view/SPPRYF12View.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/frontEnd/view/SPPRYF12View.fxml"));
         
         Scene scene = new Scene(root);
         
