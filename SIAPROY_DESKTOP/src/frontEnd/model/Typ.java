@@ -19,40 +19,40 @@
  * |(*) Marca registrada por                                               |   
  * |LOBO SOFTWARE, S.A. DE C.V.                                            |  
  * |_______________________________________________________________________|  
- *  Document     : SPPRYF12Main.java
- * Created on    : 08 abr 2016 10:22:36 AM
+ *  Document     : Typ.java
+ * Created on    : 11 abr 2016 11:09:11 AM
  * Author        : CCL
- * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos. 
+ * Modifications : 
  */
-package controller;
+package frontEnd.model;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  *
  * @author Lobo Software
  */
-public class SPPRYF12Main extends Application {
-    
-    @Override
-    public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/view/SPPRYF12View.fxml"));
-        
-        Scene scene = new Scene(root);
-        
-        stage.setScene(scene);
-        stage.show();
+
+
+ public  class Typ {
+
+        private final SimpleStringProperty typ;
+
+        public Typ(String typ) {
+            this.typ = new SimpleStringProperty(typ);
+        }
+        public String getTyp() {
+            return this.typ.get();
+        }
+        public StringProperty typProperty() {
+            return this.typ;
+        }
+        public void setTyp(String typ) {
+            this.typ.set(typ);
+        }
+        public String toString() {
+            return typ.get();
+        }
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
-    
-}

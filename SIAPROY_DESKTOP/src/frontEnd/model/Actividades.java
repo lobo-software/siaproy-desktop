@@ -23,98 +23,81 @@
  * Created on    : 08 abr 2016 10:23:09 AM
  * Author        : CCL
  * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos. 
+                   14/Apr/2016 09:53 CCL (LOBO_000076): Se elimina espaciocios innecesarios y codigoinnecesario.               
  */
-package model;
+package frontEnd.model;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 /**
  *
  * @author Lobo Software
  */
 public class Actividades {
-
-    private String proyecto;
-   
-    private String actividad;
+    private final SimpleObjectProperty<Typ> proyecto;
+    private final SimpleObjectProperty<Typ> actividad;
 //    private String botonInicio;
     private String tiempo;
-    private final SimpleStringProperty descripcion;
-//    private String avance;
-    private final SimpleStringProperty avance;
-    
-//     public Actividades(){
-//        this.proyecto = "";
-//        this.actividad = "";
-//        this.tiempo = "";
-//        this.descripcion = new SimpleStringProperty();
-//        this.avance="";
-//      
-//        
-//    }
+    private String descripcion;
+    private String avance;
+    private String Fecha;
 
-
-
-
-    public Actividades(String proyecto, String actividad, String tiempo, String descripcion, String avance) {
-        this.proyecto = proyecto;
-        this.actividad = actividad;
+    //Se inicia con el modelado de datos
+    public Actividades(Typ proyecto, Typ actividad, String tiempo, String descripcion, String avance) {
+        this.proyecto = new SimpleObjectProperty(proyecto);
+        this.actividad = new SimpleObjectProperty(actividad);
         this.tiempo = tiempo;
-        this.descripcion = new SimpleStringProperty(descripcion);
-        this.avance = new SimpleStringProperty(avance);
+        this.descripcion = descripcion;
+        this.avance = avance;
     }
-    
-     public String getProyecto() {
+
+    public Typ getTypProyecto() {
+        return proyecto.get();
+    }
+
+    public void setTypProyecto(Typ proyecto) {
+        this.proyecto.set(proyecto);
+    }
+
+    public ObjectProperty<Typ> getProyectoProperty() {
         return proyecto;
     }
 
-    public void setProyecto(String proyecto) {
-        this.proyecto = proyecto;
+    public Typ getTypActividad() {
+        return actividad.get();
     }
-    
-     public String getActividad () {
+
+    public void setTypActividad(Typ actividad) {
+        this.actividad.set(actividad);
+    }
+
+    public ObjectProperty<Typ> getActividadProperty() {
         return actividad;
     }
-     public void setActividad(String actividad) {
-        this.actividad = actividad;
-    }
-     
-     
-     public String getTiempo() {
+
+    public String getTiempo() {
         return tiempo;
     }
-    
+
     public void setTiempo(String tiempo) {
         this.tiempo = tiempo;
     }
-    
-    public void setDescripcion(String descripcion){
-    this.descripcion.set(descripcion);
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setPorcentajeAvance(String avance) {
+        this.avance = avance;
+    }
+
+    public String getAvance() {
+        return avance;
+
+    }
 }
-    
-     public String getDescripcion() {
-        return descripcion.get();
-    }
-    
-//    
-  public StringProperty descripcionProperty() {
-            return this.descripcion;
-        }
-  public StringProperty porcentajeAvanceProperty() {
-            return this.descripcion;
-        }
-// public StringProperty avance
-    public void setporcentajeAvance(String avance) {
-        this.avance.set(avance);
-    }
-
-    public void CronometroProperty() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    
-   
-
-}
-
