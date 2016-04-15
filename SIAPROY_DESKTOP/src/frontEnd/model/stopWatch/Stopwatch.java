@@ -34,6 +34,7 @@ package frontEnd.model.stopWatch;
  */
 import de.jensd.fx.fontawesome.AwesomeDude;
 import de.jensd.fx.fontawesome.AwesomeIcon;
+import frontEnd.controller.SPPRYF12Controller;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -66,7 +67,7 @@ public class Stopwatch extends Region {
         hBox.setSpacing(5);
         hBox.getChildren().addAll(startStop);
         HBox.setHgrow(startStop, Priority.ALWAYS);
-        startStop.setMinWidth(61);
+        startStop.setMinWidth(25);
         VBox vBox = new VBox();
         vBox.setSpacing(5d);
         vBox.getChildren().addAll(hBox);
@@ -86,6 +87,7 @@ public class Stopwatch extends Region {
                 return;
             }
             if (currentStatus == StopWatchStatus.RUNNING) {
+//                controller.running= true;
                 AwesomeDude.setIcon(startStop, AwesomeIcon.PLAY);
                 currentTime = stopWatchWorker.stop();
                 startTime = stopWatchWorker.getStartTime();

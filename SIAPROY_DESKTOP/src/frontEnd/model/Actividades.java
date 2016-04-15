@@ -27,6 +27,7 @@
  */
 package frontEnd.model;
 
+import frontEnd.model.stopWatch.Stopwatch;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -35,16 +36,20 @@ import javafx.beans.property.SimpleObjectProperty;
  * @author Lobo Software
  */
 public class Actividades {
-    private final SimpleObjectProperty<Typ> proyecto;
-    private final SimpleObjectProperty<Typ> actividad;
-//    private String botonInicio;
+    private  SimpleObjectProperty<Typ> proyecto;
+    private  SimpleObjectProperty<Typ> actividad;
+    private Stopwatch stopWatch;
     private String tiempo;
     private String descripcion;
     private String avance;
     private String Fecha;
 
+    public Actividades(){
+    }
+    
     //Se inicia con el modelado de datos
-    public Actividades(Typ proyecto, Typ actividad, String tiempo, String descripcion, String avance) {
+    public Actividades(Stopwatch stopWatch, Typ proyecto, Typ actividad, String tiempo, String descripcion, String avance) {
+        this.stopWatch = stopWatch;
         this.proyecto = new SimpleObjectProperty(proyecto);
         this.actividad = new SimpleObjectProperty(actividad);
         this.tiempo = tiempo;
@@ -99,5 +104,9 @@ public class Actividades {
     public String getAvance() {
         return avance;
 
+    }
+    
+    public Stopwatch getStopWatch(){
+        return stopWatch;
     }
 }

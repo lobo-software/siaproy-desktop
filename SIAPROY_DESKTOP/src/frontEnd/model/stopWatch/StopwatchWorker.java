@@ -32,6 +32,7 @@ package frontEnd.model.stopWatch;
  *
  * @author Lobo Software
  */
+import frontEnd.controller.SPPRYF12Controller;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import javafx.beans.property.BooleanProperty;
@@ -64,6 +65,7 @@ public class StopwatchWorker extends Task<Void> {
     private Stopwatch stopWatch;
     private final TextField tiempoFinal;
     private final StringProperty horaFinal = new SimpleStringProperty();
+    SPPRYF12Controller controller = new SPPRYF12Controller();
 
     @Override
     protected Void call() throws Exception {
@@ -73,6 +75,7 @@ public class StopwatchWorker extends Task<Void> {
             startTime = startDateTime;
         }
         while (!stop.getValue()) {
+            controller.running = true;
             stopDateTime = LocalDateTime.now();
             duration = Duration.between(startDateTime, stopDateTime);
             if (contador > 0) {
