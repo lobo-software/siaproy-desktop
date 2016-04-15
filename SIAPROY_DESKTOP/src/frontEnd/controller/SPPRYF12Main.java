@@ -23,6 +23,7 @@
  * Created on    : 08 abr 2016 10:22:36 AM
  * Author        : CCL
  * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos. 
+ 14/Apr/2016 17:11 SVA (LOBO_000076): Se elimina código comentado / se da formato al archivo.
  */
 package frontEnd.controller;
 
@@ -42,19 +43,12 @@ public class SPPRYF12Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/frontEnd/view/SPPRYF12View.fxml"));
-
         Scene scene = new Scene(root);
-
         stage.setScene(scene);
         stage.show();
     }
 
-//   StopWatch stopwatch =  new StopWatch();
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         launch(args);
     }
-
 }

@@ -39,24 +39,24 @@ import javafx.util.Callback;
  */
 public class SialCheckBoxCellFactory<E> {
 
-    private boolean multipleSelection;
-
+private boolean multipleSelection;
+    
     public Callback<Integer, ObservableValue<Boolean>> creaCheckBoxOneSelection(boolean multipleSelection, TableView<E> grid, BooleanProperty property) {
-        this.multipleSelection = multipleSelection;
+       this.multipleSelection = multipleSelection;
         Callback<Integer, ObservableValue<Boolean>> callBack;
         callBack = new Callback<Integer, ObservableValue<Boolean>>() {
 //
-            @Override
+     @Override
             public ObservableValue<Boolean> call(Integer param) {
 //                System.out.println("Cours " + grid.getItems().get(param).getActividad() + " changed value to " + grdActividades.getItems().get(param).getActivo());
                 if (!multipleSelection) {
                     //selecciona un checkbox
                 } else {
                     return property;
-                }
+                    }
 //                return grid.getItems().get(param);
                 return property;
-            }
+                }
         };
         return callBack;
     }
