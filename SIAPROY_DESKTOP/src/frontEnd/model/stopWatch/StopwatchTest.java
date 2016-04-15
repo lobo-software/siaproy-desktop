@@ -43,12 +43,13 @@ public class StopwatchTest extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Stopwatch");
-        TextField total, tiempoInicio;
+        TextField total, tiempoInicio, tiempoFinal;
         total = new TextField();
         tiempoInicio = new TextField();
-//        Stopwatch stopwatch = new Stopwatch(total, tiempoInicio);
+        tiempoFinal = new TextField();
+        Stopwatch stopwatch = new Stopwatch(total, tiempoInicio, tiempoFinal);
         StackPane root = new StackPane();
-//        root.getChildren().add(stopwatch);
+        root.getChildren().add(stopwatch);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
 }

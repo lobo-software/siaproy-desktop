@@ -24,6 +24,8 @@
  * Author        : CCL
  * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos. 
  14/Apr/2016 17:11 SVA (LOBO_000076): Se elimina código comentado / se da formato al archivo.
+ 14/Apr/2016 15:16 CCL (LOBO_000076): Se añade una validación para cerrar ventana principalcon el atert mandanla llamar desde el   SPPRYF12Controller....
+
  */
 package frontEnd.controller;
 
@@ -45,6 +47,12 @@ public class SPPRYF12Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/frontEnd/view/SPPRYF12View.fxml"));
         Scene scene = new Scene(root);
         stage.setScene(scene);
+        stage.setOnCloseRequest(e -> {
+            if (SPPRYF12Controller.getBanderaEjecucion()) {
+                e.consume();
+            }
+            SPPRYF12Controller.cierraAplicacion(stage);
+        });
         stage.show();
     }
 

@@ -25,6 +25,7 @@
    Modifications : 13/Apr/2016 10:44 CCL (LOBO_000076): Se se añaden la funcionalidad a los 
                    a las  variables que haran la impresion de informacoón dentrodel los TextFields en pantalla.
                    14/Apr/2016 10:44 CCL(LOBO_000076):Se elimina codigo inecesario y espacios en blacon,por último se da formatoalcódigo.
+ 15/Apr/2016 13:24 CCL(LOBO_000076):Se eliminaron objetos innecesarios en la clase.
  */
 package frontEnd.model.stopWatch;
 
@@ -32,6 +33,7 @@ package frontEnd.model.stopWatch;
  *
  * @author Lobo Software
  */
+import frontEnd.controller.SPPRYF12Controller;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import javafx.beans.property.BooleanProperty;
