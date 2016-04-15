@@ -23,65 +23,64 @@
  * Created on    : 08 abr 2016 10:23:09 AM
  * Author        : CCL
  * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos. 
-                   14/Apr/2016 09:53 CCL (LOBO_000076): Se elimina espaciocios innecesarios y codigoinnecesario.               
+                   14/Apr/2016 09:53 CCL (LOBO_000076): Se elimina espaciocios innecesarios y codigoinnecesario.
+14/Apr/2016 17:00 SVA (LOBO_000076): Se cambia el tipo de dato en las propiedades del modelo / se da formato y restructuración de métodos en el archivo.
  */
 package frontEnd.model;
-
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 
 /**
  *
  * @author Lobo Software
  */
 public class Actividades {
-    private final SimpleObjectProperty<Typ> proyecto;
-    private final SimpleObjectProperty<Typ> actividad;
-//    private String botonInicio;
+
+    private String proyecto;
+    private String actividad;
     private String tiempo;
     private String descripcion;
     private String avance;
     private String Fecha;
 
     //Se inicia con el modelado de datos
-    public Actividades(Typ proyecto, Typ actividad, String tiempo, String descripcion, String avance) {
-        this.proyecto = new SimpleObjectProperty(proyecto);
-        this.actividad = new SimpleObjectProperty(actividad);
+    public Actividades() {
+        this.proyecto = "";
+        this.actividad = "";
+        this.tiempo = "";
+        this.descripcion = "";
+        this.avance = "";
+
+    }
+
+    public Actividades(String proyecto, String actividad, String tiempo, String descripcion, String avance) {
+        this.proyecto = proyecto;
+        this.actividad = actividad;
         this.tiempo = tiempo;
         this.descripcion = descripcion;
         this.avance = avance;
     }
 
-    public Typ getTypProyecto() {
-        return proyecto.get();
+    public void setProyecto(String proyecto) {
+        this.proyecto = proyecto;
     }
 
-    public void setTypProyecto(Typ proyecto) {
-        this.proyecto.set(proyecto);
-    }
-
-    public ObjectProperty<Typ> getProyectoProperty() {
+    public String getProyecto() {
         return proyecto;
     }
 
-    public Typ getTypActividad() {
-        return actividad.get();
+    public void setActividad(String actividad) {
+        this.actividad = actividad;
     }
 
-    public void setTypActividad(Typ actividad) {
-        this.actividad.set(actividad);
-    }
-
-    public ObjectProperty<Typ> getActividadProperty() {
+    public String getActividad() {
         return actividad;
-    }
-
-    public String getTiempo() {
-        return tiempo;
     }
 
     public void setTiempo(String tiempo) {
         this.tiempo = tiempo;
+    }
+
+    public String getTiempo() {
+        return tiempo;
     }
 
     public void setDescripcion(String descripcion) {
@@ -92,12 +91,11 @@ public class Actividades {
         return descripcion;
     }
 
-    public void setPorcentajeAvance(String avance) {
+    public void setAvance(String avance) {
         this.avance = avance;
     }
 
     public String getAvance() {
         return avance;
-
     }
 }
