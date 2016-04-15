@@ -28,42 +28,20 @@
  */
 package frontEnd.model;
 
-<<<<<<< HEAD
-import frontEnd.model.stopWatch.Stopwatch;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-
-=======
->>>>>>> refs/remotes/origin/master
 /**
  *
  * @author Lobo Software
  */
 public class Actividades {
-<<<<<<< HEAD
-    private  SimpleObjectProperty<Typ> proyecto;
-    private  SimpleObjectProperty<Typ> actividad;
-    private Stopwatch stopWatch;
-=======
 
     private String proyecto;
     private String actividad;
->>>>>>> refs/remotes/origin/master
     private String tiempo;
     private String descripcion;
     private String avance;
     private String Fecha;
 
-    public Actividades(){
-    }
-    
     //Se inicia con el modelado de datos
-<<<<<<< HEAD
-    public Actividades(Stopwatch stopWatch, Typ proyecto, Typ actividad, String tiempo, String descripcion, String avance) {
-        this.stopWatch = stopWatch;
-        this.proyecto = new SimpleObjectProperty(proyecto);
-        this.actividad = new SimpleObjectProperty(actividad);
-=======
     public Actividades() {
         this.proyecto = "";
         this.actividad = "";
@@ -76,7 +54,6 @@ public class Actividades {
     public Actividades(String proyecto, String actividad, String tiempo, String descripcion, String avance) {
         this.proyecto = proyecto;
         this.actividad = actividad;
->>>>>>> refs/remotes/origin/master
         this.tiempo = tiempo;
         this.descripcion = descripcion;
         this.avance = avance;
@@ -120,9 +97,5 @@ public class Actividades {
 
     public String getAvance() {
         return avance;
-    }
-    
-    public Stopwatch getStopWatch(){
-        return stopWatch;
     }
 }
