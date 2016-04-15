@@ -24,7 +24,8 @@
  * Author        : SVA
    Modifications : 14/Apr/2016 13:44 CCL (LOBO_000076): Se eliminan librerías inicesarias, se comentaron unos segmentos de código}
                   para saber  exactamente  donde se realizaronmodificaciones al momento de la integración del StopWatch, se eliminó espacio }
-                  inecesario así como librerías no usadas dentro  de la clase.                                    
+                  inecesario así como librerías no usadas dentro  de la clase.    
+ 15/Apr/2016 13:44 CCL (LOBO_000076): Se incluye  la llamada al controller para establecer bandera en ciere de aplicación.
  */
 package frontEnd.model.stopWatch;
 
@@ -75,6 +76,7 @@ public class Stopwatch extends Region {
         this.getChildren().add(vBox);
         startStop.setOnAction(arg0 -> {
             if (currentStatus == StopWatchStatus.STOPPED) {
+                SPPRYF12Controller.setBanderaEjecucion(true);
                 AwesomeDude.setIcon(startStop, AwesomeIcon.STOP);
                 currentStatus = StopWatchStatus.RUNNING;
                 ///Se añaden parametros dentro constructor stpoWatchWorker como los textfield los cuales muestran dentro de la vista la información del tiempo....
@@ -87,7 +89,7 @@ public class Stopwatch extends Region {
                 return;
             }
             if (currentStatus == StopWatchStatus.RUNNING) {
-//                controller.running= true;
+                SPPRYF12Controller.setBanderaEjecucion(false);
                 AwesomeDude.setIcon(startStop, AwesomeIcon.PLAY);
                 currentTime = stopWatchWorker.stop();
                 startTime = stopWatchWorker.getStartTime();

@@ -25,6 +25,7 @@
    Modifications : 13/Apr/2016 10:44 CCL (LOBO_000076): Se se añaden la funcionalidad a los 
                    a las  variables que haran la impresion de informacoón dentrodel los TextFields en pantalla.
                    14/Apr/2016 10:44 CCL(LOBO_000076):Se elimina codigo inecesario y espacios en blacon,por último se da formatoalcódigo.
+ 15/Apr/2016 13:24 CCL(LOBO_000076):Se eliminaron objetos innecesarios en la clase.
  */
 package frontEnd.model.stopWatch;
 
@@ -65,7 +66,6 @@ public class StopwatchWorker extends Task<Void> {
     private Stopwatch stopWatch;
     private final TextField tiempoFinal;
     private final StringProperty horaFinal = new SimpleStringProperty();
-    SPPRYF12Controller controller = new SPPRYF12Controller();
 
     @Override
     protected Void call() throws Exception {
@@ -75,7 +75,6 @@ public class StopwatchWorker extends Task<Void> {
             startTime = startDateTime;
         }
         while (!stop.getValue()) {
-            controller.running = true;
             stopDateTime = LocalDateTime.now();
             duration = Duration.between(startDateTime, stopDateTime);
             if (contador > 0) {

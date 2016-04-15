@@ -28,7 +28,8 @@
    14/Apr/2016 09:55 CCl(LOBO_000076: Se agraga funcionalidad al boton que contine el Stopwatch  dentro de este Controller se manda llamar la misma Clase Sw.
    14/Apr/2016 09:55 CCL(LOBO_000076):Se da formato a este dcomunto.
    14/Apr/2016 17:11 SVA (LOBO_000076): Se añade funcionalidad con clases genéricas para la edición del TableView / Se restructura el archivo
- 
+   15/Apr/2016 01:03 CCL (LOBO_000076): Se añade funcionalidad para cerrar la ventana principal con creando un alert al mismo.
+
  */
 package frontEnd.controller;
 
@@ -57,9 +58,13 @@ import frontEnd.model.Actividades;
 import frontEnd.model.stopWatch.Stopwatch;
 import frontEnd.util.SialComboCellFactory;
 import frontEnd.util.SialStringCellFactory;
+import java.util.Optional;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 /**
  *
@@ -105,6 +110,7 @@ public class SPPRYF12Controller implements Initializable {
     private ObservableList<String> datosComboProyecto;
     private ObservableList<String> datosComboActividades;
     private final Font fuenteReloj = Font.loadFont(Stopwatch.class.getResource("digital-7_mono.ttf").toExternalForm(), 24);
+    private static boolean running;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -161,7 +167,6 @@ public class SPPRYF12Controller implements Initializable {
 
             System.out.println("Carga combo secundario (parametro):" + proyecto);
         });
-
         colTiempo.setCellValueFactory(new PropertyValueFactory<>("tiempo"));
         colDescripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         colDescripcion.setCellFactory(textFieldCell.creaTextField());
@@ -180,6 +185,7 @@ public class SPPRYF12Controller implements Initializable {
                     .get(t.getTablePosition().getRow()))
                     .setAvance(t.getNewValue());
                 });
+        colTimer.setCellValueFactory(new PropertyValueFactory<>("stopWatch"));
         //Carga de registros de actividades
         grdActividades.setItems(cargaRegistrosExistentes());
     }
@@ -198,11 +204,32 @@ public class SPPRYF12Controller implements Initializable {
 
     public ObservableList<Actividades> cargaRegistrosExistentes() {
         ObservableList<Actividades> registros = FXCollections.observableArrayList();
-        registros.add(new Actividades("DMS_2014", "INVESTIGACION", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades("DMS_2014", "REUNIÓN DE ESTÁNDARES", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades("DMS_2015", "APOYO AL EQUIPO DE TRABAJO", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades("DMS_2016", "DOCUMENTACIÓN", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
+        registros.add(new Actividades(new Stopwatch(tfTotal, tftiempoInicio, tfFinActividad), "DMS_2014", "INVESTIGACION", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
+        registros.add(new Actividades(new Stopwatch(tfTotal, tftiempoInicio, tfFinActividad), "DMS_2014", "REUNIÓN DE ESTÁNDARES", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
+        registros.add(new Actividades(new Stopwatch(tfTotal, tftiempoInicio, tfFinActividad), "DMS_2015", "APOYO AL EQUIPO DE TRABAJO", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
+        registros.add(new Actividades(new Stopwatch(tfTotal, tftiempoInicio, tfFinActividad), "DMS_2016", "DOCUMENTACIÓN", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
 
         return registros;
+    }
+    
+    public static void setBanderaEjecucion(boolean bandera) {
+        running = bandera;
+    }
+    public static boolean getBanderaEjecucion() {
+        return running;
+    }
+
+    public static void cierraAplicacion(Stage primaryStage) {
+        if (running) {
+            Alert ventana = new Alert(Alert.AlertType.CONFIRMATION);
+            ventana.setTitle("SPPRYF12");
+            ventana.setHeaderText("CERRAR APLICACIÓN");
+            ventana.setContentText("Existe una actividad en ejecución. Si continúa perderá los cambios realizados. ¿Desea continuar?");
+            Optional<ButtonType> seleccion = ventana.showAndWait();
+            if (seleccion.get() == ButtonType.OK) {
+                primaryStage.close();
+            }
+            ventana.close();
+        }
     }
 }
