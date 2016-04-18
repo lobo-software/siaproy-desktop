@@ -26,6 +26,7 @@
                    14/Apr/2016 09:53 CCL (LOBO_000076): Se elimina espaciocios innecesarios y codigoinnecesario.
 14/Apr/2016 17:00 SVA (LOBO_000076): Se cambia el tipo de dato en las propiedades del modelo / se da formato y restructuración de métodos en el archivo.
 15/Apr/2016 13:25 CCL(LOBO_000076):Se cambió el tipo de dato así como los setters y getters de la variable tiempo / se añade la propiedad Stopwatch al modelo.
+16/Apr/2016 11:40 SVA (LOBO_000076):  Se da formato al archivo y se elimina el parámetro de tipo Stopwatch en el constructor.
 
 
  */
@@ -61,13 +62,13 @@ public class Actividades {
 
     }
 
-    public Actividades(Stopwatch stopWatch, String proyecto, String actividad, String tiempo, String descripcion, String avance) {
+    public Actividades(String proyecto, String actividad, String tiempo, String descripcion, String avance) {
         this.proyecto = proyecto;
         this.actividad = actividad;
         this.tiempo = new SimpleStringProperty(tiempo);
         this.descripcion = descripcion;
         this.avance = avance;
-          this.stopWatch = new SimpleObjectProperty(stopWatch);
+        this.stopWatch = new SimpleObjectProperty(stopWatch);
     }
 
     public void setProyecto(String proyecto) {
@@ -93,8 +94,8 @@ public class Actividades {
     public String getTiempo() {
         return tiempo.get();
     }
-    
-    public StringProperty tiempoProperty(){
+
+    public StringProperty tiempoProperty() {
         return tiempo;
     }
 
@@ -113,15 +114,16 @@ public class Actividades {
     public String getAvance() {
         return avance;
     }
-    
-    public void setStopWatch(Stopwatch stopWatch){
+
+    public void setStopWatch(Stopwatch stopWatch) {
         this.stopWatch.set(stopWatch);
     }
-    public Stopwatch getStopWatch(){
+
+    public Stopwatch getStopWatch() {
         return stopWatch.get();
     }
-    
-    public ObjectProperty<Stopwatch> stopWatchProperty(){
+
+    public ObjectProperty<Stopwatch> stopWatchProperty() {
         return stopWatch;
     }
 }
