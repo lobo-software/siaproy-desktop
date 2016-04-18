@@ -29,6 +29,7 @@
    14/Apr/2016 09:55 CCL(LOBO_000076):Se da formato a este dcomunto.
    14/Apr/2016 17:11 SVA (LOBO_000076): Se añade funcionalidad con clases genéricas para la edición del TableView / Se restructura el archivo
    15/Apr/2016 01:03 CCL (LOBO_000076): Se añade funcionalidad para cerrar la ventana principal con creando un alert al mismo.
+   16/Apr/2016 11:30 SVA (LOBO_000076):  Se crea objeto del tipo SialStopWatchCellFactory, usado en la renderización de la columna timer.
 
  */
 package frontEnd.controller;
@@ -57,6 +58,7 @@ import javafx.scene.layout.BorderPane;
 import frontEnd.model.Actividades;
 import frontEnd.model.stopWatch.Stopwatch;
 import frontEnd.util.SialComboCellFactory;
+import frontEnd.util.SialStopWatchCellFactory;
 import frontEnd.util.SialStringCellFactory;
 import java.util.Optional;
 import javafx.scene.control.Alert;
@@ -110,7 +112,8 @@ public class SPPRYF12Controller implements Initializable {
     private ObservableList<String> datosComboProyecto;
     private ObservableList<String> datosComboActividades;
     private final Font fuenteReloj = Font.loadFont(Stopwatch.class.getResource("digital-7_mono.ttf").toExternalForm(), 24);
-    private static boolean running;
+    private static boolean running, runningSelectedTimer;
+    private static long contadorSelectedTimer, contador = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -146,6 +149,10 @@ public class SPPRYF12Controller implements Initializable {
 
         SialStringCellFactory<Actividades, String> textFieldCell = new SialStringCellFactory<>();
         SialComboCellFactory<Actividades, String> comboBoxCell = new SialComboCellFactory<>();
+        SialStopWatchCellFactory<Actividades, Boolean> timerCell = new SialStopWatchCellFactory<>();
+
+        colTimer.setCellValueFactory(new PropertyValueFactory<>("stopWatch"));
+        colTimer.setCellFactory(timerCell.creaTimer(tfTotal, tftiempoInicio, tfFinActividad));
         colProyecto.setCellValueFactory(new PropertyValueFactory<>("proyecto"));
         colProyecto.setCellFactory(comboBoxCell.creaComboBox(datosComboProyecto));
         colProyecto.setOnEditCommit(
@@ -185,7 +192,6 @@ public class SPPRYF12Controller implements Initializable {
                     .get(t.getTablePosition().getRow()))
                     .setAvance(t.getNewValue());
                 });
-        colTimer.setCellValueFactory(new PropertyValueFactory<>("stopWatch"));
         //Carga de registros de actividades
         grdActividades.setItems(cargaRegistrosExistentes());
     }
@@ -204,17 +210,18 @@ public class SPPRYF12Controller implements Initializable {
 
     public ObservableList<Actividades> cargaRegistrosExistentes() {
         ObservableList<Actividades> registros = FXCollections.observableArrayList();
-        registros.add(new Actividades(new Stopwatch(tfTotal, tftiempoInicio, tfFinActividad), "DMS_2014", "INVESTIGACION", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades(new Stopwatch(tfTotal, tftiempoInicio, tfFinActividad), "DMS_2014", "REUNIÓN DE ESTÁNDARES", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades(new Stopwatch(tfTotal, tftiempoInicio, tfFinActividad), "DMS_2015", "APOYO AL EQUIPO DE TRABAJO", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades(new Stopwatch(tfTotal, tftiempoInicio, tfFinActividad), "DMS_2016", "DOCUMENTACIÓN", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
+        registros.add(new Actividades("DMS_2014", "INVESTIGACION", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
+        registros.add(new Actividades("DMS_2014", "REUNIÓN DE ESTÁNDARES", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
+        registros.add(new Actividades("DMS_2015", "APOYO AL EQUIPO DE TRABAJO", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
+        registros.add(new Actividades("DMS_2016", "DOCUMENTACIÓN", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
 
         return registros;
     }
-    
+
     public static void setBanderaEjecucion(boolean bandera) {
         running = bandera;
     }
+
     public static boolean getBanderaEjecucion() {
         return running;
     }
@@ -231,5 +238,30 @@ public class SPPRYF12Controller implements Initializable {
             }
             ventana.close();
         }
+    }
+
+    public static long getContador() {
+        return contador;
+    }
+
+    public static long getContadorSelectedTimer() {
+        return contadorSelectedTimer;
+    }
+
+    public static void incrementaContadorSelectedTimer() {
+        contadorSelectedTimer++;
+        contador++;
+    }
+
+    public static void decrementaContadorSelectedTimer() {
+        contadorSelectedTimer--;
+    }
+
+    public static void setBanderaSelectedTimer(boolean bandera) {
+        runningSelectedTimer = bandera;
+    }
+
+    public static boolean getBanderaSelectedTimer() {
+        return runningSelectedTimer;
     }
 }
