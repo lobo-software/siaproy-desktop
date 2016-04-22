@@ -44,31 +44,49 @@ import javafx.beans.property.StringProperty;
  */
 public class Actividades {
 
+    private final SimpleObjectProperty<Stopwatch> stopWatch;
     private String proyecto;
     private String actividad;
-    private SimpleStringProperty tiempo;
-    private String descripcion;
+    private final SimpleStringProperty tiempoTotal;
+    private final SimpleStringProperty tiempoInicio;
+    private final SimpleStringProperty tiempoFin;
+    private SimpleStringProperty descripcion;
     private String avance;
-    private String Fecha;
-    private SimpleObjectProperty<Stopwatch> stopWatch;
 
     //Se inicia con el modelado de datos
     public Actividades() {
+        this.stopWatch = new SimpleObjectProperty();
         this.proyecto = "";
         this.actividad = "";
-        this.tiempo = new SimpleStringProperty("");
-        this.descripcion = "";
+        this.tiempoTotal = new SimpleStringProperty("");
+        this.tiempoInicio = new SimpleStringProperty("");
+        this.tiempoFin = new SimpleStringProperty("");
+        this.descripcion = new SimpleStringProperty("");
         this.avance = "";
 
     }
 
-    public Actividades(String proyecto, String actividad, String tiempo, String descripcion, String avance) {
+    public Actividades(Stopwatch stopWatch, String proyecto, String actividad, String tiempoTotal, String tiempoInicio, String tiempoFin, String descripcion, String avance) {
+        this.stopWatch = new SimpleObjectProperty(stopWatch);
         this.proyecto = proyecto;
         this.actividad = actividad;
-        this.tiempo = new SimpleStringProperty(tiempo);
-        this.descripcion = descripcion;
+        this.tiempoTotal = new SimpleStringProperty(tiempoTotal);
+        this.tiempoInicio = new SimpleStringProperty(tiempoInicio);
+        this.tiempoFin = new SimpleStringProperty(tiempoFin);
+        this.descripcion = new SimpleStringProperty(descripcion);
         this.avance = avance;
-        this.stopWatch = new SimpleObjectProperty(stopWatch);
+    }
+
+    public void setStopWatch(Stopwatch stopWatch) {
+        this.stopWatch.set(stopWatch);
+    }
+
+    public Stopwatch getStopWatch() {
+        return stopWatch.get();
+    }
+
+    public ObjectProperty<Stopwatch> stopWatchProperty() {
+        return stopWatch;
     }
 
     public void setProyecto(String proyecto) {
@@ -87,23 +105,51 @@ public class Actividades {
         return actividad;
     }
 
-    public void setTiempo(String tiempo) {
-        this.tiempo.set(avance);
+    public void setTiempoTotal(String tiempoTotal) {
+        this.tiempoTotal.set(tiempoTotal);
     }
 
-    public String getTiempo() {
-        return tiempo.get();
+    public String getTiempoTotal() {
+        return tiempoTotal.get();
     }
 
-    public StringProperty tiempoProperty() {
-        return tiempo;
+    public StringProperty tiempoTotalProperty() {
+        return tiempoTotal;
+    }
+
+    public void setTiempoInicio(String tiempoInicio) {
+        this.tiempoInicio.set(tiempoInicio);
+    }
+
+    public String getTiempoInicio() {
+        return tiempoInicio.get();
+    }
+
+    public StringProperty tiempoInicioProperty() {
+        return tiempoInicio;
+    }
+
+    public void setTiempoFin(String tiempoFinal) {
+        this.tiempoFin.set(tiempoFinal);
+    }
+
+    public String getTiempoFin() {
+        return tiempoFin.get();
+    }
+
+    public StringProperty tiempoFinProperty() {
+        return tiempoFin;
     }
 
     public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+        this.descripcion.set(descripcion);
     }
 
     public String getDescripcion() {
+        return descripcion.get();
+    }
+    
+    public StringProperty descripcionProperty(){
         return descripcion;
     }
 
@@ -113,17 +159,5 @@ public class Actividades {
 
     public String getAvance() {
         return avance;
-    }
-
-    public void setStopWatch(Stopwatch stopWatch) {
-        this.stopWatch.set(stopWatch);
-    }
-
-    public Stopwatch getStopWatch() {
-        return stopWatch.get();
-    }
-
-    public ObjectProperty<Stopwatch> stopWatchProperty() {
-        return stopWatch;
     }
 }

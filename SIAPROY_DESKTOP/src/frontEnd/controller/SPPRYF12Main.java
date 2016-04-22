@@ -24,7 +24,8 @@
  * Author        : CCL
  * Modifications : 08/Apr/2016 18:44 CCL (LOBO_000076): Se añaden cabeceras de licencia a los archivos. 
  14/Apr/2016 17:11 SVA (LOBO_000076): Se elimina código comentado / se da formato al archivo.
- 14/Apr/2016 15:16 CCL (LOBO_000076): Se añade una validación para cerrar ventana principalcon el atert mandanla llamar desde el   SPPRYF12Controller....
+ 14/Apr/2016 15:16 CCL (LOBO_000076): Se añade una validación para cerrar ventana principal con el atert mandanla llamar desde el   SPPRYF12Controller....
+ 22/Apr/2016 15:36 CCL (LOBO_000076): Se cambia el nombre del método cierraAplicación por alertActividades.
 
  */
 package frontEnd.controller;
@@ -51,8 +52,9 @@ public class SPPRYF12Main extends Application {
             if (SPPRYF12Controller.getBanderaEjecucion()) {
                 e.consume();
             }
-            SPPRYF12Controller.cierraAplicacion(stage);
+            SPPRYF12Controller.alertActividades(stage, "SPPRYF12", "CERRAR APLICACIÓN", 0);
         });
+        SPPRYF12Controller.setPrimaryStage(stage);
         stage.show();
     }
 

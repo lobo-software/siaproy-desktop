@@ -29,7 +29,8 @@
    14/Apr/2016 09:55 CCL(LOBO_000076):Se da formato a este dcomunto.
    14/Apr/2016 17:11 SVA (LOBO_000076): Se añade funcionalidad con clases genéricas para la edición del TableView / Se restructura el archivo
    15/Apr/2016 01:03 CCL (LOBO_000076): Se añade funcionalidad para cerrar la ventana principal con creando un alert al mismo.
-   16/Apr/2016 11:30 SVA (LOBO_000076):  Se crea objeto del tipo SialStopWatchCellFactory, usado en la renderización de la columna timer.
+   22/Apr/2016 01:17 CCL (LOBO_000076): Se siguen añadiendo funcionalidades a los componentes de la vista y se eliminó cógio inesesario.
+   
 
  */
 package frontEnd.controller;
@@ -60,7 +61,11 @@ import frontEnd.model.stopWatch.Stopwatch;
 import frontEnd.util.SialComboCellFactory;
 import frontEnd.util.SialStopWatchCellFactory;
 import frontEnd.util.SialStringCellFactory;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -93,46 +98,66 @@ public class SPPRYF12Controller implements Initializable {
     @FXML
     private TableColumn<Actividades, String> colDescripcion;
     @FXML
-    private TextField tfTotal;
+    private TableColumn<Actividades, String> colInicio;
     @FXML
-    private TextField tftiempoInicio;
+    private TableColumn<Actividades, String> colFin;
     @FXML
-    private TextField tfFinActividad;
+    private TextField tfTiempoTotal;
+    @FXML
+    private TextField tfTiempoInicio;
+    @FXML
+    private TextField tfTiempoFin;
     @FXML
     private TableColumn<Actividades, String> colAvance;
     @FXML
-    private TextField tfMostrarDescripcion;
+    private TextField tfDescripcion;
     @FXML
     private Button btnStarStop;
     @FXML
-    private Button btnAgragarAtividad;
+    private Button btnAgregarActividad;
     @FXML
-    private HBox hboxBotonPlayAgregar;
+    private Label lbTotalRegistros;
+    @FXML
+    private Label lbTiempoTotal;
     // VARIABLES 
     private ObservableList<String> datosComboProyecto;
     private ObservableList<String> datosComboActividades;
     private final Font fuenteReloj = Font.loadFont(Stopwatch.class.getResource("digital-7_mono.ttf").toExternalForm(), 24);
-    private static boolean running, runningSelectedTimer;
-    private static long contadorSelectedTimer, contador = 0;
+    private static boolean running;
+    private static TableView<Actividades> grid;
+    private static int posicionTimer;
+    private static Stage primaryStage;
+    public static DatePicker datePicker;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        tfTotal.setText("00:00:00");
-        tfTotal.setFont(fuenteReloj);
-        tftiempoInicio.setText("00:00:00");
-        tftiempoInicio.setFont(fuenteReloj);
-        tfFinActividad.setText("00:00:00");
-        tfFinActividad.setFont(fuenteReloj);
+        tfTiempoTotal.setText("00:00:00");
+        tfTiempoTotal.setFont(fuenteReloj);
+        tfTiempoInicio.setText("00:00:00");
+        tfTiempoInicio.setFont(fuenteReloj);
+        tfTiempoFin.setText("00:00:00");
+        tfTiempoFin.setFont(fuenteReloj);
         AwesomeDude.setIcon(btnStarStop, AwesomeIcon.PLAY);
-        Stopwatch stopWatch = new Stopwatch(tfTotal, tftiempoInicio, tfFinActividad);
-        stopWatch.startStop.setMinWidth(61);
-        stopWatch.startStop.setMinHeight(65);
-        hboxBotonPlayAgregar.getChildren().removeAll(btnStarStop, btnAgragarAtividad);
-        hboxBotonPlayAgregar.getChildren().addAll(stopWatch, btnAgragarAtividad);
+//        Stopwatch stopWatch = new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin);
+        btnStarStop.setMinWidth(61);
+        btnStarStop.setMinHeight(65);
+//        hboxBotonPlayAgregar.getChildren().removeAll(btnStarStop, btnAgragarAtividad);
+//        hboxBotonPlayAgregar.getChildren().addAll(stopWatch, btnAgragarAtividad);
         dtfFechaActual.setValue(LocalDate.now());
         DatePickerSkin datePickerSkin = new DatePickerSkin((dtfFechaActual));
         Node popupContent = datePickerSkin.getPopupContent();
         layoutSecundario.setRight(popupContent);
+        datePicker = dtfFechaActual;
+        dtfFechaActual.valueProperty().addListener((ov, oldValue, newValue) -> {
+            System.out.println("consulta actividades");
+//            if (contadorCambioDia == 0) {
+//                SPPRYF12Controller.oldValue = oldValue;
+//                SPPRYF12Controller.newValue = newValue;
+//                this.cambioDia();
+//            } else {
+//                contadorCambioDia = 0;
+//            }
+        });
         muestraFecha();
         //Store proyectos
         datosComboProyecto
@@ -152,7 +177,7 @@ public class SPPRYF12Controller implements Initializable {
         SialStopWatchCellFactory<Actividades, Boolean> timerCell = new SialStopWatchCellFactory<>();
 
         colTimer.setCellValueFactory(new PropertyValueFactory<>("stopWatch"));
-        colTimer.setCellFactory(timerCell.creaTimer(tfTotal, tftiempoInicio, tfFinActividad));
+//        colTimer.setCellFactory(timerCell.creaTimer(tfTotal, tftiempoInicio, tfTiempoFin));
         colProyecto.setCellValueFactory(new PropertyValueFactory<>("proyecto"));
         colProyecto.setCellFactory(comboBoxCell.creaComboBox(datosComboProyecto));
         colProyecto.setOnEditCommit(
@@ -174,7 +199,9 @@ public class SPPRYF12Controller implements Initializable {
 
             System.out.println("Carga combo secundario (parametro):" + proyecto);
         });
-        colTiempo.setCellValueFactory(new PropertyValueFactory<>("tiempo"));
+        colTiempo.setCellValueFactory(new PropertyValueFactory<>("tiempoTotal"));
+        colInicio.setCellValueFactory(new PropertyValueFactory<>("tiempoInicio"));
+        colFin.setCellValueFactory(new PropertyValueFactory<>("tiempoFin"));
         colDescripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         colDescripcion.setCellFactory(textFieldCell.creaTextField());
         colDescripcion.setOnEditCommit(
@@ -182,6 +209,7 @@ public class SPPRYF12Controller implements Initializable {
                     ((Actividades) t.getTableView().getItems()
                     .get(t.getTablePosition().getRow()))
                     .setDescripcion(t.getNewValue());
+
                 });
 
         colAvance.setCellValueFactory(new PropertyValueFactory<>("avance"));
@@ -193,7 +221,14 @@ public class SPPRYF12Controller implements Initializable {
                     .setAvance(t.getNewValue());
                 });
         //Carga de registros de actividades
+        grid = grdActividades;
         grdActividades.setItems(cargaRegistrosExistentes());
+        grdActividades.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            public void changed(ObservableValue muestra, Object valorViejo, Object valorNuevo) {
+                muestraInfActividades();
+            }
+        });
+        setTotalRegistros();
     }
 
     public void muestraFecha() {
@@ -201,21 +236,20 @@ public class SPPRYF12Controller implements Initializable {
         String fechaFormateada;
         LocalDate fechaActual = dtfFechaActual.getValue();
         fechaFormateada = sdf.format(Date.from(fechaActual.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        lbFecha.setText(fechaFormateada);
-    }
-
-    public void muestraActividadesRegistradas() {
-        ObservableList<Actividades> muestraInfoActividad = grdActividades.getSelectionModel().getSelectedItems();
+        lbFecha.setText(fechaFormateada.toUpperCase());
     }
 
     public ObservableList<Actividades> cargaRegistrosExistentes() {
         ObservableList<Actividades> registros = FXCollections.observableArrayList();
-        registros.add(new Actividades("DMS_2014", "INVESTIGACION", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades("DMS_2014", "REUNIÓN DE ESTÁNDARES", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades("DMS_2015", "APOYO AL EQUIPO DE TRABAJO", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-        registros.add(new Actividades("DMS_2016", "DOCUMENTACIÓN", "00:10:00", "CAPTURA ACTIVIDADES 06/ABR/2016", "100"));
-
+        registros.add(new Actividades(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin), "DMS_2014", "INVESTIGACION", "02:10:00", "09:05:00", "11:15:00", "INVESTIGACION JAVAFX", "100"));
+        registros.add(new Actividades(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin), "DMS_2014", "REUNIÓN DE ESTÁNDARES", "01:05:00", "11:16:00", "12:21:00", "REUNION DMS", "100"));
+        registros.add(new Actividades(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin), "DMS_2015", "APOYO AL EQUIPO DE TRABAJO", "04:20:00", "12:22:00", "16:42:00", "APOYO A SVA", "100"));
+        registros.add(new Actividades(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin), "DMS_2016", "DOCUMENTACIÓN", "00:10:00", "16:43:00", "16:53:00", "REALIZACION DE MANUALES", "100"));
         return registros;
+    }
+
+    public static void setPrimaryStage(Stage primaryStage) {
+        SPPRYF12Controller.primaryStage = primaryStage;
     }
 
     public static void setBanderaEjecucion(boolean bandera) {
@@ -226,42 +260,111 @@ public class SPPRYF12Controller implements Initializable {
         return running;
     }
 
-    public static void cierraAplicacion(Stage primaryStage) {
+    public static void alertActividades(Stage primaryStage, String title, String headerText, int operacion) {
         if (running) {
             Alert ventana = new Alert(Alert.AlertType.CONFIRMATION);
-            ventana.setTitle("SPPRYF12");
-            ventana.setHeaderText("CERRAR APLICACIÓN");
+            ventana.setTitle(title);
+            ventana.setHeaderText(headerText);
             ventana.setContentText("Existe una actividad en ejecución. Si continúa perderá los cambios realizados. ¿Desea continuar?");
+//            if (oldValue != null) {
+//                contadorCambioDia++;
+//                datePicker.setValue(oldValue);
+//            }
             Optional<ButtonType> seleccion = ventana.showAndWait();
             if (seleccion.get() == ButtonType.OK) {
-                primaryStage.close();
+                if (operacion == 0) {//cerrar ventana
+                    primaryStage.close();
+                } else if (operacion == 1) {//eliminar registro
+                    eliminaActividadesAction(grid.getItems(), grid.getSelectionModel().getSelectedItems());
+                }
+//                else if (operacion == 2) { //cambiar dia
+//                    cambioDiaAction(grid.getItems(), grid.getSelectionModel().getSelectedItems());
+//                    System.out.println("Descarta cambios de: " + oldValue + " Consulta actividades dia: " + newValue);
+//                }
             }
             ventana.close();
         }
     }
 
-    public static long getContador() {
-        return contador;
+    public static TableView<Actividades> getTableView() {
+        return grid;
     }
 
-    public static long getContadorSelectedTimer() {
-        return contadorSelectedTimer;
+    public static void setPosicionTimer(int posicion) {
+        posicionTimer = posicion;
     }
 
-    public static void incrementaContadorSelectedTimer() {
-        contadorSelectedTimer++;
-        contador++;
+    public static int getPosicionTimer() {
+        return posicionTimer;
     }
 
-    public static void decrementaContadorSelectedTimer() {
-        contadorSelectedTimer--;
+    public void agregaActividades() {
+        Actividades actividades = new Actividades();
+        actividades.setStopWatch(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin));
+        actividades.setDescripcion(tfDescripcion.getText());
+        actividades.setTiempoTotal("00:00:00");
+        actividades.setTiempoInicio("00:00:00");
+        actividades.setTiempoFin("00:00:00");
+        if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
+            grdActividades.getSelectionModel().getSelectedItem().getStopWatch().startStop.fire();
+        }
+        grdActividades.getItems().add(0, actividades);
+        actividades.getStopWatch().startStop.fire();
+        setTotalRegistros();
+
     }
 
-    public static void setBanderaSelectedTimer(boolean bandera) {
-        runningSelectedTimer = bandera;
+    public void muestraInfActividades() {
+        ObservableList<Actividades> muestraInfo = grid.getSelectionModel().getSelectedItems();
+        tfDescripcion.textProperty().bind(muestraInfo.get(0).descripcionProperty());
+        tfTiempoTotal.textProperty().bind(muestraInfo.get(0).tiempoTotalProperty());
+        tfTiempoInicio.textProperty().bind(muestraInfo.get(0).tiempoInicioProperty());
+        tfTiempoFin.textProperty().bind(muestraInfo.get(0).tiempoFinProperty());
     }
 
-    public static boolean getBanderaSelectedTimer() {
-        return runningSelectedTimer;
+    public void eliminaActividades() {
+        ObservableList<Actividades> allRecords = grdActividades.getItems();
+        ObservableList<Actividades> registro = grdActividades.getSelectionModel().getSelectedItems();
+        List registroSeleccionado = new ArrayList(registro);
+        if (!registro.get(0).getStopWatch().getCurrentStatus()) {
+            eliminaActividadesAction(allRecords, registro);
+        } else {
+            alertActividades(primaryStage, "SPPRYF12", "ELIMINAR ACTIVIDAD", 1);
+        }
+        setTotalRegistros();
+
+    }
+//    public void cambioDia() {
+//        ObservableList<Actividades> allRecords = grdActividades.getItems();
+//        ObservableList<Actividades> registro = grdActividades.getSelectionModel().getSelectedItems();
+//        List registroSeleccionado = new ArrayList(registro);
+//        if (registro.size() > 0) {
+//            if (registro.get(0).getStopWatch().getCurrentStatus()) {
+//                alertActividades(primaryStage, "SPPRYF12", "CAMBIAR DE DIA", 2);
+//            }
+//        } else {
+//            System.out.println("Consulta actividades dia" + newValue);
+//        }
+//    }
+
+    private static void eliminaActividadesAction(ObservableList<Actividades> allRecords, ObservableList<Actividades> registroSeleccionado) {
+        List selectedRecord = new ArrayList(registroSeleccionado);
+        if (registroSeleccionado.get(0).getStopWatch().getCurrentStatus()) {
+            registroSeleccionado.get(0).getStopWatch().startStop.fire();
+        }
+        allRecords.removeAll(selectedRecord);
+    }
+
+    public void setTotalRegistros() {
+        lbTotalRegistros.setText(String.valueOf(grid.getItems().size()));
+    }
+
+//    public static void cambioDiaAction(ObservableList<Actividades> allRecords, ObservableList<Actividades> registroSeleccionado) {
+//        contadorCambioDia++;
+//        datePicker.setValue(newValue);
+//        registroSeleccionado.get(0).getStopWatch().startStop.fire();
+//    }
+    public void setTiempoTotal() {
+        lbTiempoTotal.setText(String.valueOf(grid.getItems().size()));
     }
 }
