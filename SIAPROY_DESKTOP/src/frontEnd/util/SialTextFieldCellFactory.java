@@ -19,29 +19,21 @@
  * |(*) Marca registrada por                                                                                               |   
  * |LOBO SOFTWARE, S.A. DE C.V.                                                                                |  
  * |_______________________________________________________________________|  
- *  Document     : SialDateCellFactory.java
- * Created on    : 11 Apr 2016 4:37:26 PM
+ *  Document     : SialTextFieldCellFactory.java
+ * Created on    : 19 Apr 2016 5:45:34 PM
  * Author           : SVA
- * Modifications : 19/Abr/2016 Se añade funcionalidad para darle el formato 'dd MMM yyyy' a la fecha.
+ * Modifications : 
  */
 package frontEnd.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.scene.control.DatePicker;
+import javafx.beans.property.StringProperty;
+import javafx.event.EventHandler;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
@@ -52,20 +44,18 @@ import javafx.util.Callback;
  * @param <E>
  * @param <T>
  */
-public class SialDateCellFactory<E, T> extends TableCell<E, Date> {
+public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
 
-    private DatePicker datePicker;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
-    private Calendar cal;
+    private TextField textField;
     private int contador = 0;
     private int row = 0;
 
-    public SialDateCellFactory() {
+    public SialTextFieldCellFactory() {
     }
 
-    public Callback<TableColumn<E, Date>, TableCell<E, Date>> creaDatePicker() {
-        Callback<TableColumn<E, Date>, TableCell<E, Date>> callBack;
-        callBack = (TableColumn<E, Date> tableColumn) -> new SialDateCellFactory();
+    public Callback<TableColumn<E, String>, TableCell<E, String>> creaTextField() {
+        Callback<TableColumn<E, String>, TableCell<E, String>> callBack;
+        callBack = (TableColumn<E, String> tableColumn) -> new SialTextFieldCellFactory();
         return callBack;
     }
 
@@ -73,13 +63,14 @@ public class SialDateCellFactory<E, T> extends TableCell<E, Date> {
     public void startEdit() {
         if (!isEmpty()) {
             super.startEdit();
-            createDatePicker();
+            createTextField();
             setText(null);
-            setGraphic(datePicker);
+            setGraphic(textField);
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    datePicker.requestFocus();
+                    textField.requestFocus();
+                    textField.selectAll();
                 }
             });
         }
@@ -88,67 +79,61 @@ public class SialDateCellFactory<E, T> extends TableCell<E, Date> {
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        setText(getDateString());
+        setText(getString());
         setGraphic(null);
     }
 
     @Override
-    public void updateItem(Date item, boolean empty) {
+    public void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
+
         if (empty) {
-            setText(null);
+            setText(item);
             setGraphic(null);
         } else if (isEditing()) {
-            if (datePicker != null) {
-                datePicker.setValue(getDate());
+            if (textField != null) {
+                textField.setText(getString());
             }
             setText(null);
-            setGraphic(datePicker);
+            setGraphic(textField);
         } else {
-            setText(sdf.format(item));
+            setText(getString());
             setGraphic(null);
         }
     }
 
-    private void createDatePicker() {
-        datePicker = new DatePicker();
-        datePicker.setValue(getDate());
-        datePicker.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
-        datePicker.setOnAction((e) -> {
-            commitEdit(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        });
-        datePicker.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) -> {
-            if (event.getCode() == KeyCode.TAB) {
-                commitEdit(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-                TableColumn nextColumn = getNextColumn(!event.isShiftDown());
-                if (nextColumn != null) {
-                    getTableView().edit(row, nextColumn);
-                    getTableView().getSelectionModel().select(row);
+    private void createTextField() {
+        textField = new TextField(getString());
+        textField.selectAll();
+        textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
+        textField.setOnAction((e) -> commitEdit(textField.getText()));
+        textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent t) {
+                if (t.getCode() == KeyCode.TAB) {
+                    commitEdit(textField.getText());
+                    TableColumn nextColumn = getNextColumn(!t.isShiftDown());
+                    if (nextColumn != null) {
+                        getTableView().edit(row, nextColumn);
+                        getTableView().getSelectionModel().select(row);
+                    }
                 }
-             }
+            }
         });
-
+        textField.textProperty().addListener((ov, oldValue, newValue) -> {
+            StringProperty elemento = (StringProperty) ov;
+            ((TextField) elemento.getBean()).setText(newValue.toUpperCase());
+        });
+        textField.focusedProperty().addListener((ov, olvPropertyValue, newPropertyValue) -> {
+            if (olvPropertyValue) { // pierde el foco
+                commitEdit(getItem());
+            } 
+        });
+//        textField.textProperty().bindBidirectional(textProperty());
     }
 
-    private LocalDate getDate() {
-        int dia, mes, anio;
-        String dateWithFormat;
-        dia = mes = anio = 0;
-        dateWithFormat = sdf.format(getItem() == null ? Date.from(getItem().toInstant()) : getItem());
-        cal = Calendar.getInstance();
-        try {
-            cal.setTime(sdf.parse(dateWithFormat));
-            dia = Integer.parseInt(dateWithFormat.substring(0, 2));
-            mes = cal.get(Calendar.MONTH) + 1;
-            anio = Integer.parseInt(dateWithFormat.substring(7, dateWithFormat.length()));
-        } catch (ParseException ex) {
-            Logger.getLogger(SialDateCellFactory.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return LocalDate.of(anio, mes, dia);
-    }
-
-    private String getDateString() {
-        return sdf.format(getItem() == null ? new Date() : Date.from(getItem().toInstant()));
+    private String getString() {
+        return getItem() == null ? "" : getItem();
     }
 
     private TableColumn<E, ?> getNextColumn(boolean forward) {
