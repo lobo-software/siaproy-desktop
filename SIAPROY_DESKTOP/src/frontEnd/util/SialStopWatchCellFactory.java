@@ -50,6 +50,7 @@ public class SialStopWatchCellFactory<E, T> extends TableCell<Actividades, Stopw
     private TextField tiempoTotal;
     private TextField tiempoInicial;
     private TextField tiempoFinal;
+    private TableCell<Actividades, Stopwatch> tableCell;
 
     public SialStopWatchCellFactory() {
     }
@@ -62,7 +63,10 @@ public class SialStopWatchCellFactory<E, T> extends TableCell<Actividades, Stopw
 
     public Callback<TableColumn<E, Stopwatch>, TableCell<E, Stopwatch>> creaTimer(TextField tiempoTotal, TextField tiempoInicial, TextField tiempoFinal) {
         Callback<TableColumn<E, Stopwatch>, TableCell<E, Stopwatch>> callBack;
-        callBack = (TableColumn<E, Stopwatch> tableColumn) -> new SialStopWatchCellFactory(tiempoTotal, tiempoInicial, tiempoFinal);
+        callBack = (TableColumn<E, Stopwatch> tableColumn) -> {
+            tableCell = new SialStopWatchCellFactory();
+            return new TableCell();
+        };
         return callBack;
     }
 
