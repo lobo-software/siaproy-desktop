@@ -23,9 +23,10 @@
  * Created on    : 06 abr 2016 12:32:40 PM
  * Author        : SVA
    Modifications : 13/Apr/2016 10:44 CCL (LOBO_000076): Se se añaden la funcionalidad a los 
-                   a las  variables que haran la impresion de informacoón dentrodel los TextFields en pantalla.
+                   a las  variables que haran la impresion de información dentro del los TextFields en pantalla.
                    14/Apr/2016 10:44 CCL(LOBO_000076):Se elimina codigo inecesario y espacios en blacon,por último se da formatoalcódigo.
  15/Apr/2016 13:24 CCL(LOBO_000076):Se eliminaron objetos innecesarios en la clase.
+ 15/Apr/2016 13:44 CCL (LOBO_000076): No se modificó nada en este modelo.
  */
 package frontEnd.model.stopWatch;
 
@@ -45,13 +46,12 @@ import javafx.scene.control.TextField;
 
 public class StopwatchWorker extends Task<Void> {
 
-    public StopwatchWorker(long contador, Duration currentTime, LocalDateTime startTime, TextField tiempoTotal, TextField tiempoInicio, TextField tiempoFinal) {
+    public StopwatchWorker(long contador, Duration currentTime, LocalDateTime startTime) {
         this.contador = contador;
         this.currentTime = currentTime;
         this.startTime = startTime;
-        this.tiempoTotal = tiempoTotal;
-        this.tiempoInicio = tiempoInicio;
-        this.tiempoFinal = tiempoFinal;
+        this.tfTiempoInicio = new TextField();
+        this.tfTiempoFin = new TextField();
     }
     //VARIABLES A NIVEL DE CLASE LAS  QUE  SE UTILIZARAN EN TODOS LOS MÉTODOS.
     private final BooleanProperty stop = new SimpleBooleanProperty(false);
@@ -61,10 +61,9 @@ public class StopwatchWorker extends Task<Void> {
     private final long contador;
     private Duration duration;
     private final Duration currentTime;
-    private final TextField tiempoTotal;
-    private final TextField tiempoInicio;
+    private final TextField tfTiempoInicio;
+    private final TextField tfTiempoFin;
     private Stopwatch stopWatch;
-    private final TextField tiempoFinal;
     private final StringProperty horaFinal = new SimpleStringProperty();
 
     @Override
@@ -102,10 +101,10 @@ public class StopwatchWorker extends Task<Void> {
             //Se agraga  la función  las variables  las cuales  hacen  la imprecion del tiempo Inicio final y total paramostrarse en los textfields de la API.
             System.out.print(String.format("%02d", currentHours) + ":" + String.format("%02d", currentMinutes) + ":" + String.format("%02d", currentSeconds));
             System.out.print("Hora inicio: " + String.format("%02d", startTime.getHour()) + ":" + String.format("%02d", startTime.getMinute()) + ":" + String.format("%02d", startTime.getSecond()));
-            tiempoInicio.setText(String.format("%02d", startTime.getHour()) + ":" + String.format("%02d", startTime.getMinute()) + ":" + String.format("%02d", startTime.getSecond()));
+            tfTiempoInicio.setText(String.format("%02d", startTime.getHour()) + ":" + String.format("%02d", startTime.getMinute()) + ":" + String.format("%02d", startTime.getSecond()));
             System.out.print("Hora final: " + String.format("%02d", finalHours) + ":" + String.format("%02d", finalMinutes) + ":" + String.format("%02d", finalSeconds));
             System.out.println();
-            tiempoFinal.setText(String.format("%02d", finalHours) + ":" + String.format("%02d", finalMinutes) + ":" + String.format("%02d", finalSeconds));
+            tfTiempoFin.setText(String.format("%02d", finalHours) + ":" + String.format("%02d", finalMinutes) + ":" + String.format("%02d", finalSeconds));
             updateMessage(String.format("%02d", currentHours) + ":" + String.format("%02d", currentMinutes) + ":" + String.format("%02d", currentSeconds));
             Thread.sleep(1000);
         }
@@ -139,5 +138,13 @@ public class StopwatchWorker extends Task<Void> {
 
     public LocalDateTime getStartTime() {
         return startTime;
+    }
+
+    public StringProperty getTiempoInicioProperty() {
+        return tfTiempoInicio.textProperty();
+    }
+
+    public StringProperty getTiempoFinalProperty() {
+        return tfTiempoFin.textProperty();
     }
 }
