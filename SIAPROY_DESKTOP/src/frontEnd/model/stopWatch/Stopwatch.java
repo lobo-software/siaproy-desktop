@@ -26,7 +26,7 @@
                   para saber  exactamente  donde se realizaronmodificaciones al momento de la integración del StopWatch, se eliminó espacio }
                   inecesario así como librerías no usadas dentro  de la clase.    
  15/Apr/2016 13:44 CCL (LOBO_000076): Se incluye  la llamada al controller para establecer bandera en ciere de aplicación.
- 22/Apr/2016 13:41 CCL (LOBO_000076): Se añde validadción para seleccionar  el registro del timer que se agregue.
+ 22/Apr/2016 13:41 CCL (LOBO_000076): Se añade validadción para seleccionar  el registro del timer que se agregue.
 
  */
 package frontEnd.model.stopWatch;

@@ -239,7 +239,7 @@
                 </VBox>
             </center>
             <right>
-                <DatePicker fx:id="dtfFechaActual" onAction="#muestraFecha" prefHeight="25.0" prefWidth="193.0" BorderPane.alignment="CENTER">
+                <DatePicker fx:id="dtfFechaActual" onAction="#muestraFecha" BorderPane.alignment="CENTER">
                <effect>
                   <Lighting>
                      <bumpInput>
