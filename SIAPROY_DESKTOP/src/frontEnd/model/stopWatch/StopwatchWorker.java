@@ -27,6 +27,7 @@
                    14/Apr/2016 10:44 CCL(LOBO_000076):Se elimina codigo inecesario y espacios en blacon,por último se da formatoalcódigo.
  15/Apr/2016 13:24 CCL(LOBO_000076):Se eliminaron objetos innecesarios en la clase.
  15/Apr/2016 13:44 CCL (LOBO_000076): No se modificó nada en este modelo.
+ 29/Abr/2016 17:07 SVA (LOBO_000076): Se mejora funcionalidad para mostrar las horas.
  */
 package frontEnd.model.stopWatch;
 
@@ -34,7 +35,6 @@ package frontEnd.model.stopWatch;
  *
  * @author Lobo Software
  */
-import frontEnd.controller.SPPRYF12Controller;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import javafx.beans.property.BooleanProperty;
@@ -52,6 +52,8 @@ public class StopwatchWorker extends Task<Void> {
         this.startTime = startTime;
         this.tfTiempoInicio = new TextField();
         this.tfTiempoFin = new TextField();
+        tti = new TimerTiempoInicio();
+        ttf = new TimerTiempoFin();
     }
     //VARIABLES A NIVEL DE CLASE LAS  QUE  SE UTILIZARAN EN TODOS LOS MÉTODOS.
     private final BooleanProperty stop = new SimpleBooleanProperty(false);
@@ -63,8 +65,8 @@ public class StopwatchWorker extends Task<Void> {
     private final Duration currentTime;
     private final TextField tfTiempoInicio;
     private final TextField tfTiempoFin;
-    private Stopwatch stopWatch;
-    private final StringProperty horaFinal = new SimpleStringProperty();
+    TimerTiempoInicio tti;
+    TimerTiempoFin ttf;
 
     @Override
     protected Void call() throws Exception {
@@ -73,6 +75,7 @@ public class StopwatchWorker extends Task<Void> {
         if (contador == 0) {
             startTime = startDateTime;
         }
+         tti.setHoraInicio(startTime);
         while (!stop.getValue()) {
             stopDateTime = LocalDateTime.now();
             duration = Duration.between(startDateTime, stopDateTime);
@@ -96,16 +99,16 @@ public class StopwatchWorker extends Task<Void> {
                     tempMinutes = finalMinutes * (finalHours - startDateTime.getHour());
                     finalMinutes = Math.max(0, tempMinutes - 60 * (finalHours - startDateTime.getHour()));
                 }
-
             }
+             ttf.setHoraFin(finalHours, finalMinutes, finalSeconds);
             //Se agraga  la función  las variables  las cuales  hacen  la imprecion del tiempo Inicio final y total paramostrarse en los textfields de la API.
             System.out.print(String.format("%02d", currentHours) + ":" + String.format("%02d", currentMinutes) + ":" + String.format("%02d", currentSeconds));
             System.out.print("Hora inicio: " + String.format("%02d", startTime.getHour()) + ":" + String.format("%02d", startTime.getMinute()) + ":" + String.format("%02d", startTime.getSecond()));
-            tfTiempoInicio.setText(String.format("%02d", startTime.getHour()) + ":" + String.format("%02d", startTime.getMinute()) + ":" + String.format("%02d", startTime.getSecond()));
             System.out.print("Hora final: " + String.format("%02d", finalHours) + ":" + String.format("%02d", finalMinutes) + ":" + String.format("%02d", finalSeconds));
             System.out.println();
-            tfTiempoFin.setText(String.format("%02d", finalHours) + ":" + String.format("%02d", finalMinutes) + ":" + String.format("%02d", finalSeconds));
             updateMessage(String.format("%02d", currentHours) + ":" + String.format("%02d", currentMinutes) + ":" + String.format("%02d", currentSeconds));
+            tti.call();
+            ttf.call();
             Thread.sleep(1000);
         }
         return null;

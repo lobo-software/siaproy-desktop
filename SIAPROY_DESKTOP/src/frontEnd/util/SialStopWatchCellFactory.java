@@ -26,17 +26,14 @@
  */
 package frontEnd.util;
 
-import frontEnd.controller.SPPRYF12Controller;
 import frontEnd.model.Actividades;
 import frontEnd.model.stopWatch.Stopwatch;
-import javafx.beans.InvalidationListener;
 import javafx.event.ActionEvent;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.util.Callback;
-import static javax.management.Query.value;
 
 /**
  *
@@ -50,6 +47,7 @@ public class SialStopWatchCellFactory<E, T> extends TableCell<Actividades, Stopw
     private TextField tiempoTotal;
     private TextField tiempoInicial;
     private TextField tiempoFinal;
+    private TableCell<Actividades, Stopwatch> tableCell;
 
     public SialStopWatchCellFactory() {
     }
@@ -62,7 +60,10 @@ public class SialStopWatchCellFactory<E, T> extends TableCell<Actividades, Stopw
 
     public Callback<TableColumn<E, Stopwatch>, TableCell<E, Stopwatch>> creaTimer(TextField tiempoTotal, TextField tiempoInicial, TextField tiempoFinal) {
         Callback<TableColumn<E, Stopwatch>, TableCell<E, Stopwatch>> callBack;
-        callBack = (TableColumn<E, Stopwatch> tableColumn) -> new SialStopWatchCellFactory(tiempoTotal, tiempoInicial, tiempoFinal);
+        callBack = (TableColumn<E, Stopwatch> tableColumn) -> {
+            tableCell = new SialStopWatchCellFactory();
+            return new TableCell();
+        };
         return callBack;
     }
 
@@ -79,6 +80,13 @@ public class SialStopWatchCellFactory<E, T> extends TableCell<Actividades, Stopw
     @Override
     public void updateItem(Stopwatch item, boolean empty) {
         super.updateItem(item, empty);
+        TableCell<E, Stopwatch> celdaTimer = new TableCell<E, Stopwatch>() {
+        };
+        celdaTimer.setOnMouseClicked(e -> {
+            if (!celdaTimer.isEmpty()) {
+                System.out.println("Deten others timers");
+            }
+        });
         if (empty) {
             setGraphic(null);
         } else if (isEditing()) {
@@ -91,28 +99,24 @@ public class SialStopWatchCellFactory<E, T> extends TableCell<Actividades, Stopw
             setGraphic(creaStopWatch());
         }
     }
-//Modificar
 
     private Stopwatch creaStopWatch() {
         stopWatch = new Stopwatch(tiempoTotal, tiempoInicial, tiempoFinal);
-        TableView<Actividades> grid = getTableView();
-//        grid.selectionModelProperty().bindBidirectional();
-        grid.getSelectionModel().cellSelectionEnabledProperty();
-    
-//        stopWatch.startStop.addEventHandler(ActionEvent.ACTION, (ActionEvent actionEvent) -> {
-//            if (!SPPRYF12Controller.getBanderaEjecucion() && !stopWatch.localRunning()) {
-//                System.out.println("set row");
-//            } else if (SPPRYF12Controller.getBanderaEjecucion() && stopWatch.localRunning()) {
-//                SPPRYF12Controller.decrementaContadores();
-//            } else {
-//                System.out.println("get row / deten este timer");
-//                System.out.println("set row");
-//
-//                grid.getItems().get(0).getStopWatch().startStop.fire();
-//                stopWatch.startStop.fire();
+        stopWatch.startStop.addEventHandler(ActionEvent.ACTION, (ActionEvent actionEvent) -> {
+//            if (SPPRYF12Controller.getContador() == 0 && !SPPRYF12Controller.getBanderaEjecucion()) {
+                System.out.println("set row");
+//                SPPRYF12Controller.incrementaContadorSelectedTimer();
+//                SPPRYF12Controller.setBanderaSelectedTimer(true);
+//            } else if (SPPRYF12Controller.getContadorSelectedTimer() == 1 && SPPRYF12Controller.getBanderaEjecucion() && !SPPRYF12Controller.getBanderaSelectedTimer()) {
+//                SPPRYF12Controller.decrementaContadorSelectedTimer();
+//            } else if (SPPRYF12Controller.getContador() != 0 && SPPRYF12Controller.getContadorSelectedTimer() == 0 && !SPPRYF12Controller.getBanderaEjecucion()) {
+                System.out.println("get old row");
+                System.out.println("set new row");
+                TableView<Actividades> grid = getTableView();
+                grid.getItems().get(0).getStopWatch().startStop.fire();
+                stopWatch.startStop.fire();
 //            }
-//
-//        });
+        });
         return stopWatch;
     }
 }

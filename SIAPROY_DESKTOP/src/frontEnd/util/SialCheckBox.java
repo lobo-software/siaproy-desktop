@@ -22,10 +22,11 @@
  *  Document     : SialCheckBox.java
  * Created on    : 16 Apr 2016 11:04:14 AM
  * Author           : SVA
- * Modifications : 
+ * Modifications : 29/Abr/2016 17:07 SVA (LOBO_000076): Se crea método getCheckedProperty
  */
 package frontEnd.util;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.CheckBox;
 
 /**
@@ -34,9 +35,9 @@ import javafx.scene.control.CheckBox;
  */
 public interface SialCheckBox {
 
+    public SimpleBooleanProperty getCheckedProperty();
+
     public void setOneSelection();
 
-    public void createCheckBoxHeader();
-
-    public void setAllSelection(CheckBox header);
+    public void setAllSelection(boolean valueHeader);
 }

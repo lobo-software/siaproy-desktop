@@ -29,7 +29,7 @@
 14/Apr/2016 16:48 SVA (LOBO_000076): Se mueve el tableView al centro del BorderPane y se añade propiedad de redimencionamiento a las columnas..
 15/Apr/2016 12:33 CCL (LOBO_000076): Se eliminó el evento de prueba "#agregaActividades" al boton Guardar en la vista.
 22/Apr/2016 13:44 CCL (LOBO_000076): Redimencionan ciertos  componetes apra darle un mejor diseño a la vista y se le cambia el tipo y tamo de fuente a los textfields.
-
+29/Abr/2016 17:07 SVA (LOBO_000076): Se añaden métodos para agregar registros y guardar información.
 -->
 
 <?import javafx.geometry.Insets?>
@@ -129,7 +129,7 @@
                         <Insets bottom="5.0" />
                      </padding>
                         </Button>
-                        <Button fx:id="btnAgregarActividad" mnemonicParsing="false" prefHeight="75.0" prefWidth="61.0" text="+" textFill="#4f16db">
+                        <Button fx:id="btnAgregarActividad" mnemonicParsing="false" onAction="#agregaActividades" prefHeight="75.0" prefWidth="61.0" text="+" textFill="#4f16db">
                             <font>
                                 <Font size="30.0" />
                             </font>
@@ -272,7 +272,7 @@
                         <Font name="Arial" size="12.0" />
                     </font>
                 </Label>
-                <Button fx:id="btnGuardar" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" prefHeight="25.0" prefWidth="68.0" text="Guardar " textAlignment="CENTER" />
+                <Button fx:id="btnGuardar" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#guardaActividades" prefHeight="25.0" prefWidth="68.0" text="Guardar " textAlignment="CENTER" />
                 <Button fx:id="btnSincronizar" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" text="Sincronizar" />
             </children>
         </HBox>
@@ -280,7 +280,7 @@
    <center>
         <TableView fx:id="grdActividades" editable="true" BorderPane.alignment="CENTER">
             <columns>
-                <TableColumn fx:id="colTimer" maxWidth="1100.0" minWidth="-Infinity" prefWidth="62.0" />
+                <TableColumn fx:id="colTimer" editable="false" maxWidth="1100.0" minWidth="-Infinity" prefWidth="62.0" />
                 <TableColumn fx:id="colProyecto" minWidth="0.0" prefWidth="262.0" text="PROYECTO" />
                 <TableColumn fx:id="colActividades" minWidth="-1.0" prefWidth="215.0" text="ACTIVIDADADES" />
                 <TableColumn fx:id="colTiempo" editable="false" prefWidth="145.0" text="TIEMPO" />
@@ -288,6 +288,8 @@
             <TableColumn fx:id="colFin" editable="false" prefWidth="145.0" text="FIN" visible="false" />
                 <TableColumn fx:id="colDescripcion" prefWidth="224.0" text="DESCRIPCIÓN" />
                 <TableColumn fx:id="colAvance" prefWidth="132.0" text="AVANCE %" />
+            <TableColumn fx:id="colFecha" prefWidth="75.0" text="FECHA" />
+            <TableColumn fx:id="colActivo" prefWidth="75.0" text="ACTIVO" />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
