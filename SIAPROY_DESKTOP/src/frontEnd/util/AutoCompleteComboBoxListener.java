@@ -22,7 +22,7 @@
  *  Document     : AutoCompleteComboBoxListener.java
  * Created on    : 23 Apr 2016 12:48:32 PM
  * Author           : SVA
- * Modifications : 
+ * Modifications : 29/Abr/2016 17:07 SVA (LOBO_000076): Se añade clase y método en la llamada a GeneraCuadroMensaje.
  */
 package frontEnd.util;
 
@@ -121,13 +121,13 @@ public class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
                         comboBox.getEditor().positionCaret(sb.toString().length());
                         comboBox.getEditor().selectEnd();
                         break;
-                    }else {
-                    comboBox.getSelectionModel().clearSelection();
+                    } else {
+                        comboBox.getSelectionModel().clearSelection();
                     }
                 }
             }
         } catch (Exception e) {
-//            GeneraCuadroMensaje.alert(e.toString());
+            GeneraCuadroMensaje.error(e.toString() + "\nCLASE: AutoCompleteComboBoxListener. \nMÉTODO: handle");
         }
     }
 
@@ -168,4 +168,3 @@ public class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
     }
 
 }
-

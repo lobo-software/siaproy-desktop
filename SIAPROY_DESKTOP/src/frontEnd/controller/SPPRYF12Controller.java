@@ -30,11 +30,15 @@
    14/Apr/2016 17:11 SVA (LOBO_000076): Se añade funcionalidad con clases genéricas para la edición del TableView / Se restructura el archivo
    15/Apr/2016 01:03 CCL (LOBO_000076): Se añade funcionalidad para cerrar la ventana principal con creando un alert al mismo.
    22/Apr/2016 01:17 CCL (LOBO_000076): Se siguen añadiendo funcionalidades a los componentes de la vista y se eliminó cógio inesesario.
-   
+   29/Abr/2016 17:07 SVA (LOBO_000076): Se restructura clase y se mejora funcionalidad.
 
  */
 package frontEnd.controller;
 
+import backEnd.mx.com.lobos.spdreportesactividades.store.ActualizaSpdReportesActividadesStore;
+import backEnd.mx.com.lobos.spdreportesactividades.store.ConsultaSpdReportesActividadesStore;
+import backEnd.mx.com.lobos.spdreportesactividades.store.EliminaSpdReportesActividadesStore;
+import backEnd.mx.com.lobos.spdreportesactividades.store.InsertaSpdReportesActividadesStore;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import de.jensd.fx.fontawesome.AwesomeDude;
 import de.jensd.fx.fontawesome.AwesomeIcon;
@@ -56,20 +60,22 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import frontEnd.model.Actividades;
+import frontEnd.model.SpdReportesActividadesModel;
 import frontEnd.model.stopWatch.Stopwatch;
+import frontEnd.util.GeneraCuadroMensaje;
 import frontEnd.util.SialComboCellFactory;
-import frontEnd.util.SialStopWatchCellFactory;
-import frontEnd.util.SialStringCellFactory;
-import java.util.ArrayList;
-import java.util.List;
+import frontEnd.util.SialDateCellFactory;
+import frontEnd.util.SialTextFieldCellFactory;
+import java.util.HashMap;
 import java.util.Optional;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.layout.HBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -86,21 +92,21 @@ public class SPPRYF12Controller implements Initializable {
     @FXML
     private BorderPane layoutSecundario;
     @FXML
-    private TableView<Actividades> grdActividades;
+    private TableView<SpdReportesActividadesModel> grdActividades;
     @FXML
-    private TableColumn<Actividades, Stopwatch> colTimer;
+    private TableColumn<SpdReportesActividadesModel, Stopwatch> colTimer;
     @FXML
-    private TableColumn<Actividades, String> colProyecto;
+    private TableColumn<SpdReportesActividadesModel, String> colProyecto;
     @FXML
-    private TableColumn<Actividades, String> colActividades;
+    private TableColumn<SpdReportesActividadesModel, String> colSpdReportesActividadesModel;
     @FXML
-    private TableColumn<Actividades, String> colTiempo;
+    private TableColumn<SpdReportesActividadesModel, String> colTiempo;
     @FXML
-    private TableColumn<Actividades, String> colDescripcion;
+    private TableColumn<SpdReportesActividadesModel, String> colDescripcion;
     @FXML
-    private TableColumn<Actividades, String> colInicio;
+    private TableColumn<SpdReportesActividadesModel, String> colInicio;
     @FXML
-    private TableColumn<Actividades, String> colFin;
+    private TableColumn<SpdReportesActividadesModel, String> colFin;
     @FXML
     private TextField tfTiempoTotal;
     @FXML
@@ -108,7 +114,7 @@ public class SPPRYF12Controller implements Initializable {
     @FXML
     private TextField tfTiempoFin;
     @FXML
-    private TableColumn<Actividades, String> colAvance;
+    private TableColumn<SpdReportesActividadesModel, String> colAvance;
     @FXML
     private TextField tfDescripcion;
     @FXML
@@ -119,18 +125,32 @@ public class SPPRYF12Controller implements Initializable {
     private Label lbTotalRegistros;
     @FXML
     private Label lbTiempoTotal;
+    @FXML
+    private TableColumn<SpdReportesActividadesModel, String> colFecha;
+    @FXML
+    private TableColumn<SpdReportesActividadesModel, Boolean> colActivo;
+    @FXML
+    private Button btnGuardar;
     // VARIABLES 
     private ObservableList<String> datosComboProyecto;
-    private ObservableList<String> datosComboActividades;
+    private ObservableList<String> datosComboSpdReportesActividadesModel;
     private final Font fuenteReloj = Font.loadFont(Stopwatch.class.getResource("digital-7_mono.ttf").toExternalForm(), 24);
-    private static boolean running;
-    private static TableView<Actividades> grid;
+    private static boolean running, insertaDiaActual;
+    private static TableView<SpdReportesActividadesModel> grid;
     private static int posicionTimer;
     private static Stage primaryStage;
     public static DatePicker datePicker;
+    public static int posicionTimerRunning;
+    private static ObservableList<SpdReportesActividadesModel> registrosNuevos, registrosActualizados;
+    private static TextField duracion, horaInicio, horaFin;
+    private static LocalDate fechaSeleccionada;
+    private int contadorCambioDia;
+    private SpdReportesActividadesModel actividadEnEjecucion;
+    private static Stage loading = GeneraCuadroMensaje.loading();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        loading.show();
         tfTiempoTotal.setText("00:00:00");
         tfTiempoTotal.setFont(fuenteReloj);
         tfTiempoInicio.setText("00:00:00");
@@ -149,7 +169,8 @@ public class SPPRYF12Controller implements Initializable {
         layoutSecundario.setRight(popupContent);
         datePicker = dtfFechaActual;
         dtfFechaActual.valueProperty().addListener((ov, oldValue, newValue) -> {
-            System.out.println("consulta actividades");
+            fechaSeleccionada = newValue;
+            consultaActividades();
 //            if (contadorCambioDia == 0) {
 //                SPPRYF12Controller.oldValue = oldValue;
 //                SPPRYF12Controller.newValue = newValue;
@@ -166,47 +187,48 @@ public class SPPRYF12Controller implements Initializable {
                         "DMS_2015",
                         "DMS_2016");
         //Store actividades.
-        datosComboActividades
+        datosComboSpdReportesActividadesModel
                 = FXCollections.observableArrayList(
                         "INVESTIGACION",
                         "REUNIÓN DE ESTÁNDARES",
                         "APOYO AL EQUIPO DE TRABAJO");
 
-        SialStringCellFactory<Actividades, String> textFieldCell = new SialStringCellFactory<>();
-        SialComboCellFactory<Actividades, String> comboBoxCell = new SialComboCellFactory<>();
-        SialStopWatchCellFactory<Actividades, Boolean> timerCell = new SialStopWatchCellFactory<>();
+        SialTextFieldCellFactory<SpdReportesActividadesModel, String> textFieldCell = new SialTextFieldCellFactory<>();
+        SialComboCellFactory<SpdReportesActividadesModel, String> comboBoxCell = new SialComboCellFactory<>();
+        SialDateCellFactory<SpdReportesActividadesModel, Date> datePickerCell = new SialDateCellFactory<>();
+//        SialCheckBoxCellFactory<SpdReportesActividadesModel, Boolean> checkBoxCell = new SialCheckBoxCellFactory<>();
 
         colTimer.setCellValueFactory(new PropertyValueFactory<>("stopWatch"));
 //        colTimer.setCellFactory(timerCell.creaTimer(tfTotal, tftiempoInicio, tfTiempoFin));
-        colProyecto.setCellValueFactory(new PropertyValueFactory<>("proyecto"));
-        colProyecto.setCellFactory(comboBoxCell.creaComboBox(datosComboProyecto));
-        colProyecto.setOnEditCommit(
-                (TableColumn.CellEditEvent<Actividades, String> t) -> {
-                    String[] clave = t.getNewValue().split("-");
-
-                    ((Actividades) t.getTableView().getItems()
-                    .get(t.getTablePosition().getRow()))
-                    .setProyecto(clave[0]);
-
-                    System.out.println("Carga combo secundario (parametro):" + t.getNewValue());
-                });
-        colActividades.setCellValueFactory(new PropertyValueFactory<>("actividad"));
-        colActividades.setCellFactory(comboBoxCell.creaComboBoxWithCascade(datosComboProyecto, datosComboActividades));
-        colActividades.setOnEditStart((TableColumn.CellEditEvent<Actividades, String> t) -> {
-            String proyecto = ((Actividades) t.getTableView().getItems()
-                    .get(t.getTablePosition().getRow()))
-                    .getProyecto();
-
-            System.out.println("Carga combo secundario (parametro):" + proyecto);
-        });
-        colTiempo.setCellValueFactory(new PropertyValueFactory<>("tiempoTotal"));
-        colInicio.setCellValueFactory(new PropertyValueFactory<>("tiempoInicio"));
-        colFin.setCellValueFactory(new PropertyValueFactory<>("tiempoFin"));
+//        colProyecto.setCellValueFactory(new PropertyValueFactory<>("proyecto"));
+//        colProyecto.setCellFactory(comboBoxCell.creaComboBox(datosComboProyecto, true));
+//        colProyecto.setOnEditCommit(
+//                (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
+//                    String[] clave = t.getNewValue().split("-");
+//
+//                    ((SpdReportesActividadesModel) t.getTableView().getItems()
+//                    .get(t.getTablePosition().getRow()))
+//                    .setProyecto(clave[0]);
+//
+//                    System.out.println("Carga combo secundario (parametro):" + t.getNewValue());
+//                });
+//        colSpdReportesActividadesModel.setCellValueFactory(new PropertyValueFactory<>("actividad"));
+//        colSpdReportesActividadesModel.setCellFactory(comboBoxCell.creaComboBoxWithCascade(datosComboProyecto, datosComboSpdReportesActividadesModel, true));
+//        colSpdReportesActividadesModel.setOnEditStart((TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
+//            String proyecto = ((SpdReportesActividadesModel) t.getTableView().getItems()
+//                    .get(t.getTablePosition().getRow()))
+//                    .getProyecto();
+//
+//            System.out.println("Carga combo secundario (parametro):" + proyecto);
+//        });
+        colTiempo.setCellValueFactory(new PropertyValueFactory<>("duracion"));
+        colInicio.setCellValueFactory(new PropertyValueFactory<>("horaInicio"));
+        colFin.setCellValueFactory(new PropertyValueFactory<>("horaFin"));
         colDescripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         colDescripcion.setCellFactory(textFieldCell.creaTextField());
         colDescripcion.setOnEditCommit(
-                (TableColumn.CellEditEvent<Actividades, String> t) -> {
-                    ((Actividades) t.getTableView().getItems()
+                (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
+                    ((SpdReportesActividadesModel) t.getTableView().getItems()
                     .get(t.getTablePosition().getRow()))
                     .setDescripcion(t.getNewValue());
 
@@ -215,20 +237,80 @@ public class SPPRYF12Controller implements Initializable {
         colAvance.setCellValueFactory(new PropertyValueFactory<>("avance"));
         colAvance.setCellFactory(textFieldCell.creaTextField());
         colAvance.setOnEditCommit(
-                (TableColumn.CellEditEvent<Actividades, String> t) -> {
-                    ((Actividades) t.getTableView().getItems()
+                (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
+                    ((SpdReportesActividadesModel) t.getTableView().getItems()
                     .get(t.getTablePosition().getRow()))
                     .setAvance(t.getNewValue());
                 });
+        colFecha.setCellValueFactory(cellData -> cellData.getValue().fechaProperty());
+//        colFecha.setCellFactory(datePickerCell.creaDatePicker());
+//        colActivo.setGraphic(checkBoxCell.createCheckHeader(colActivo, grdActividades));
+//        colActivo.setCellValueFactory(cellData -> cellData.getValue().activoProperty());
+//        colActivo.setCellFactory(checkBoxCell.creaCheckBoxMultipleSelection());
+
         //Carga de registros de actividades
         grid = grdActividades;
-        grdActividades.setItems(cargaRegistrosExistentes());
+        duracion = tfTiempoTotal;
+        horaInicio = tfTiempoInicio;
+        horaFin = tfTiempoFin;
+        fechaSeleccionada = dtfFechaActual.getValue();
         grdActividades.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
             public void changed(ObservableValue muestra, Object valorViejo, Object valorNuevo) {
-                muestraInfActividades();
+                muestraActividadesFormulario();
             }
         });
-        setTotalRegistros();
+        tfTiempoTotal.setOnAction(e -> {
+            if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
+                grdActividades.getSelectionModel().getSelectedItem().setDuracion(tfTiempoTotal.getText());
+            }
+        });
+        tfTiempoTotal.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent t) {
+                if (t.getCode() == KeyCode.TAB) {
+                    if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
+                        grdActividades.getSelectionModel().getSelectedItem().setDuracion(tfTiempoTotal.getText());
+                    }
+                }
+            }
+        });
+        tfTiempoInicio.setOnAction(e -> {
+            if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
+                grdActividades.getSelectionModel().getSelectedItem().setHoraInicio(tfTiempoInicio.getText());
+            }
+        });
+        tfTiempoInicio.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent t) {
+                if (t.getCode() == KeyCode.TAB) {
+                    if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
+                        grdActividades.getSelectionModel().getSelectedItem().setHoraInicio(tfTiempoInicio.getText());
+                    }
+                }
+            }
+        });
+        tfTiempoFin.setOnAction(e -> {
+            if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
+                grdActividades.getSelectionModel().getSelectedItem().setHoraFin(tfTiempoFin.getText());
+            }
+        });
+        tfTiempoFin.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent t) {
+                if (t.getCode() == KeyCode.TAB) {
+                    if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
+                        grdActividades.getSelectionModel().getSelectedItem().setHoraFin(tfTiempoFin.getText());
+                    }
+                }
+            }
+        });
+        try {
+            consultaActividades();
+            setTotalRegistros();
+        } catch (Exception ex) {
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: initialize");
+        }
+        loading.close();
     }
 
     public void muestraFecha() {
@@ -239,13 +321,75 @@ public class SPPRYF12Controller implements Initializable {
         lbFecha.setText(fechaFormateada.toUpperCase());
     }
 
-    public ObservableList<Actividades> cargaRegistrosExistentes() {
-        ObservableList<Actividades> registros = FXCollections.observableArrayList();
-        registros.add(new Actividades(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin), "DMS_2014", "INVESTIGACION", "02:10:00", "09:05:00", "11:15:00", "INVESTIGACION JAVAFX", "100"));
-        registros.add(new Actividades(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin), "DMS_2014", "REUNIÓN DE ESTÁNDARES", "01:05:00", "11:16:00", "12:21:00", "REUNION DMS", "100"));
-        registros.add(new Actividades(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin), "DMS_2015", "APOYO AL EQUIPO DE TRABAJO", "04:20:00", "12:22:00", "16:42:00", "APOYO A SVA", "100"));
-        registros.add(new Actividades(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin), "DMS_2016", "DOCUMENTACIÓN", "00:10:00", "16:43:00", "16:53:00", "REALIZACION DE MANUALES", "100"));
-        return registros;
+    public void consultaActividades() {
+        ObservableList<SpdReportesActividadesModel> registros = FXCollections.observableArrayList();
+        boolean isPhantom = false;
+        int posicion = 0;
+        if (!fechaSeleccionada.equals(LocalDate.now())) {
+            btnStarStop.setDisable(true);
+            btnAgregarActividad.setDisable(false);
+            if (!running) {
+                setPosicionTimer(0);
+            }
+        } else {
+            btnStarStop.setDisable(false);
+            btnAgregarActividad.setDisable(true);
+        }
+        HashMap<String, Object> parametrosHsm = new HashMap<>();
+        parametrosHsm.put("fecha", fechaSeleccionada);
+        parametrosHsm.put("txtTiempoTotal", tfTiempoTotal);
+        parametrosHsm.put("txtTiempoInicio", tfTiempoInicio);
+        parametrosHsm.put("txtTiempoFinal", tfTiempoFin);
+        try {
+            ConsultaSpdReportesActividadesStore store = new ConsultaSpdReportesActividadesStore();
+            registros = store.consultaActividades(parametrosHsm);
+            if (contadorCambioDia == 0) {
+                if (grdActividades.getItems().size() > 0) {
+                    grdActividades.getItems().get(posicionTimer).duracionProperty().unbind();
+                    grdActividades.getItems().get(posicionTimer).horaInicioProperty().unbind();
+                    grdActividades.getItems().get(posicionTimer).horaFinProperty().unbind();
+                }
+            }
+//            tfDescripcion.textProperty().unbind();
+            tfDescripcion.setText("");
+            tfTiempoTotal.textProperty().unbind();
+            tfTiempoTotal.setText("00:00:00");
+            tfTiempoInicio.textProperty().unbind();
+            tfTiempoInicio.setText("00:00:00");
+            tfTiempoFin.textProperty().unbind();
+            tfTiempoFin.setText("00:00:00");
+            if (!fechaSeleccionada.equals(LocalDate.now()) && running && contadorCambioDia == 0) {
+                actividadEnEjecucion = grdActividades.getItems().get(posicionTimer);
+                contadorCambioDia++;
+            } else if (fechaSeleccionada.equals(LocalDate.now()) && actividadEnEjecucion != null && running && contadorCambioDia > 0) {
+                contadorCambioDia = 0;
+                if (actividadEnEjecucion.getIdReporteActividad() == null) {
+                    registros.add(0, actividadEnEjecucion);
+                    isPhantom = true;
+                } else {
+                    for (int x = 0; x < registros.size(); x++) {
+                        if (registros.get(x).getIdReporteActividad().equals(actividadEnEjecucion.getIdReporteActividad())) {
+                            registros.remove(x);
+                            registros.add(x, actividadEnEjecucion);
+                            posicion = x;
+                        }
+                    }
+
+                    isPhantom = false;
+                }
+            }
+            grdActividades.setItems(registros);
+            if (isPhantom && running && grdActividades.getItems().size() > 0) {
+                grdActividades.getItems().get(0).getStopWatch().startStop.fire();
+                grdActividades.getItems().get(0).getStopWatch().startStop.fire();
+                contadorCambioDia = 0;
+            } else if (!isPhantom && running && grdActividades.getItems().size() > 0) {
+                grdActividades.getItems().get(posicion).getStopWatch().startStop.fire();
+                grdActividades.getItems().get(posicion).getStopWatch().startStop.fire();
+            }
+        } catch (Exception ex) {
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaActividades");
+        }
     }
 
     public static void setPrimaryStage(Stage primaryStage) {
@@ -275,7 +419,9 @@ public class SPPRYF12Controller implements Initializable {
                 if (operacion == 0) {//cerrar ventana
                     primaryStage.close();
                 } else if (operacion == 1) {//eliminar registro
-                    eliminaActividadesAction(grid.getItems(), grid.getSelectionModel().getSelectedItems());
+                    eliminaActividadesAction();
+                } else if (operacion == 2) {
+                    guardaActividadesAction();
                 }
 //                else if (operacion == 2) { //cambiar dia
 //                    cambioDiaAction(grid.getItems(), grid.getSelectionModel().getSelectedItems());
@@ -286,7 +432,7 @@ public class SPPRYF12Controller implements Initializable {
         }
     }
 
-    public static TableView<Actividades> getTableView() {
+    public static TableView<SpdReportesActividadesModel> getTableView() {
         return grid;
     }
 
@@ -299,35 +445,58 @@ public class SPPRYF12Controller implements Initializable {
     }
 
     public void agregaActividades() {
-        Actividades actividades = new Actividades();
+        SpdReportesActividadesModel actividades = new SpdReportesActividadesModel();
         actividades.setStopWatch(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin));
         actividades.setDescripcion(tfDescripcion.getText());
-        actividades.setTiempoTotal("00:00:00");
-        actividades.setTiempoInicio("00:00:00");
-        actividades.setTiempoFin("00:00:00");
-        if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
-            grdActividades.getSelectionModel().getSelectedItem().getStopWatch().startStop.fire();
+        if (dtfFechaActual.getValue().equals(LocalDate.now())) {
+            actividades.setDuracion("00:00:00");
+            actividades.setHoraInicio("00:00:00");
+            actividades.setHoraFin("00:00:00");
+            if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
+                if (running) {
+                    grdActividades.getSelectionModel().getSelectedItem().getStopWatch().startStop.fire();
+                }
+            }
+        } else {
+            actividades.setDuracion(tfTiempoTotal.getText());
+            actividades.setHoraInicio(tfTiempoInicio.getText());
+            actividades.setHoraFin(tfTiempoFin.getText());
         }
+        actividades.setFecha(dtfFechaActual.getValue().toString());
+        actividades.setAvance("0");
         grdActividades.getItems().add(0, actividades);
         actividades.getStopWatch().startStop.fire();
         setTotalRegistros();
 
     }
 
-    public void muestraInfActividades() {
-        ObservableList<Actividades> muestraInfo = grid.getSelectionModel().getSelectedItems();
-        tfDescripcion.textProperty().bind(muestraInfo.get(0).descripcionProperty());
-        tfTiempoTotal.textProperty().bind(muestraInfo.get(0).tiempoTotalProperty());
-        tfTiempoInicio.textProperty().bind(muestraInfo.get(0).tiempoInicioProperty());
-        tfTiempoFin.textProperty().bind(muestraInfo.get(0).tiempoFinProperty());
+    public void muestraActividadesFormulario() {
+        ObservableList<SpdReportesActividadesModel> muestraInfo = grid.getSelectionModel().getSelectedItems();
+        if (grid.getSelectionModel().getSelectedItems().size() > 0 && fechaSeleccionada.equals(LocalDate.now())) {
+//            tfDescripcion.textProperty().bind(muestraInfo.get(0).descripcionProperty());
+            tfDescripcion.setText(muestraInfo.get(0).getDescripcion());
+            tfTiempoTotal.textProperty().bind(muestraInfo.get(0).duracionProperty());
+            tfTiempoInicio.textProperty().bind(muestraInfo.get(0).horaInicioProperty());
+            tfTiempoFin.textProperty().bind(muestraInfo.get(0).horaFinProperty());
+        } else if (grid.getSelectionModel().getSelectedItems().size() > 0 && !fechaSeleccionada.equals(LocalDate.now())) {
+//            tfDescripcion.textProperty().unbind();
+            tfDescripcion.setText(muestraInfo.get(0).getDescripcion());
+            tfTiempoTotal.textProperty().unbind();
+            tfTiempoTotal.setText(muestraInfo.get(0).getDuracion());
+            tfTiempoInicio.textProperty().unbind();
+            tfTiempoInicio.setText(muestraInfo.get(0).getHoraInicio());
+            tfTiempoFin.textProperty().unbind();
+            tfTiempoFin.setText(muestraInfo.get(0).getHoraFin());
+//            muestraInfo.get(0).duracionProperty().bindBidirectional(tfTiempoTotal.textProperty());
+//            muestraInfo.get(0).horaInicioProperty().bindBidirectional(tfTiempoInicio.textProperty());
+//            muestraInfo.get(0).horaFinProperty().bindBidirectional(tfTiempoFin.textProperty());
+        }
+//        setPosicionTimer(grdActividades.getSelectionModel().getSelectedIndex());
     }
 
     public void eliminaActividades() {
-        ObservableList<Actividades> allRecords = grdActividades.getItems();
-        ObservableList<Actividades> registro = grdActividades.getSelectionModel().getSelectedItems();
-        List registroSeleccionado = new ArrayList(registro);
-        if (!registro.get(0).getStopWatch().getCurrentStatus()) {
-            eliminaActividadesAction(allRecords, registro);
+        if (!grid.getSelectionModel().getSelectedItems().get(0).getStopWatch().getCurrentStatus()) {//SI LA ACTIVIDAD A ELIMINAR NO ESTÁ CORRIENDO
+            eliminaActividadesAction();
         } else {
             alertActividades(primaryStage, "SPPRYF12", "ELIMINAR ACTIVIDAD", 1);
         }
@@ -335,36 +504,122 @@ public class SPPRYF12Controller implements Initializable {
 
     }
 //    public void cambioDia() {
-//        ObservableList<Actividades> allRecords = grdActividades.getItems();
-//        ObservableList<Actividades> registro = grdActividades.getSelectionModel().getSelectedItems();
+//        ObservableList<SpdReportesActividadesModel> allRecords = grdActividades.getItems();
+//        ObservableList<SpdReportesActividadesModel> registro = grdActividades.getSelectionModel().getSelectedItems();
 //        List registroSeleccionado = new ArrayList(registro);
 //        if (registro.size() > 0) {
 //            if (registro.get(0).getStopWatch().getCurrentStatus()) {
-//                alertActividades(primaryStage, "SPPRYF12", "CAMBIAR DE DIA", 2);
+//                alertSpdReportesActividadesModel(primaryStage, "SPPRYF12", "CAMBIAR DE DIA", 2);
 //            }
 //        } else {
 //            System.out.println("Consulta actividades dia" + newValue);
 //        }
 //    }
 
-    private static void eliminaActividadesAction(ObservableList<Actividades> allRecords, ObservableList<Actividades> registroSeleccionado) {
-        List selectedRecord = new ArrayList(registroSeleccionado);
-        if (registroSeleccionado.get(0).getStopWatch().getCurrentStatus()) {
-            registroSeleccionado.get(0).getStopWatch().startStop.fire();
+    private static void eliminaActividadesAction() {
+        if (grid.getSelectionModel().getSelectedItems().get(0).getStopWatch().getCurrentStatus()) {
+            grid.getSelectionModel().getSelectedItems().get(0).getStopWatch().startStop.fire();
         }
-        allRecords.removeAll(selectedRecord);
+        grid.getSelectionModel().getSelectedItems().get(0).setDescripcion("");
+//        descripcionAct.textProperty().unbind();
+        grid.getSelectionModel().getSelectedItems().get(0).duracionProperty().unbind();
+        duracion.textProperty().unbind();
+        duracion.setText("00:00:00");
+        grid.getSelectionModel().getSelectedItems().get(0).horaInicioProperty().unbind();
+        horaInicio.textProperty().unbind();
+        horaInicio.setText("00:00:00");
+        grid.getSelectionModel().getSelectedItems().get(0).horaFinProperty().unbind();
+        horaFin.textProperty().unbind();
+        horaFin.setText("00:00:00");
+        HashMap<String, Object> parametrosHsm = new HashMap<>();
+        parametrosHsm.put("listaDelete", grid.getSelectionModel().getSelectedItems());
+        parametrosHsm.put("mascara", loading);
+        boolean isPhantom = grid.getSelectionModel().getSelectedItems().get(0).getIdReporteActividad() == null;
+        if (!isPhantom) {
+            EliminaSpdReportesActividadesStore store = new EliminaSpdReportesActividadesStore();
+            try {
+                store.eliminaActividades(parametrosHsm);
+            } catch (Exception ex) {
+                GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: eliminaActividadesAction");
+            }
+        }
+        grid.getItems().removeAll(grid.getSelectionModel().getSelectedItems());
     }
 
     public void setTotalRegistros() {
         lbTotalRegistros.setText(String.valueOf(grid.getItems().size()));
     }
 
-//    public static void cambioDiaAction(ObservableList<Actividades> allRecords, ObservableList<Actividades> registroSeleccionado) {
+//    public static void cambioDiaAction(ObservableList<SpdReportesActividadesModel> allRecords, ObservableList<SpdReportesActividadesModel> registroSeleccionado) {
 //        contadorCambioDia++;
 //        datePicker.setValue(newValue);
 //        registroSeleccionado.get(0).getStopWatch().startStop.fire();
 //    }
     public void setTiempoTotal() {
         lbTiempoTotal.setText(String.valueOf(grid.getItems().size()));
+    }
+
+    public void guardaActividades() {
+        registrosNuevos = FXCollections.observableArrayList();
+        registrosActualizados = FXCollections.observableArrayList();
+        for (int x = 0; x < grdActividades.getItems().size(); x++) {
+            if (grdActividades.getItems().get(x).getIdReporteActividad() == null) { //REGISTROS NUEVOS
+                registrosNuevos.add(grdActividades.getItems().get(x));
+            } else {
+                registrosActualizados.add(grdActividades.getItems().get(x));
+            }
+            if (dtfFechaActual.getValue().equals(LocalDate.now())) {
+                if (grdActividades.getItems().get(x).getStopWatch().getCurrentStatus()) {//SI EL REGISTRO ACTUAL ESTA CORRIENDO
+                    posicionTimerRunning = x;
+                    insertaDiaActual = true;
+                }
+            } else {
+                insertaDiaActual = false;
+            }
+        }
+        if (running && dtfFechaActual.getValue().equals(LocalDate.now())) {
+            alertActividades(primaryStage, "SPPRYF12", "GUARDAR ACTIVIDADES", 2);
+        } else {
+            guardaActividadesAction();
+        }
+    }
+
+    public static void guardaActividadesAction() {
+        loading.show();
+        InsertaSpdReportesActividadesStore storeInsert;
+        ActualizaSpdReportesActividadesStore storeUpdate;
+        HashMap<String, Object> parametrosHsm;
+        if (registrosNuevos.size() > 0) {
+            if (running) {
+                if (insertaDiaActual) {
+                    registrosNuevos.get(posicionTimerRunning).getStopWatch().startStop.fire();
+                }
+                if (grid.getItems().get(posicionTimer).getStopWatch().getCurrentStatus() && datePicker.getValue().equals(LocalDate.now())) {
+                    grid.getItems().get(posicionTimer).getStopWatch().startStop.fire();
+                }
+            }
+        }
+        if (registrosActualizados.size() > 0) {
+            if (running) {
+                if (insertaDiaActual) {
+                    registrosActualizados.get(posicionTimerRunning).getStopWatch().startStop.fire();
+                }
+                if (registrosActualizados.get(posicionTimerRunning).getStopWatch().getCurrentStatus() && datePicker.getValue().equals(LocalDate.now())) {
+                    grid.getItems().get(posicionTimer).getStopWatch().startStop.fire();
+                }
+            }
+        }
+        storeInsert = new InsertaSpdReportesActividadesStore();
+        storeUpdate = new ActualizaSpdReportesActividadesStore();
+        parametrosHsm = new HashMap<>();
+        parametrosHsm.put("listaCreate", registrosNuevos);
+        parametrosHsm.put("listaUpdate", registrosActualizados);
+        parametrosHsm.put("mascara", loading);
+        try {
+            storeInsert.insertaActividades(parametrosHsm);
+            storeUpdate.actualizaActividades(parametrosHsm);
+        } catch (Exception ex) {
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: guardaActividadesAction");
+        }
     }
 }

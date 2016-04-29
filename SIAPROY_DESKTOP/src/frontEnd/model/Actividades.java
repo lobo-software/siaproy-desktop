@@ -33,7 +33,11 @@
 package frontEnd.model;
 
 import frontEnd.model.stopWatch.Stopwatch;
+import frontEnd.util.SialCheckBox;
+import java.util.Date;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -42,7 +46,7 @@ import javafx.beans.property.StringProperty;
  *
  * @author Lobo Software
  */
-public class Actividades {
+public class Actividades implements SialCheckBox{
 
     private final SimpleObjectProperty<Stopwatch> stopWatch;
     private String proyecto;
@@ -52,6 +56,8 @@ public class Actividades {
     private final SimpleStringProperty tiempoFin;
     private SimpleStringProperty descripcion;
     private String avance;
+    private SimpleObjectProperty<Date> fecha;
+    private SimpleBooleanProperty activo;
 
     //Se inicia con el modelado de datos
     public Actividades() {
@@ -63,10 +69,12 @@ public class Actividades {
         this.tiempoFin = new SimpleStringProperty("");
         this.descripcion = new SimpleStringProperty("");
         this.avance = "";
+        this.fecha = new SimpleObjectProperty<>();
+        this.activo = new SimpleBooleanProperty();
 
     }
 
-    public Actividades(Stopwatch stopWatch, String proyecto, String actividad, String tiempoTotal, String tiempoInicio, String tiempoFin, String descripcion, String avance) {
+    public Actividades(Stopwatch stopWatch, String proyecto, String actividad, String tiempoTotal, String tiempoInicio, String tiempoFin, String descripcion, String avance, Date fecha, String activo) {
         this.stopWatch = new SimpleObjectProperty(stopWatch);
         this.proyecto = proyecto;
         this.actividad = actividad;
@@ -75,6 +83,9 @@ public class Actividades {
         this.tiempoFin = new SimpleStringProperty(tiempoFin);
         this.descripcion = new SimpleStringProperty(descripcion);
         this.avance = avance;
+        this.fecha = new SimpleObjectProperty<>(fecha);
+        this.activo = new SimpleBooleanProperty(activo.equals("S") || activo.equals("A"));
+
     }
 
     public void setStopWatch(Stopwatch stopWatch) {
@@ -148,8 +159,8 @@ public class Actividades {
     public String getDescripcion() {
         return descripcion.get();
     }
-    
-    public StringProperty descripcionProperty(){
+
+    public StringProperty descripcionProperty() {
         return descripcion;
     }
 
@@ -160,4 +171,44 @@ public class Actividades {
     public String getAvance() {
         return avance;
     }
+    
+        public void setFecha(Date fecha) {
+        this.fecha.set(fecha);
+    }
+
+    public Date getFecha() {
+        return fecha.get();
+    }
+
+    public ObjectProperty<Date> fechaProperty() {
+        return fecha;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo.set(activo);
+    }
+
+    public boolean getActivo() {
+        return activo.get();
+    }
+
+    public BooleanProperty activoProperty() {
+        return activo;
+    }
+    
+    @Override
+    public SimpleBooleanProperty getCheckedProperty(){
+        return activo;
+    }
+
+    @Override
+    public void setOneSelection() {
+        this.setActivo(false);
+    }
+
+    @Override
+    public void setAllSelection(boolean valueHeader) {
+        this.setActivo(valueHeader);
+    }
+
 }

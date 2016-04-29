@@ -22,7 +22,7 @@
  *  Document     : SialTextFieldCellFactory.java
  * Created on    : 19 Apr 2016 5:45:34 PM
  * Author           : SVA
- * Modifications : 
+ * Modifications : 29/Abr/2016 17:07 SVA (LOBO_000076): Se restructura la clase y se mejora la funcionalidad.
  */
 package frontEnd.util;
 
@@ -47,7 +47,6 @@ import javafx.util.Callback;
 public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
 
     private TextField textField;
-    private int contador = 0;
     private int row = 0;
 
     public SialTextFieldCellFactory() {
@@ -152,31 +151,31 @@ public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
             nextIndex++;
             if (nextIndex > columns.size() - 1) {
                 nextIndex = 0;
-                if (contador == 0) {
-                    contador++;
+//                if (contador == 0) {
+//                    contador++;
                     if (row < getTableView().getItems().size() - 1) {
                         row += 1;
                     } else {
                         row = 0;
                     }
-                } else {
-                    contador = 0;
-                }
+//                } else {
+//                    contador = 0;
+//                }
             }
         } else {
             nextIndex--;
             if (nextIndex < 0) {
                 nextIndex = columns.size() - 1;
-                if (contador == 0) {
-                    contador++;
+//                if (contador == 0) {
+//                    contador++;
                     if (row > 0) {
                         row -= 1;
                     } else {
                         row = getTableView().getItems().size() - 1;
                     }
-                } else {
-                    contador = 0;
-                }
+//                } else {
+//                    contador = 0;
+//                }
             }
         }
         return columns.get(nextIndex);
