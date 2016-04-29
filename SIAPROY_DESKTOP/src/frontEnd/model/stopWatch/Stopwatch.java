@@ -27,7 +27,7 @@
                   inecesario así como librerías no usadas dentro  de la clase.    
  15/Apr/2016 13:44 CCL (LOBO_000076): Se incluye  la llamada al controller para establecer bandera en ciere de aplicación.
  22/Apr/2016 13:41 CCL (LOBO_000076): Se añde validadción para seleccionar  el registro del timer que se agregue.
-
+ 29/Abr/2016 17:07 SVA (LOBO_000076): Se modifica el bind para el los textfields de los tiempos total, inicio y final.
  */
 package frontEnd.model.stopWatch;
 
@@ -113,11 +113,11 @@ public class Stopwatch extends Region {
                 stopWatchWorker = new StopwatchWorker(contador, currentTime, startTime);
                 Thread t = new Thread(stopWatchWorker);
                 tiempoTotal.textProperty().bind(stopWatchWorker.messageProperty());
-                tiempoInicio.textProperty().bind(stopWatchWorker.getTiempoInicioProperty());
-                tiempoFinal.textProperty().bind(stopWatchWorker.getTiempoFinalProperty());
-                SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).tiempoTotalProperty().bind(stopWatchWorker.messageProperty());
-                SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).tiempoInicioProperty().bind(stopWatchWorker.getTiempoInicioProperty());
-                SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).tiempoFinProperty().bind(stopWatchWorker.getTiempoFinalProperty());
+                tiempoInicio.textProperty().bind(stopWatchWorker.tti.messageProperty());
+                tiempoFinal.textProperty().bind(stopWatchWorker.ttf.messageProperty());
+                SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).duracionProperty().bind(stopWatchWorker.messageProperty());
+                SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).horaInicioProperty().bind(stopWatchWorker.tti.messageProperty());
+                SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).horaFinProperty().bind(stopWatchWorker.ttf.messageProperty());
                 t.setDaemon(true);
                 t.start();
                 return;
