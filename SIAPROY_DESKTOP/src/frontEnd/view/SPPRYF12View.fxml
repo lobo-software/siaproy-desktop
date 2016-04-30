@@ -30,92 +30,86 @@
 15/Apr/2016 12:33 CCL (LOBO_000076): Se eliminó el evento de prueba "#agregaActividades" al boton Guardar en la vista.
 22/Apr/2016 13:44 CCL (LOBO_000076): Redimencionan ciertos  componetes apra darle un mejor diseño a la vista y se le cambia el tipo y tamo de fuente a los textfields.
 29/Abr/2016 17:07 SVA (LOBO_000076): Se añaden métodos para agregar registros y guardar información.
+29/Apr/2016 13:55 CCl(LOBO_0000076):Se hicieron ajustes a todos los componentes dentro de la vista, como el ordemamiento simétrico de los mismos para una mejor estética visual.
 -->
 
 <?import javafx.geometry.Insets?>
+<?import javafx.geometry.Point3D?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.Blend?>
 <?import javafx.scene.effect.Glow?>
 <?import javafx.scene.effect.InnerShadow?>
-<?import javafx.scene.effect.Lighting?>
-<?import javafx.scene.effect.Shadow?>
+<?import javafx.scene.effect.Reflection?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="layoutPral" prefHeight="540.0" prefWidth="1003.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontEnd.controller.SPPRYF12Controller">
+<BorderPane id="SPPRY12.Reporte de actividades" fx:id="layoutPral" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontEnd.controller.SPPRYF12Controller">
     <top>
-        <BorderPane fx:id="layoutSecundario" cache="true" cacheHint="SPEED" prefHeight="200.0" prefWidth="530.0" BorderPane.alignment="CENTER">
+        <BorderPane cache="true" cacheHint="SPEED" BorderPane.alignment="CENTER">
             <top>
-                <VBox prefHeight="36.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+                <VBox prefHeight="78.0" prefWidth="861.0" BorderPane.alignment="CENTER">
                     <children>
-                        <HBox prefHeight="21.0" prefWidth="600.0" spacing="5.0">
+                        <HBox blendMode="SCREEN" spacing="5.0">
                             <children>
                                 <Button fx:id="btnRegistro" mnemonicParsing="false" text="Registro" textFill="#103912">
                                     <font>
                                         <Font name="Arial Black" size="12.0" />
                                     </font>
+                           <HBox.margin>
+                              <Insets bottom="5.0" top="10.0" />
+                           </HBox.margin>
                                 </Button>
                                 <Button fx:id="btnConsulta" mnemonicParsing="false" text="Consulta" textFill="#174a20">
                                     <font>
                                         <Font name="Arial Black" size="12.0" />
                                     </font>
+                           <HBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </HBox.margin>
                                 </Button>
                             </children>
                             <effect>
                                 <Glow>
                            <input>
                               <Glow />
-                           </input></Glow>
+                           </input>
+                        </Glow>
                             </effect>
+                     <VBox.margin>
+                        <Insets left="10.0" right="260.0" />
+                     </VBox.margin>
                     
-                        </HBox>
-                        <HBox blendMode="RED" cache="true" cacheHint="QUALITY" prefHeight="55.0" prefWidth="972.0">
-                            <children>
-                                <TextField fx:id="tfDescripcion" blendMode="LIGHTEN" focusTraversable="false" prefHeight="41.0" prefWidth="742.0" HBox.hgrow="ALWAYS">
-                                    <padding>
-                                        <Insets top="5.0" />
-                                    </padding>
+                                                </HBox>
+                  <HBox prefHeight="53.0" prefWidth="848.0">
+                     <children>
+                        <TextField fx:id="tfDescripcion" prefHeight="43.0" prefWidth="763.0" HBox.hgrow="ALWAYS">
                            <font>
-                              <Font name="Arial Narrow Bold Italic" size="25.0" />
+                              <Font name="Arial Narrow" size="23.0" />
                            </font>
-                                </TextField>
-                                <Label fx:id="lbFecha" accessibleRole="DATE_PICKER" blendMode="DIFFERENCE" contentDisplay="CENTER" lineSpacing="3.0" prefHeight="55.0" prefWidth="220.0" text="12 Ene 2016" textFill="WHITE">
-                                    <padding>
-                                        <Insets bottom="5.0" left="20.0" right="5.0" top="5.0" />
-                                    </padding>
-                                    <font>
-                                        <Font name="Arial Black" size="18.0" />
-                                    </font>
-                                    <opaqueInsets>
-                                        <Insets left="15.0" right="5.0" />
-                                    </opaqueInsets>
-                                    <HBox.margin>
-                                        <Insets left="10.0" />
-                                    </HBox.margin>
-                          
-                           <effect>
-                              <Blend />
-                           </effect>
-                                </Label>
-                            </children>
-                            <VBox.margin>
-                                <Insets top="10.0" />
-                            </VBox.margin>
-                        </HBox>
+                           <HBox.margin>
+                              <Insets top="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                     </children>
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin></HBox>
                     </children>
+               <BorderPane.margin>
+                  <Insets right="250.0" />
+               </BorderPane.margin>
                 </VBox>
             </top>
             <left>
-                <HBox fx:id="hboxBotonPlayAgregar" cache="true" cacheHint="QUALITY" prefHeight="84.0" prefWidth="207.0" spacing="10.0" BorderPane.alignment="CENTER">
+                <HBox fx:id="hboxBotonPlayAgregar" blendMode="DIFFERENCE" cache="true" cacheHint="QUALITY" prefHeight="154.0" prefWidth="237.0" spacing="10.0" BorderPane.alignment="CENTER">
                     <children>
-                        <Button fx:id="btnStarStop" mnemonicParsing="false" onAction="#agregaActividades" prefHeight="74.0" prefWidth="54.0" textFill="#56ad0a">
+                        <Button fx:id="btnStarStop" mnemonicParsing="false" onAction="#agregaActividades" prefHeight="67.0" prefWidth="66.0" textFill="#56ad0a" HBox.hgrow="ALWAYS">
                             <font>
                                 <Font name="Arial Black" size="30.0" />
                             </font>
@@ -126,10 +120,10 @@
                         <Insets top="10.0" />
                      </HBox.margin>
                      <padding>
-                        <Insets bottom="5.0" />
+                        <Insets bottom="10.0" />
                      </padding>
                         </Button>
-                        <Button fx:id="btnAgregarActividad" mnemonicParsing="false" onAction="#agregaActividades" prefHeight="75.0" prefWidth="61.0" text="+" textFill="#4f16db">
+                        <Button fx:id="btnAgregarActividad" mnemonicParsing="false" onAction="#agregaActividades" prefHeight="67.0" prefWidth="73.0" text="+" textFill="#1130e1" HBox.hgrow="ALWAYS">
                             <font>
                                 <Font size="30.0" />
                             </font>
@@ -143,7 +137,7 @@
                         <Insets bottom="5.0" />
                      </padding>
                         </Button>
-                  <Button fx:id="btnEliminar" mnemonicParsing="false" onAction="#eliminaActividades" prefHeight="75.0" prefWidth="65.0" text="-" textAlignment="CENTER" textFill="#da0d0d">
+                  <Button fx:id="btnEliminar" mnemonicParsing="false" onAction="#eliminaActividades" prefHeight="69.0" prefWidth="78.0" text="-" textAlignment="CENTER" textFill="#eb5a00" HBox.hgrow="ALWAYS">
                      <font>
                         <Font name="Arial Black" size="24.0" />
                      </font>
@@ -159,128 +153,221 @@
                   </Button>
                     </children>
                     <BorderPane.margin>
-                        <Insets top="10.0" />
+                        <Insets left="10.0" top="10.0" />
                     </BorderPane.margin>
                     <effect>
                         <Glow />
                     </effect>
                <padding>
-                  <Insets top="20.0" />
+                  <Insets bottom="15.0" top="20.0" />
                </padding>
               
                 </HBox>
             </left>
-            <center>
-                <VBox blendMode="GREEN" prefHeight="95.0" prefWidth="561.0" spacing="20.0" BorderPane.alignment="CENTER">
-                    <children>
-                        <HBox blendMode="BLUE" prefHeight="45.0" prefWidth="564.0" spacing="40.0">
-                            <children>
-                                <Label fx:id="lblTotal" prefHeight="45.0" prefWidth="183.0" text="Total" textAlignment="CENTER" textFill="#ad0c91" wrapText="true" HBox.hgrow="ALWAYS">
-                                    <padding>
-                                        <Insets bottom="5.0" left="30.0" right="70.0" top="5.0" />
-                                    </padding>
-                                    <font>
-                                        <Font name="Arial Black" size="23.0" />
-                                    </font>
-                           <HBox.margin>
+         <center>
+            <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+               <children>
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label fx:id="lblTotal" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" prefHeight="40.0" prefWidth="210.0" text="  Total" textAlignment="CENTER" textFill="#168b94" VBox.vgrow="ALWAYS">
+                           <font>
+                              <Font name="Arial Black" size="27.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets bottom="15.0" top="20.0" />
+                           </opaqueInsets>
+                           <VBox.margin>
+                              <Insets left="20.0" right="20.0" />
+                           </VBox.margin>
+                           <padding>
+                              <Insets left="5.0" right="10.0" />
+                           </padding>
+                        </Label>
+                        <TextField fx:id="tfTiempoTotal" alignment="CENTER" blendMode="SOFT_LIGHT" prefHeight="69.0" prefWidth="150.0" VBox.vgrow="ALWAYS">
+                           <opaqueInsets>
+                              <Insets left="20.0" top="15.0" />
+                           </opaqueInsets>
+                           <VBox.margin>
+                              <Insets left="20.0" right="20.0" />
+                           </VBox.margin>
+                        </TextField>
+                     </children>
+                     <opaqueInsets>
+                        <Insets top="15.0" />
+                     </opaqueInsets>
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                     <effect>
+                        <Reflection bottomOpacity="0.45" />
+                     </effect>
+                  </VBox>
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label fx:id="lblInicio" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" prefHeight="40.0" prefWidth="210.0" text="  Inicio" textFill="#138756">
+                           <font>
+                              <Font name="Arial Black" size="27.0" />
+                           </font>
+                           <opaqueInsets>
                               <Insets left="20.0" />
-                           </HBox.margin>
-                                </Label>
-                                <Label fx:id="lblInicio" layoutX="10.0" layoutY="10.0" prefHeight="41.0" prefWidth="160.0" text="Inicio" textFill="#132dae" HBox.hgrow="ALWAYS">
-                                    <padding>
-                                        <Insets bottom="5.0" left="5.0" right="55.0" top="5.0" />
-                                    </padding>
-                                    <font>
-                                        <Font name="Arial Black" size="21.0" />
-                                    </font>
-                                </Label>
-                                <Label fx:id="lblFin" layoutX="38.0" layoutY="10.0" prefHeight="45.0" prefWidth="124.0" text="Fin" textFill="#3b526b" HBox.hgrow="ALWAYS">
-                                    <padding>
-                                        <Insets bottom="5.0" right="5.0" top="5.0" />
-                                    </padding>
-                                    <font>
-                                        <Font name="Arial Black" size="23.0" />
-                                    </font>
-                                </Label>
-                            </children>
-                        </HBox>
-                        <HBox prefHeight="77.0" prefWidth="532.0" spacing="4.0">
-                            <children>
-                                <TextField fx:id="tfTiempoTotal" prefHeight="47.0" prefWidth="143.0" HBox.hgrow="ALWAYS">
-                                    <padding>
-                                        <Insets left="5.0" right="5.0" />
-                                    </padding>
+                           </opaqueInsets>
+                           <VBox.margin>
+                              <Insets left="20.0" right="20.0" />
+                           </VBox.margin>
+                           <padding>
+                              <Insets left="5.0" right="20.0" />
+                           </padding>
+                        </Label>
+                        <TextField fx:id="tfTiempoInicio" alignment="CENTER" prefHeight="69.0" prefWidth="150.0" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets left="20.0" right="20.0" />
+                           </VBox.margin>
+                        </TextField>
+                     </children>
+                    
+                  </VBox>
+                  <VBox fx:id="lblfin" alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label fx:id="lblFin" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" prefHeight="40.0" prefWidth="210.0" text="   Fin   " textAlignment="CENTER" textFill="#c44f63" VBox.vgrow="ALWAYS">
+                           <font>
+                              <Font name="Arial Black" size="26.0" />
+                           </font>
+                           <opaqueInsets>
+                              <Insets left="20.0" />
+                           </opaqueInsets>
+                           <VBox.margin>
+                              <Insets left="20.0" right="20.0" />
+                           </VBox.margin>
+                           <padding>
+                              <Insets left="10.0" right="30.0" />
+                           </padding>
+                        </Label>
+                        <TextField fx:id="tfTiempoFin" alignment="CENTER" prefHeight="69.0" prefWidth="150.0" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets left="20.0" right="20.0" />
+                           </VBox.margin>
+                        </TextField>
+                     </children>
+                  </VBox>
+               </children>
+               <BorderPane.margin>
+                  <Insets right="25.0" />
+               </BorderPane.margin>
+            </HBox>
+         </center>
+         <right>
+            <VBox alignment="CENTER" BorderPane.alignment="TOP_CENTER">
+               <BorderPane.margin>
+                  <Insets right="10.0" top="-50.0" />
+               </BorderPane.margin>
+               <children>
+                  <HBox VBox.vgrow="ALWAYS">
+                     <children>
+                        <Label fx:id="lbFecha" alignment="CENTER" contentDisplay="CENTER" prefHeight="37.0" prefWidth="200.0" text="12 Ene 2016" textAlignment="CENTER" textFill="#6f1ed6" textOverrun="CENTER_ELLIPSIS">
+                           <padding>
+                              <Insets left="5.0" />
+                           </padding>
+                           <font>
+                              <Font name="Arial Black" size="24.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox fx:id="layoutDatePicker" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <DatePicker fx:id="dtfFechaActual" onAction="#muestraFecha" prefHeight="40.0" prefWidth="209.0">
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
                            <HBox.margin>
-                              <Insets bottom="20.0" left="20.0" />
-                           </HBox.margin>
-                                </TextField>
-                                <TextField fx:id="tfTiempoInicio" prefHeight="49.0" prefWidth="177.0" HBox.hgrow="ALWAYS">
-                                    <padding>
-                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                    </padding>
-                           <HBox.margin>
-                              <Insets bottom="20.0" left="20.0" />
-                           </HBox.margin>
-                                </TextField>
-                                <TextField fx:id="tfTiempoFin" layoutX="121.0" layoutY="10.0" prefHeight="47.0" prefWidth="146.0" HBox.hgrow="ALWAYS">
-                                    <padding>
-                                        <Insets bottom="5.0" left="5.0" right="20.0" top="5.0" />
-                                    </padding>
-                           <HBox.margin>
-                              <Insets bottom="20.0" left="20.0" />
-                           </HBox.margin>
-                                </TextField>
-                            </children>
-                        </HBox>
-                    </children>
-                    <padding>
-                        <Insets left="20.0" right="20.0" />
-                    </padding>
-                </VBox>
-            </center>
-            <right>
-                <DatePicker fx:id="dtfFechaActual" onAction="#muestraFecha" prefHeight="25.0" prefWidth="193.0" BorderPane.alignment="CENTER">
-               <effect>
-                  <Lighting>
-                     <bumpInput>
-                        <Shadow />
-                     </bumpInput>
-                     <light>
-                        
-                     </light>
-                  </Lighting>
-               </effect></DatePicker>
-            </right>
+                              <Insets top="10.0" />
+                           </HBox.margin></DatePicker>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </right>
         </BorderPane>
     </top>
     <bottom>
-        <HBox prefHeight="28.0" prefWidth="600.0" spacing="50.0" BorderPane.alignment="CENTER">
+        <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0" spacing="50.0" BorderPane.alignment="CENTER">
             <children>
-                <Label fx:id="lblTotalActividades" text="Total de Actividades:" textFill="#1a0dae">
+                <Label fx:id="lblTotalActividades" prefHeight="17.0" prefWidth="216.0" text="Total de Actividades:" textFill="#1a0dae">
                     <font>
-                        <Font name="Arial Black" size="12.0" />
+                        <Font name="Arial Black" size="14.0" />
                     </font>
+               <padding>
+                  <Insets left="60.0" />
+               </padding>
+               <HBox.margin>
+                  <Insets bottom="20.0" top="20.0" />
+               </HBox.margin>
                 </Label>
-                <Label fx:id="lbTotalRegistros" text="3" textFill="#1b0a79" />
-                <Label fx:id="lblTiempoTotal" text="Tiempo Total:" textFill="#0d1b86">
+                <Label fx:id="lbTotalRegistros" prefHeight="17.0" prefWidth="24.0" text="3" textAlignment="CENTER" textFill="#1b0a79">
+               <HBox.margin>
+                  <Insets bottom="20.0" top="20.0" />
+               </HBox.margin>
+               <font>
+                  <Font name="System Bold Italic" size="14.0" />
+               </font></Label>
+                <Label fx:id="lblTiempoTotal" prefHeight="17.0" prefWidth="170.0" text="Tiempo Total:" textFill="#0d1b86">
                     <font>
-                        <Font name="Arial Black" size="12.0" />
+                        <Font name="Arial Black" size="14.0" />
                     </font>
+               <HBox.margin>
+                  <Insets top="20.0" />
+               </HBox.margin>
+               <padding>
+                  <Insets left="50.0" />
+               </padding>
                 </Label>
-                <Label fx:id="lbTiempoTo" text="00:00:00" textFill="#080f57">
+                <Label fx:id="lbTiempoTo" text="00:00:00" textAlignment="CENTER" textFill="#080f57" textOverrun="CLIP">
                     <font>
-                        <Font name="Arial" size="12.0" />
+                        <Font name="Arial" size="14.0" />
                     </font>
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding>
+               <HBox.margin>
+                  <Insets bottom="20.0" top="20.0" />
+               </HBox.margin>
                 </Label>
-                <Button fx:id="btnGuardar" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#guardaActividades" prefHeight="25.0" prefWidth="68.0" text="Guardar " textAlignment="CENTER" />
-                <Button fx:id="btnSincronizar" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" text="Sincronizar" />
+                <Button fx:id="btnGuardar" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#guardaActividades" prefHeight="30.0" prefWidth="85.0" text="Guardar " textAlignment="CENTER" HBox.hgrow="ALWAYS">
+               <font>
+                  <Font name="Arial Black" size="13.0" />
+               </font>
+               <HBox.margin>
+                  <Insets bottom="10.0" top="15.0" />
+               </HBox.margin></Button>
+                <Button fx:id="btnSincronizar" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" prefHeight="30.0" prefWidth="140.0" text="Sincronizar" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+               <font>
+                  <Font name="Arial Black" size="14.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets top="2.0" />
+               </opaqueInsets>
+               <rotationAxis>
+                  <Point3D />
+               </rotationAxis>
+               <HBox.margin>
+                  <Insets bottom="10.0" top="15.0" />
+               </HBox.margin></Button>
             </children>
+         <padding>
+            <Insets bottom="5.0" />
+         </padding>
         </HBox>
     </bottom>
+   <padding>
+      <Insets bottom="5.0" />
+   </padding>
    <center>
-        <TableView fx:id="grdActividades" editable="true" BorderPane.alignment="CENTER">
+        <TableView fx:id="grdActividades" editable="true" fixedCellSize="0.0" prefHeight="260.0" prefWidth="1253.0" BorderPane.alignment="CENTER">
             <columns>
-                <TableColumn fx:id="colTimer" editable="false" maxWidth="1100.0" minWidth="-Infinity" prefWidth="62.0" />
+                <TableColumn fx:id="colTimer" maxWidth="1100.0" minWidth="-Infinity" prefWidth="62.0" />
                 <TableColumn fx:id="colProyecto" minWidth="0.0" prefWidth="262.0" text="PROYECTO" />
                 <TableColumn fx:id="colActividades" minWidth="-1.0" prefWidth="215.0" text="ACTIVIDADADES" />
                 <TableColumn fx:id="colTiempo" editable="false" prefWidth="145.0" text="TIEMPO" />
@@ -289,13 +376,12 @@
                 <TableColumn fx:id="colDescripcion" prefWidth="224.0" text="DESCRIPCIÓN" />
                 <TableColumn fx:id="colAvance" prefWidth="132.0" text="AVANCE %" />
             <TableColumn fx:id="colFecha" prefWidth="75.0" text="FECHA" />
-            <TableColumn fx:id="colActivo" prefWidth="75.0" text="ACTIVO" />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
          <BorderPane.margin>
-            <Insets bottom="20.0" />
+            <Insets top="30.0" />
          </BorderPane.margin>
         </TableView>
    </center>
