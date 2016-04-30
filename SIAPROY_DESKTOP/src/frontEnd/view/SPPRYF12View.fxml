@@ -102,7 +102,11 @@
                      </VBox.margin></HBox>
                     </children>
                <BorderPane.margin>
+<<<<<<< HEAD
                   <Insets right="300.0" />
+=======
+                  <Insets right="250.0" />
+>>>>>>> refs/remotes/origin/master
                </BorderPane.margin>
                 </VBox>
             </top>
@@ -251,19 +255,31 @@
                   </VBox>
                </children>
                <BorderPane.margin>
+<<<<<<< HEAD
                   <Insets right="15.0" />
+=======
+                  <Insets right="25.0" />
+>>>>>>> refs/remotes/origin/master
                </BorderPane.margin>
             </HBox>
          </center>
          <right>
+<<<<<<< HEAD
             <VBox alignment="CENTER" prefHeight="214.0" prefWidth="256.0" BorderPane.alignment="TOP_CENTER">
+=======
+            <VBox alignment="CENTER" BorderPane.alignment="TOP_CENTER">
+>>>>>>> refs/remotes/origin/master
                <BorderPane.margin>
                   <Insets right="10.0" top="-50.0" />
                </BorderPane.margin>
                <children>
                   <HBox VBox.vgrow="ALWAYS">
                      <children>
+<<<<<<< HEAD
                         <Label fx:id="lbFecha" alignment="CENTER" contentDisplay="CENTER" prefHeight="37.0" prefWidth="263.0" text="12 Ene 2016" textAlignment="CENTER" textFill="#6f1ed6" textOverrun="CENTER_ELLIPSIS">
+=======
+                        <Label fx:id="lbFecha" alignment="CENTER" contentDisplay="CENTER" prefHeight="37.0" prefWidth="200.0" text="12 Ene 2016" textAlignment="CENTER" textFill="#6f1ed6" textOverrun="CENTER_ELLIPSIS">
+>>>>>>> refs/remotes/origin/master
                            <padding>
                               <Insets left="5.0" />
                            </padding>
@@ -324,7 +340,11 @@
                   <Insets left="50.0" />
                </padding>
                 </Label>
+<<<<<<< HEAD
                 <Label fx:id="lbTiempoTotal" text="00:00:00" textAlignment="CENTER" textFill="#080f57" textOverrun="CLIP">
+=======
+                <Label fx:id="lbTiempoTo" text="00:00:00" textAlignment="CENTER" textFill="#080f57" textOverrun="CLIP">
+>>>>>>> refs/remotes/origin/master
                     <font>
                         <Font name="Arial" size="14.0" />
                     </font>

@@ -214,8 +214,17 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+<<<<<<< HEAD
 *.properties
 SIAPROY_DESKTOP/build/
 SIAPROY_DESKTOP/dist/
 SIAPROY_DESKTOP/nbproject/
 SIAPROY_DESKTOP/test/
+=======
+
+
+SIAPROY_DESKTOP/build/
+SIAPROY_DESKTOP/dist/
+SIAPROY_DESKTOP/nbproject/
+SIAPROY_DESKTOP/test/
+>>>>>>> refs/remotes/origin/master

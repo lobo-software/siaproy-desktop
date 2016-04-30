@@ -562,6 +562,7 @@ public class SPPRYF12Controller implements Initializable {
 //        registroSeleccionado.get(0).getStopWatch().startStop.fire();
 //    }
     public void setTiempoTotal() {
+<<<<<<< HEAD
         String duracion = "";
         String[] tiempo;
         double min = 0.0, hora = 0.0, horasTotales = 0.0;
@@ -617,6 +618,138 @@ public class SPPRYF12Controller implements Initializable {
             duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
             lbTiempoTotal.setText(String.valueOf(duracion));
         }
+=======
+//               int TiempoTotal = 0;
+//        String tiempoInicio = "", tiempoFin = "", tiempoTotal = "", minutos = "", sumaTiempoTotal = "";
+//        Double total, totalFinal = Double.MIN_VALUE;
+//        int sumar = 0, i = 0;
+//        String[] hora, horaTiempoIni, horaTiempoFin;
+//        long hr;
+//        double min = 0, sumaTotal = 0;
+        String duracion;
+        for (int i = 0; i < grid.getItems().size(); i++) {
+            String[] tiempo = grid.getItems().get(i).getDuracion().split("[.]");
+            boolean esEntero = true;
+            double hora = Double.parseDouble(grid.getItems().get(i).getDuracion());
+            hora -= Integer.parseInt(tiempo[0]);
+//        if (tiempo[1].startsWith("0")) {
+//            tiempo[1] = tiempo[1].replaceFirst(tiempo[1], "0." + tiempo[1]);
+//        }
+            double min = hora * 60 / 100;
+            if (String.valueOf(min).split("[.]")[0].startsWith("0")) {
+                esEntero = false;
+            }
+            if (esEntero) {
+                long m = Math.round(min);
+                duracion = tiempo[0] + ":" + String.valueOf(m) + ":00";
+            } else {
+                min = Math.ceil(min * 1000) / 1000;
+                int m = (int)min;
+                duracion = tiempo[0] + ":" + "0"+String.valueOf(m)+":00";
+            }
+            grid.getItems().get(i).setDuracion(duracion);
+//            hora = grid.getItems().get(i).getDuracion().split(Pattern.quote("."));
+//            horaTiempoIni = grid.getItems().get(i).getHoraInicio().split("[.]");
+//            horaTiempoFin = grid.getItems().get(i).getHoraFin().split("\\.");
+//            if (hora[0].length() == 1) {
+//                tiempoTotal = "0" + hora[0] + ":";
+//            } else {
+//                tiempoTotal = hora[0] + ":";
+//            }
+//            if (horaTiempoIni[0].length() == 0) {
+//                tiempoInicio = "0" + horaTiempoIni[0] + ":";
+//            } else {
+//                tiempoInicio = horaTiempoIni[0] + ":";
+//            }
+//            if (horaTiempoFin[0].length() == 1) {
+//                tiempoFin = "0" + horaTiempoFin[0] + ":";
+//            } else {
+//                tiempoFin = horaTiempoFin[0] + ":";
+//            }
+//            sumaTotal += Double.parseDouble(grid.getItems().get(i).getDuracion());
+//            hr = Integer.parseInt(hora[0]);
+//            if (hora[1].startsWith("0")) {
+//                hora[1] = hora[1].replaceFirst(hora[1], "0." + hora[1]);
+//            }
+//            min = Double.parseDouble(hora[1]);
+//            double m = (double) min * 60 / 100;
+//            boolean tomaDecimal;
+//            if (String.valueOf(m).split("[.]")[0].equals("0")) {
+//                tomaDecimal = true;
+//            } else {
+//                minutos = String.valueOf(m).split("[.]")[1];
+//                tomaDecimal = false;
+//            }
+//
+//            if (!tomaDecimal) {
+//
+//                min = Math.rint(m);
+//                minutos = String.valueOf(min);
+//            }
+//            if (minutos.length() == 1 && !tomaDecimal) {
+//                tiempoTotal += minutos += ":00";
+//            } else if (minutos.length() == 1 && !tomaDecimal) {
+//                tiempoTotal += "0";
+//                tiempoTotal += minutos += ":00";
+//
+//            } else {
+//                tiempoTotal += minutos += ":00";
+//            }
+//
+//            hr = Integer.parseInt(horaTiempoIni[0]);
+//            min = Integer.parseInt(horaTiempoIni[1]);
+//            min = min * 60 / 100;
+//            minutos = String.valueOf(min);
+//            if (minutos.length() == 1) {
+//                tiempoInicio += minutos += "0:00";
+//            } else {
+//                tiempoInicio += minutos += ":00";
+//            }
+//            hr = Integer.parseInt(horaTiempoFin[0]);
+//            min = Integer.parseInt(horaTiempoFin[1]);
+//            min = min * 60 / 100;
+//            minutos = String.valueOf(min);
+//            if (minutos.length() == 1) {
+//                tiempoFin += minutos += "0:00";
+//            } else {
+//                tiempoFin += minutos += ":00";
+//            }
+//
+//            grid.getItems().get(i).setDuracion(tiempoTotal);
+//            grid.getItems().get(i).setHoraInicio(tiempoInicio);
+//            grid.getItems().get(i).setHoraFin(tiempoFin);
+//            tiempoTotal = "";
+//            tiempoInicio = "";
+//            tiempoFin = "";
+//
+//        }
+//        String sumaTiempos = String.valueOf(sumaTotal);
+//        hora = sumaTiempos.split(Pattern.quote("."));
+//        if (hora[0].length() == 1) {
+//            sumaTiempoTotal = "0" + hora[0] + ":";
+//        } else {
+//            sumaTiempoTotal = hora[0] + ":";
+//        }
+//
+//        double m = (double) Long.parseLong(hora[1].substring(0, 2)) * 60 / 100;
+//        boolean tomaDecimal;
+////            if (!String.valueOf(m).split("[.]")[0].equals("0")) {
+////                tomaDecimal = false;
+////            } else {
+////                minutos = String.valueOf(m).split("[.]")[1];
+////                tomaDecimal = true;
+//////            }
+////            if (!tomaDecimal) {
+//        min = Math.round(m);
+//        minutos = String.valueOf(min);
+////            }
+//        if (minutos.length() == 1) {
+//            sumaTiempoTotal += minutos += "0:00";
+//        } else {
+//            sumaTiempoTotal += minutos += ":00";
+        }
+//        lbTiempoTotal.setText(sumaTiempoTotal);
+>>>>>>> refs/remotes/origin/master
     }
 
     public void guardaActividades() {
