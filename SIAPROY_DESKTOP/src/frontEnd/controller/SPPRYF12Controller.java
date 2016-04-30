@@ -33,6 +33,7 @@
    29/Abr/2016 17:07 SVA (LOBO_000076): Se restructura clase y se mejora funcionalidad.
    29/Abr/2016 01:17 CCL(LOBO_000076):Se añade un metodo para llevar acabo el conteo de tiempo total de actividades.
    30/Abr/2016 12:50 SVA (LOBO_000076): Se rmejora método "setTiempoTotal".
+   30/Abr/2016 12:50 SVA (LOBO_000076): Se rmejora método "setTiempoTotal".
 
  */
 package frontEnd.controller;
@@ -591,7 +592,7 @@ public class SPPRYF12Controller implements Initializable {
                 min = Math.floor(min * 100) / 100;
                 duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
                 grid.getItems().get(i).setHoraInicio(duracion);
-            } else if (dtfFechaActual.getValue().equals(LocalDate.now())) {
+            } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
                 grid.getItems().get(i).setHoraInicio("00:00:00");
             }
             if (!grid.getItems().get(i).getHoraFin().equals("")) {
@@ -604,7 +605,7 @@ public class SPPRYF12Controller implements Initializable {
                 min = Math.floor(min * 100) / 100;
                 duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
                 grid.getItems().get(i).setHoraFin(duracion);
-            } else if (dtfFechaActual.getValue().equals(LocalDate.now())) {
+            } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
                 grid.getItems().get(i).setHoraFin("00:00:00");
             }
 
