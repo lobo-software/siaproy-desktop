@@ -42,7 +42,7 @@ public class Conexion {
     private static Connection con = null;
 
     public static Connection creaConexionLocalBD() throws Exception{
-        String dbms = "jdbc:derby:C:/SIAPROY_DESKTOP/siaproy-desktop/SIAPROY_DESKTOP/database/SIAPROY_DESKTOP";
+        String dbms = "jdbc:derby:C:/Users/ceciliac/Desktop/siaproy-desktop/SIAPROY_DESKTOP/database/SIAPROY_DESKTOP";
         String uName = "LOBORH";
         String uPass = "k_23h45t";
         con = null;

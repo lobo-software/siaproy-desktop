@@ -569,12 +569,15 @@ public class SPPRYF12Controller implements Initializable {
 //        String[] hora, horaTiempoIni, horaTiempoFin;
 //        long hr;
 //        double min = 0, sumaTotal = 0;
+//probar
+
         String duracion;
         for (int i = 0; i < grid.getItems().size(); i++) {
             String[] tiempo = grid.getItems().get(i).getDuracion().split("[.]");
             boolean esEntero = true;
             double hora = Double.parseDouble(grid.getItems().get(i).getDuracion());
             hora -= Integer.parseInt(tiempo[0]);
+            hora = Math.ceil(hora * 1000 ) / 1000;
 //        if (tiempo[1].startsWith("0")) {
 //            tiempo[1] = tiempo[1].replaceFirst(tiempo[1], "0." + tiempo[1]);
 //        }
