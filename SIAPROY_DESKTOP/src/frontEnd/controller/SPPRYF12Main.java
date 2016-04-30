@@ -55,6 +55,7 @@ public class SPPRYF12Main extends Application {
             SPPRYF12Controller.alertActividades(stage, "SPPRYF12", "CERRAR APLICACIÓN", 0);
         });
         SPPRYF12Controller.setPrimaryStage(stage);
+        stage.setTitle("SPPRYF12. Reporte de actividades");
         stage.show();
     }
 
