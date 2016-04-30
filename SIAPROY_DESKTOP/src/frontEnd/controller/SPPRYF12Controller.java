@@ -31,6 +31,7 @@
    15/Apr/2016 01:03 CCL (LOBO_000076): Se añade funcionalidad para cerrar la ventana principal con creando un alert al mismo.
    22/Apr/2016 01:17 CCL (LOBO_000076): Se siguen añadiendo funcionalidades a los componentes de la vista y se eliminó cógio inesesario.
    29/Abr/2016 17:07 SVA (LOBO_000076): Se restructura clase y se mejora funcionalidad.
+   29/Abr/2016 01:17 CCL(LOBO_000076):Se añade un metodo para llevar acabo el conteo de tiempo total de actividades.
 
  */
 package frontEnd.controller;
@@ -59,7 +60,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
 import frontEnd.model.SpdReportesActividadesModel;
 import frontEnd.model.stopWatch.Stopwatch;
 import frontEnd.util.GeneraCuadroMensaje;
@@ -68,6 +68,7 @@ import frontEnd.util.SialDateCellFactory;
 import frontEnd.util.SialTextFieldCellFactory;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -76,6 +77,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -90,7 +92,7 @@ public class SPPRYF12Controller implements Initializable {
     @FXML
     private DatePicker dtfFechaActual;
     @FXML
-    private BorderPane layoutSecundario;
+    private HBox layoutDatePicker;
     @FXML
     private TableView<SpdReportesActividadesModel> grdActividades;
     @FXML
@@ -150,7 +152,7 @@ public class SPPRYF12Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        loading.show();
+//        loading.show();
         tfTiempoTotal.setText("00:00:00");
         tfTiempoTotal.setFont(fuenteReloj);
         tfTiempoInicio.setText("00:00:00");
@@ -166,7 +168,8 @@ public class SPPRYF12Controller implements Initializable {
         dtfFechaActual.setValue(LocalDate.now());
         DatePickerSkin datePickerSkin = new DatePickerSkin((dtfFechaActual));
         Node popupContent = datePickerSkin.getPopupContent();
-        layoutSecundario.setRight(popupContent);
+        layoutDatePicker.getChildren().remove(dtfFechaActual);
+        layoutDatePicker.getChildren().add(popupContent);
         datePicker = dtfFechaActual;
         dtfFechaActual.valueProperty().addListener((ov, oldValue, newValue) -> {
             fechaSeleccionada = newValue;
@@ -310,7 +313,7 @@ public class SPPRYF12Controller implements Initializable {
         } catch (Exception ex) {
             GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: initialize");
         }
-        loading.close();
+//        loading.close();
     }
 
     public void muestraFecha() {
@@ -387,6 +390,8 @@ public class SPPRYF12Controller implements Initializable {
                 grdActividades.getItems().get(posicion).getStopWatch().startStop.fire();
                 grdActividades.getItems().get(posicion).getStopWatch().startStop.fire();
             }
+            setTotalRegistros();
+            setTiempoTotal();
         } catch (Exception ex) {
             GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaActividades");
         }
@@ -539,6 +544,7 @@ public class SPPRYF12Controller implements Initializable {
             EliminaSpdReportesActividadesStore store = new EliminaSpdReportesActividadesStore();
             try {
                 store.eliminaActividades(parametrosHsm);
+                loading.close();
             } catch (Exception ex) {
                 GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: eliminaActividadesAction");
             }
@@ -556,7 +562,61 @@ public class SPPRYF12Controller implements Initializable {
 //        registroSeleccionado.get(0).getStopWatch().startStop.fire();
 //    }
     public void setTiempoTotal() {
-        lbTiempoTotal.setText(String.valueOf(grid.getItems().size()));
+        String duracion = "";
+        String[] tiempo;
+        double min = 0.0, hora = 0.0, horasTotales = 0.0;
+        for (int i = 0; i < grid.getItems().size(); i++) {
+            if (!grid.getItems().get(i).getDuracion().equals("")) {
+                tiempo = grid.getItems().get(i).getDuracion().split("[.]");
+                hora = Double.parseDouble(grid.getItems().get(i).getDuracion());
+                hora = Math.ceil(hora * 1000) / 1000;
+                horasTotales += hora;
+                hora -= Integer.parseInt(tiempo[0]);
+                hora = Math.ceil(hora * 1000) / 1000;
+                min = hora * 60 / 100;
+                min = Math.floor(min * 100) / 100;
+                duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
+                grid.getItems().get(i).setDuracion(duracion);
+            } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                grid.getItems().get(i).setDuracion("00:00:00");
+            }
+            if (!grid.getItems().get(i).getHoraInicio().equals("")) {
+                tiempo = grid.getItems().get(i).getHoraInicio().split("[.]");
+                hora = Double.parseDouble(grid.getItems().get(i).getHoraInicio());
+                hora = Math.ceil(hora * 1000) / 1000;
+                hora -= Integer.parseInt(tiempo[0]);
+                hora = Math.ceil(hora * 1000) / 1000;
+                min = hora * 60 / 100;
+                min = Math.floor(min * 100) / 100;
+                duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
+                grid.getItems().get(i).setHoraInicio(duracion);
+            } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                grid.getItems().get(i).setHoraInicio("00:00:00");
+            }
+            if (!grid.getItems().get(i).getHoraFin().equals("")) {
+                tiempo = grid.getItems().get(i).getHoraFin().split("[.]");
+                hora = Double.parseDouble(grid.getItems().get(i).getHoraFin());
+                hora = Math.ceil(hora * 1000) / 1000;
+                hora -= Integer.parseInt(tiempo[0]);
+                hora = Math.ceil(hora * 1000) / 1000;
+                min = hora * 60 / 100;
+                min = Math.floor(min * 100) / 100;
+                duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
+                grid.getItems().get(i).setHoraFin(duracion);
+            } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                grid.getItems().get(i).setHoraFin("00:00:00");
+            }
+
+            tiempo = String.valueOf(horasTotales).split("[.]");
+            hora = horasTotales;
+            hora = Math.ceil(hora * 1000) / 1000;
+            hora -= Integer.parseInt(tiempo[0]);
+            hora = Math.ceil(hora * 1000) / 1000;
+            min = hora * 60 / 100;
+            min = Math.floor(min * 100) / 100;
+            duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
+            lbTiempoTotal.setText(String.valueOf(duracion));
+        }
     }
 
     public void guardaActividades() {
@@ -618,6 +678,7 @@ public class SPPRYF12Controller implements Initializable {
         try {
             storeInsert.insertaActividades(parametrosHsm);
             storeUpdate.actualizaActividades(parametrosHsm);
+            loading.close();
         } catch (Exception ex) {
             GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: guardaActividadesAction");
         }
