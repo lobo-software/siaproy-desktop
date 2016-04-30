@@ -31,6 +31,7 @@
 22/Apr/2016 13:44 CCL (LOBO_000076): Redimencionan ciertos  componetes apra darle un mejor diseño a la vista y se le cambia el tipo y tamo de fuente a los textfields.
 29/Abr/2016 17:07 SVA (LOBO_000076): Se añaden métodos para agregar registros y guardar información.
 29/Apr/2016 13:55 CCl(LOBO_0000076):Se hicieron ajustes a todos los componentes dentro de la vista, como el ordemamiento simétrico de los mismos para una mejor estética visual.
+30/Abr/2016 12:50 SVA (LOBO_000076): Se renombra variable a lbTiempoTotal
 -->
 
 <?import javafx.geometry.Insets?>
@@ -324,7 +325,7 @@
                   <Insets left="50.0" />
                </padding>
                 </Label>
-                <Label fx:id="lbTiempoTo" text="00:00:00" textAlignment="CENTER" textFill="#080f57" textOverrun="CLIP">
+                <Label fx:id="lbTiempoTotal" text="00:00:00" textAlignment="CENTER" textFill="#080f57" textOverrun="CLIP">
                     <font>
                         <Font name="Arial" size="14.0" />
                     </font>
