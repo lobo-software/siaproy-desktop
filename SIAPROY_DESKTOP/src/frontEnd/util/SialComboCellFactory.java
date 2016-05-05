@@ -52,37 +52,41 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
 
     private ComboBox<String> comboBox;
     private ComboBox<String> comboBoxWithCascade;
-    private ObservableList<String> listaCombo;
-    private ObservableList<String> listaComboCascada;
+    private static ObservableList<String> listaCombo;
+    private static ObservableList<String> listaComboCascada;
     private boolean cascade, editable, editableWithCascade;
     private int contador = 0;
     private int row = 0;
+    private int posicionClave = 0;
+    private int posicionClaveCascada = 0;
 
     public SialComboCellFactory() {
     }
 
-    public SialComboCellFactory(ObservableList<String> listaCombo, boolean cascade, boolean editable) {
+    public SialComboCellFactory(ObservableList<String> listaCombo, boolean cascade, boolean editable, int posicionClave) {
         this.listaCombo = listaCombo;
         this.cascade = cascade;
         this.editable = editable;
+        this.posicionClave = posicionClave;
     }
 
-    public SialComboCellFactory(ObservableList<String> listaCombo, ObservableList<String> listaComboCascada, boolean cascade, boolean editable) {
+    public SialComboCellFactory(ObservableList<String> listaCombo, ObservableList<String> listaComboCascada, boolean cascade, boolean editable, int posicionClave) {
         this.listaCombo = listaCombo;
         this.listaComboCascada = listaComboCascada;
         this.cascade = cascade;
         this.editableWithCascade = editable;
+        this.posicionClaveCascada = posicionClave;
     }
 
-    public Callback<TableColumn<E, String>, TableCell<E, String>> creaComboBox(ObservableList<String> listaCombo, boolean editable) {
+    public Callback<TableColumn<E, String>, TableCell<E, String>> creaComboBox(ObservableList<String> listaCombo, boolean editable, int posicionClave) {
         Callback<TableColumn<E, String>, TableCell<E, String>> callBack;
-        callBack = (TableColumn<E, String> tableColumn) -> new SialComboCellFactory(listaCombo, false, editable);
+        callBack = (TableColumn<E, String> tableColumn) -> new SialComboCellFactory(listaCombo, false, editable, posicionClave);
         return callBack;
     }
 
-    public Callback<TableColumn<E, String>, TableCell<E, String>> creaComboBoxWithCascade(ObservableList<String> listaCombo, ObservableList<String> listaComboCascada, boolean editable) {
+    public Callback<TableColumn<E, String>, TableCell<E, String>> creaComboBoxWithCascade(ObservableList<String> listaCombo, ObservableList<String> listaComboCascada, boolean editable, int posicionClave) {
         Callback<TableColumn<E, String>, TableCell<E, String>> callBack;
-        callBack = (TableColumn<E, String> tableColumn) -> new SialComboCellFactory(listaCombo, listaComboCascada, true, editable);
+        callBack = (TableColumn<E, String> tableColumn) -> new SialComboCellFactory(listaCombo, listaComboCascada, true, editable, posicionClave);
         return callBack;
     }
 
@@ -129,10 +133,8 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
                 if (comboBox != null) {
                     comboBox.setValue(getTplList());
                 }
-            }else{
-                 if (comboBoxWithCascade != null) {
-                    comboBoxWithCascade.setValue(getTplListCascade());
-                }
+            } else if (comboBoxWithCascade != null) {
+                comboBoxWithCascade.setValue(getTplListCascade());
             }
             setText(!cascade ? getTplList() : getTplListCascade());
             setGraphic(!cascade ? comboBox : comboBoxWithCascade);
@@ -146,7 +148,7 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
         comboBox = new ComboBox<>(listaCombo);
         comboBoxConverter(comboBox);
         comboBox.setEditable(editable);
-        comboBox.valueProperty().set(getTplList());
+        comboBox.valueProperty().set(getTplListCombo());
         comboBox.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         comboBox.setOnAction((e) -> {
             commitEdit(comboBox.getSelectionModel().getSelectedItem());
@@ -180,7 +182,7 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
         comboBoxWithCascade = new ComboBox<>(listaComboCascada);
         comboBoxConverter(comboBoxWithCascade);
         comboBoxWithCascade.setEditable(editable);
-        comboBoxWithCascade.valueProperty().set(getTplListCascade());
+        comboBoxWithCascade.valueProperty().set(getTplListComboCascade());
         comboBoxWithCascade.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         comboBoxWithCascade.setOnAction((e) -> {
             commitEdit(comboBoxWithCascade.getSelectionModel().getSelectedItem());
@@ -231,10 +233,18 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
     }
 
     private String getTplList() {
-        return getItem() == null ? "" : (getItem().split("-"))[0];
+        return getItem() == null ? "" : getItem().length() > 0 ? getItem().split("-")[posicionClave] : "";
     }
+
+    private String getTplListCombo() {
+        return getItem() == null ? "" : getItem();
+    }
+
     private String getTplListCascade() {
-        return getItem() == null ? "" : (getItem().split("-"))[0];
+        return getItem() == null ? "" : getItem().length() > 0 ? getItem().split("-")[posicionClaveCascada] : "";
+    }
+    private String getTplListComboCascade() {
+        return getItem() == null ? "" : getItem();
     }
 
     private TableColumn<E, ?> getNextColumn(boolean forward) {
@@ -297,5 +307,12 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
             }
             return columns;
         }
+    }
+    
+    public void actualizaListaCombo(ObservableList<String> lista){
+        listaCombo = lista;
+    }
+    public void actualizaListaComboCascada(ObservableList<String> lista){
+        listaComboCascada = lista;
     }
 }

@@ -70,19 +70,22 @@ public class SpdReportesActividadesService {
                 actividades.setIdReporteActividad(rs.getString("ID_REPORTE_ACTIVIDAD"));
                 actividades.setIdProyColPlanAct(rs.getString("ID_PROY_COL_PLAN_ACT"));
                 actividades.setIdReporteColaborador(rs.getString("ID_REPORTE_COLABORADOR"));
+                actividades.setCveActividad(rs.getString("PROYECTO"));
+                actividades.setDescripcionActividad(rs.getString("ACTIVIDAD"));
                 actividades.setFecha(rs.getString("FECHA"));
                 actividades.setDescripcion(rs.getString("DESCRIPCION"));
                 actividades.setDuracion(rs.getString("DURACION"));
                 actividades.setHoraInicio(rs.getString("HORA_INICIO"));
                 actividades.setHoraFin(rs.getString("HORA_FIN"));
                 actividades.setAvance(rs.getString("AVANCE"));
+                actividades.setProyecto(rs.getString("PROYECTO"));
                 actividades.setUsuario(rs.getString("USUARIO"));
                 actividades.setFechaActualizacion(rs.getTimestamp("FECHA_ACTUALIZACION"));
                 lista.add(actividades);
             }
         } catch (Exception e) {
             GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: consulta");
-            if(mascara.isShowing()){
+            if (mascara.isShowing()) {
                 mascara.close();
             }
         } finally {
@@ -113,17 +116,20 @@ public class SpdReportesActividadesService {
                 actividades = new SpdReportesActividadesModel();
                 actividades.setIdProyColPlanAct(lista.get(a).getidProyColPlanAct());
                 actividades.setIdReporteColaborador(lista.get(a).getIdReporteColaborador());
+                actividades.setProyecto(lista.get(a).getProyecto());
+                actividades.setActividad(lista.get(a).getActividad());
                 actividades.setFecha(lista.get(a).getFecha());
                 actividades.setDescripcion(lista.get(a).getDescripcion());
                 actividades.setDuracion(lista.get(a).getDuracion());
                 actividades.setHoraInicio(lista.get(a).getHoraInicio());
                 actividades.setHoraFin(lista.get(a).getHoraFin());
                 actividades.setAvance(lista.get(a).getAvance());
+                actividades.setProyecto(lista.get(a).getProyecto());
                 this.inserta(actividades, mascara);
             }
         } catch (Exception e) {
             GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: insertaActividades");
-            if(mascara.isShowing()){
+            if (mascara.isShowing()) {
                 mascara.close();
             }
         }
@@ -135,16 +141,19 @@ public class SpdReportesActividadesService {
         try {
             con = Conexion.creaConexionLocalBD();
             ps = con.prepareStatement(SpdReportesActividadesDao.insertaActividades());
-            ps.setBigDecimal(1, actividades.getidProyColPlanAct() != null ? BigDecimal.valueOf(Long.parseLong(actividades.getidProyColPlanAct())) : null);
-            ps.setBigDecimal(2, actividades.getIdReporteColaborador() != null ? BigDecimal.valueOf(Long.parseLong(actividades.getIdReporteColaborador())) : null);
-            ps.setDate(3, java.sql.Date.valueOf((LocalDate.parse(actividades.getFecha()))));
-            ps.setString(4, actividades.getDescripcion());
-            ps.setDouble(5, Double.parseDouble(convierteHoraADecimal(actividades.getDuracion())));
-            ps.setDouble(6, Double.parseDouble(convierteHoraADecimal(actividades.getHoraInicio())));
-            ps.setDouble(7, Double.parseDouble(convierteHoraADecimal(actividades.getHoraFin())));
-            ps.setDouble(8, Double.parseDouble(actividades.getAvance()));
-            ps.setString(9, "N");
-            ps.setString(10, "SIRH");
+            ps.setBigDecimal(1, actividades.getidProyColPlanAct() != null ? BigDecimal.valueOf(Long.parseLong(actividades.getidProyColPlanAct().trim())) : null);
+            ps.setBigDecimal(2, actividades.getIdReporteColaborador() != null ? BigDecimal.valueOf(Long.parseLong(actividades.getIdReporteColaborador().trim())) : null);
+            ps.setString(3, actividades.getProyecto() != null ? actividades.getProyecto().trim() : null);
+            ps.setString(4, actividades.getActividad() != null ? actividades.getActividad().trim() : null);
+            ps.setDate(5, java.sql.Date.valueOf((LocalDate.parse(actividades.getFecha().trim()))));
+            ps.setString(6, actividades.getDescripcion().trim());
+            ps.setDouble(7, Double.parseDouble(convierteHoraADecimal(actividades.getDuracion().trim())));
+            ps.setDouble(8, actividades.getHoraInicio() != null ? Double.parseDouble(convierteHoraADecimal(actividades.getHoraInicio().trim())) : Double.parseDouble(convierteHoraADecimal("00:00:00")));
+            ps.setDouble(9, actividades.getHoraFin() != null ? Double.parseDouble(convierteHoraADecimal(actividades.getHoraFin().trim())) : Double.parseDouble(convierteHoraADecimal("00:00:00")));
+            ps.setDouble(10, Double.parseDouble(actividades.getAvance().trim()));
+            ps.setString(11, actividades.getProyecto().trim());
+            ps.setString(12, "N");
+            ps.setString(13, "SIRH");
             ps.executeUpdate();
         } catch (Exception e) {
             GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: inserta");
@@ -158,7 +167,7 @@ public class SpdReportesActividadesService {
                 }
             } catch (SQLException e) {
                 GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: inserta");
-                if(mascara.isShowing()){
+                if (mascara.isShowing()) {
                     mascara.close();
                 }
             }
@@ -176,17 +185,20 @@ public class SpdReportesActividadesService {
                 actividades.setIdReporteActividad(lista.get(a).getIdReporteActividad());
                 actividades.setIdProyColPlanAct(lista.get(a).getidProyColPlanAct());
                 actividades.setIdReporteColaborador(lista.get(a).getIdReporteColaborador());
+                actividades.setProyecto(lista.get(a).getProyecto());
+                actividades.setActividad(lista.get(a).getActividad());
                 actividades.setFecha(lista.get(a).getFecha());
                 actividades.setDescripcion(lista.get(a).getDescripcion());
                 actividades.setDuracion(lista.get(a).getDuracion());
                 actividades.setHoraInicio(lista.get(a).getHoraInicio());
                 actividades.setHoraFin(lista.get(a).getHoraFin());
                 actividades.setAvance(lista.get(a).getAvance());
+                actividades.setProyecto(lista.get(a).getProyecto());
                 this.actualiza(actividades, mascara);
             }
         } catch (Exception e) {
             GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: actualizaActividades");
-            if(mascara.isShowing()){
+            if (mascara.isShowing()) {
                 mascara.close();
             }
         }
@@ -198,21 +210,23 @@ public class SpdReportesActividadesService {
         try {
             con = Conexion.creaConexionLocalBD();
             ps = con.prepareStatement(SpdReportesActividadesDao.actualizaActividades());
-            ps.setBigDecimal(1, actividades.getidProyColPlanAct() != null ? BigDecimal.valueOf(Long.parseLong(actividades.getidProyColPlanAct())) : null);
-            ps.setBigDecimal(2, actividades.getIdReporteColaborador() != null ? BigDecimal.valueOf(Long.parseLong(actividades.getIdReporteColaborador())) : null);
-            ps.setDate(3, java.sql.Date.valueOf((LocalDate.parse(actividades.getFecha()))));
-            ps.setString(4, actividades.getDescripcion());
-            ps.setDouble(5, Double.parseDouble(convierteHoraADecimal(actividades.getDuracion())));
-            ps.setDouble(6, Double.parseDouble(convierteHoraADecimal(actividades.getHoraInicio())));
-            ps.setDouble(7, Double.parseDouble(convierteHoraADecimal(actividades.getHoraFin())));
-            ps.setDouble(8, Double.parseDouble(actividades.getAvance()));
-            ps.setString(9, "N");
-            ps.setString(10, "SIRH");
-            ps.setBigDecimal(11, BigDecimal.valueOf(Long.parseLong(actividades.getIdReporteActividad())));
+            ps.setBigDecimal(1, actividades.getidProyColPlanAct() != null ? BigDecimal.valueOf(Long.parseLong(actividades.getidProyColPlanAct().trim())) : null);
+            ps.setBigDecimal(2, actividades.getIdReporteColaborador() != null ? BigDecimal.valueOf(Long.parseLong(actividades.getIdReporteColaborador().trim())) : null);
+            ps.setString(3, actividades.getProyecto() != null ? actividades.getProyecto().trim() : null);
+            ps.setString(4, actividades.getActividad() != null ? actividades.getActividad().trim() : null);
+            ps.setDate(5, java.sql.Date.valueOf((LocalDate.parse(actividades.getFecha().trim()))));
+            ps.setString(6, actividades.getDescripcion().trim());
+            ps.setDouble(7, Double.parseDouble(convierteHoraADecimal(actividades.getDuracion().trim())));
+            ps.setDouble(8, actividades.getHoraInicio() != null ? Double.parseDouble(convierteHoraADecimal(actividades.getHoraInicio().trim())) : Double.parseDouble(convierteHoraADecimal("00:00:00")));
+            ps.setDouble(9, actividades.getHoraFin() != null ? Double.parseDouble(convierteHoraADecimal(actividades.getHoraFin().trim())) : Double.parseDouble(convierteHoraADecimal("00:00:00")));
+            ps.setDouble(10, Double.parseDouble(actividades.getAvance().trim()));
+            ps.setString(11, "N");
+            ps.setString(12, "SIRH");
+            ps.setBigDecimal(13, BigDecimal.valueOf(Long.parseLong(actividades.getIdReporteActividad().trim())));
             ps.executeUpdate();
         } catch (Exception e) {
             GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: actualiza");
-            if(mascara.isShowing()){
+            if (mascara.isShowing()) {
                 mascara.close();
             }
         } finally {
@@ -244,7 +258,7 @@ public class SpdReportesActividadesService {
             }
         } catch (Exception ex) {
             GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: eliminaActividades");
-            if(mascara.isShowing()){
+            if (mascara.isShowing()) {
                 mascara.close();
             }
         } finally {
@@ -257,7 +271,7 @@ public class SpdReportesActividadesService {
                 }
             } catch (SQLException e) {
                 GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: eliminaActividades");
-                if(mascara.isShowing()){
+                if (mascara.isShowing()) {
                     mascara.close();
                 }
             }
@@ -277,8 +291,8 @@ public class SpdReportesActividadesService {
         if (esEntero) {
             long m = Math.round(min);
             hora = tiempo[0] + "." + String.valueOf(m);
-        } else{
-            min = Math.ceil(min * 1000 ) / 1000;
+        } else {
+            min = Math.ceil(min * 1000) / 1000;
             hora = tiempo[0] + "." + String.valueOf(min).split("[.]")[1];
         }
 
