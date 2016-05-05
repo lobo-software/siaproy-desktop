@@ -27,7 +27,7 @@
 14/Apr/2016 17:00 SVA (LOBO_000076): Se cambia el tipo de dato en las propiedades del modelo / se da formato y restructuración de métodos en el archivo.
 15/Apr/2016 13:25 CCL(LOBO_000076):Se cambió el tipo de dato así como los setters y getters de la variable tiempo / se añade la propiedad Stopwatch al modelo.
 16/Apr/2016 11:40 SVA (LOBO_000076):  Se da formato al archivo y se elimina el parámetro de tipo Stopwatch en el constructor.
-
+05/Apr/2016 10:15 CCL (LOBO_000076):  Se estable función a los métodos de proyecto y acvtidades.
 
  */
 package frontEnd.model;
@@ -58,6 +58,7 @@ public class Actividades implements SialCheckBox{
     private String avance;
     private SimpleObjectProperty<Date> fecha;
     private SimpleBooleanProperty activo;
+    
 
     //Se inicia con el modelado de datos
     public Actividades() {
