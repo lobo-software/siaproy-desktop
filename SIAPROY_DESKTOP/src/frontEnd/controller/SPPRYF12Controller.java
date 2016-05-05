@@ -32,8 +32,8 @@
    22/Apr/2016 01:17 CCL (LOBO_000076): Se siguen añadiendo funcionalidades a los componentes de la vista y se eliminó cógio inesesario.
    29/Abr/2016 17:07 SVA (LOBO_000076): Se restructura clase y se mejora funcionalidad.
    29/Abr/2016 01:17 CCL(LOBO_000076):Se añade un metodo para llevar acabo el conteo de tiempo total de actividades.
-   30/Abr/2016 12:50 SVA (LOBO_000076): Se rmejora método "setTiempoTotal".
-   30/Abr/2016 12:50 SVA (LOBO_000076): Se rmejora método "setTiempoTotal".
+   30/Abr/2016 12:50 SVA (LOBO_000076): Se mejora método "setTiempoTotal".
+   05/May/2016 09:57 CCL (LOBO_000076): Se crean  métodos para Insertar, Agrear Eliminar y Actilizar enla BDD Local,se añaden 3 clases en el paquete ultil de backEnd (Mongo,Conexion,Encripta)y se crea el webService.
 
  */
 package frontEnd.controller;
@@ -42,9 +42,14 @@ import backEnd.mx.com.lobos.spdreportesactividades.store.ActualizaSpdReportesAct
 import backEnd.mx.com.lobos.spdreportesactividades.store.ConsultaSpdReportesActividadesStore;
 import backEnd.mx.com.lobos.spdreportesactividades.store.EliminaSpdReportesActividadesStore;
 import backEnd.mx.com.lobos.spdreportesactividades.store.InsertaSpdReportesActividadesStore;
+import backEnd.mx.com.lobos.spactividades.store.ConsultaSpdActividadesStore;
+import backEnd.mx.com.lobos.spproyecto.store.ConsultaSpdProyectosStore;
+import backEnd.mx.com.lobos.util.SesionesMongo;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import de.jensd.fx.fontawesome.AwesomeDude;
 import de.jensd.fx.fontawesome.AwesomeIcon;
+import frontEnd.model.SpProyectoModel;
+import frontEnd.model.SpdActividadesModel;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -68,20 +73,27 @@ import frontEnd.util.GeneraCuadroMensaje;
 import frontEnd.util.SialComboCellFactory;
 import frontEnd.util.SialDateCellFactory;
 import frontEnd.util.SialTextFieldCellFactory;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.regex.Pattern;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.PasswordField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+//import mx.com.lobos.RegistroActividadesWs.LoboException_Exception;
 
 /**
  *
@@ -102,7 +114,7 @@ public class SPPRYF12Controller implements Initializable {
     @FXML
     private TableColumn<SpdReportesActividadesModel, String> colProyecto;
     @FXML
-    private TableColumn<SpdReportesActividadesModel, String> colSpdReportesActividadesModel;
+    private TableColumn<SpdReportesActividadesModel, String> colActividades;
     @FXML
     private TableColumn<SpdReportesActividadesModel, String> colTiempo;
     @FXML
@@ -134,10 +146,14 @@ public class SPPRYF12Controller implements Initializable {
     @FXML
     private TableColumn<SpdReportesActividadesModel, Boolean> colActivo;
     @FXML
-    private Button btnGuardar;
+//    private Button btnGuardar;
+//      @FXML
+//    private TextField tfUser;
+//    @FXML
+//    private PasswordField tfPass;
     // VARIABLES 
     private ObservableList<String> datosComboProyecto;
-    private ObservableList<String> datosComboSpdReportesActividadesModel;
+    private ObservableList<String> datosComboActividades;
     private final Font fuenteReloj = Font.loadFont(Stopwatch.class.getResource("digital-7_mono.ttf").toExternalForm(), 24);
     private static boolean running, insertaDiaActual;
     private static TableView<SpdReportesActividadesModel> grid;
@@ -151,6 +167,8 @@ public class SPPRYF12Controller implements Initializable {
     private int contadorCambioDia;
     private SpdReportesActividadesModel actividadEnEjecucion;
     private static Stage loading = GeneraCuadroMensaje.loading();
+//    private String claveUsuario;
+//    private String password;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -185,47 +203,47 @@ public class SPPRYF12Controller implements Initializable {
 //            }
         });
         muestraFecha();
-        //Store proyectos
-        datosComboProyecto
-                = FXCollections.observableArrayList(
-                        "DMS_2014",
-                        "DMS_2015",
-                        "DMS_2016");
         //Store actividades.
-        datosComboSpdReportesActividadesModel
-                = FXCollections.observableArrayList(
-                        "INVESTIGACION",
-                        "REUNIÓN DE ESTÁNDARES",
-                        "APOYO AL EQUIPO DE TRABAJO");
 
         SialTextFieldCellFactory<SpdReportesActividadesModel, String> textFieldCell = new SialTextFieldCellFactory<>();
         SialComboCellFactory<SpdReportesActividadesModel, String> comboBoxCell = new SialComboCellFactory<>();
+        SialComboCellFactory<SpdReportesActividadesModel, String> comboBoxCellCascade = new SialComboCellFactory<>();
         SialDateCellFactory<SpdReportesActividadesModel, Date> datePickerCell = new SialDateCellFactory<>();
 //        SialCheckBoxCellFactory<SpdReportesActividadesModel, Boolean> checkBoxCell = new SialCheckBoxCellFactory<>();
 
         colTimer.setCellValueFactory(new PropertyValueFactory<>("stopWatch"));
 //        colTimer.setCellFactory(timerCell.creaTimer(tfTotal, tftiempoInicio, tfTiempoFin));
-//        colProyecto.setCellValueFactory(new PropertyValueFactory<>("proyecto"));
-//        colProyecto.setCellFactory(comboBoxCell.creaComboBox(datosComboProyecto, true));
-//        colProyecto.setOnEditCommit(
-//                (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
-//                    String[] clave = t.getNewValue().split("-");
-//
-//                    ((SpdReportesActividadesModel) t.getTableView().getItems()
-//                    .get(t.getTablePosition().getRow()))
-//                    .setProyecto(clave[0]);
-//
-//                    System.out.println("Carga combo secundario (parametro):" + t.getNewValue());
-//                });
-//        colSpdReportesActividadesModel.setCellValueFactory(new PropertyValueFactory<>("actividad"));
-//        colSpdReportesActividadesModel.setCellFactory(comboBoxCell.creaComboBoxWithCascade(datosComboProyecto, datosComboSpdReportesActividadesModel, true));
-//        colSpdReportesActividadesModel.setOnEditStart((TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
-//            String proyecto = ((SpdReportesActividadesModel) t.getTableView().getItems()
-//                    .get(t.getTablePosition().getRow()))
-//                    .getProyecto();
-//
-//            System.out.println("Carga combo secundario (parametro):" + proyecto);
-//        });
+        try {
+            SesionesMongo.getDataConection();
+        } catch (Exception ex) {
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: initialize");
+        }
+//        
+        this.SpProyecto();
+        this.SpActividades("all");
+        colProyecto.setCellValueFactory(new PropertyValueFactory<>("proyecto"));
+        colProyecto.setCellFactory(comboBoxCell.creaComboBox(datosComboProyecto, true, 1));
+        colProyecto.setOnEditCommit(
+                (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
+                    ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setProyecto(t.getNewValue());
+                    ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setActividad("");
+                    this.SpActividades(t.getNewValue());
+                });
+        colActividades.setCellValueFactory(new PropertyValueFactory<>("actividad"));
+        colActividades.setCellFactory(comboBoxCellCascade.creaComboBoxWithCascade(datosComboProyecto, datosComboActividades, true, 2));
+        colActividades.setOnEditStart((TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
+            String proyecto = ((SpdReportesActividadesModel) t.getTableView().getItems()
+                    .get(t.getTablePosition().getRow()))
+                    .getProyecto().split("-")[0].trim();
+
+            this.SpActividades(proyecto);
+            comboBoxCellCascade.actualizaListaComboCascada(datosComboActividades);
+        });
+        colActividades.setOnEditCommit(
+                (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
+                    ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setIdProyColPlanAct(t.getNewValue().split("-")[0]);
+                    ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setActividad(t.getNewValue());
+                });
         colTiempo.setCellValueFactory(new PropertyValueFactory<>("duracion"));
         colInicio.setCellValueFactory(new PropertyValueFactory<>("horaInicio"));
         colFin.setCellValueFactory(new PropertyValueFactory<>("horaFin"));
@@ -564,7 +582,6 @@ public class SPPRYF12Controller implements Initializable {
 //        registroSeleccionado.get(0).getStopWatch().startStop.fire();
 //    }
     public void setTiempoTotal() {
-<<<<<<< HEAD
 //               int TiempoTotal = 0;
 //        String tiempoInicio = "", tiempoFin = "", tiempoTotal = "", minutos = "", sumaTiempoTotal = "";
 //        Double total, totalFinal = Double.MIN_VALUE;
@@ -574,64 +591,55 @@ public class SPPRYF12Controller implements Initializable {
 //        double min = 0, sumaTotal = 0;
 //probar
 
-        String duracion;
-        for (int i = 0; i < grid.getItems().size(); i++) {
-            String[] tiempo = grid.getItems().get(i).getDuracion().split("[.]");
-            boolean esEntero = true;
-            double hora = Double.parseDouble(grid.getItems().get(i).getDuracion());
-            hora -= Integer.parseInt(tiempo[0]);
-            hora = Math.ceil(hora * 1000 ) / 1000;
-//        if (tiempo[1].startsWith("0")) {
-//            tiempo[1] = tiempo[1].replaceFirst(tiempo[1], "0." + tiempo[1]);
-//        }
-            double min = hora * 60 / 100;
-            if (String.valueOf(min).split("[.]")[0].startsWith("0")) {
-                esEntero = false;
-=======
         String duracion = "";
         String[] tiempo;
         double min = 0.0, hora = 0.0, horasTotales = 0.0;
         for (int i = 0; i < grid.getItems().size(); i++) {
-            if (!grid.getItems().get(i).getDuracion().equals("")) {
-                tiempo = grid.getItems().get(i).getDuracion().split("[.]");
-                hora = Double.parseDouble(grid.getItems().get(i).getDuracion());
-                hora = Math.ceil(hora * 1000) / 1000;
-                horasTotales += hora;
-                hora -= Integer.parseInt(tiempo[0]);
-                hora = Math.ceil(hora * 1000) / 1000;
-                min = hora * 60 / 100;
-                min = Math.floor(min * 100) / 100;
-                duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
-                grid.getItems().get(i).setDuracion(duracion);
-            } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
-                grid.getItems().get(i).setDuracion("00:00:00");
->>>>>>> refs/remotes/origin/master
+            if (grid.getItems().get(i).getDuracion() != null) {
+                if (!grid.getItems().get(i).getDuracion().equals("")) {
+                    tiempo = grid.getItems().get(i).getDuracion().split("[.]");
+                    hora = Double.parseDouble(grid.getItems().get(i).getDuracion());
+                    hora = Math.ceil(hora * 1000) / 1000;
+                    horasTotales += hora;
+                    hora -= Integer.parseInt(tiempo[0]);
+                    hora = Math.ceil(hora * 1000) / 1000;
+                    min = hora * 60 / 100;
+                    min = Math.floor(min * 100) / 100;
+                    duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
+                    grid.getItems().get(i).setDuracion(duracion);
+                } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                    grid.getItems().get(i).setDuracion("00:00:00");
+                }
             }
-            if (!grid.getItems().get(i).getHoraInicio().equals("")) {
-                tiempo = grid.getItems().get(i).getHoraInicio().split("[.]");
-                hora = Double.parseDouble(grid.getItems().get(i).getHoraInicio());
-                hora = Math.ceil(hora * 1000) / 1000;
-                hora -= Integer.parseInt(tiempo[0]);
-                hora = Math.ceil(hora * 1000) / 1000;
-                min = hora * 60 / 100;
-                min = Math.floor(min * 100) / 100;
-                duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
-                grid.getItems().get(i).setHoraInicio(duracion);
-            } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
-                grid.getItems().get(i).setHoraInicio("00:00:00");
+            if (grid.getItems().get(i).getHoraInicio() != null) {
+                if (!grid.getItems().get(i).getHoraInicio().equals("")) {
+                    tiempo = grid.getItems().get(i).getHoraInicio().split("[.]");
+                    hora = Double.parseDouble(grid.getItems().get(i).getHoraInicio());
+                    hora = Math.ceil(hora * 1000) / 1000;
+                    hora -= Integer.parseInt(tiempo[0]);
+                    hora = Math.ceil(hora * 1000) / 1000;
+                    min = hora * 60 / 100;
+                    min = Math.floor(min * 100) / 100;
+                    duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
+                    grid.getItems().get(i).setHoraInicio(duracion);
+                } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                    grid.getItems().get(i).setHoraInicio("00:00:00");
+                }
             }
-            if (!grid.getItems().get(i).getHoraFin().equals("")) {
-                tiempo = grid.getItems().get(i).getHoraFin().split("[.]");
-                hora = Double.parseDouble(grid.getItems().get(i).getHoraFin());
-                hora = Math.ceil(hora * 1000) / 1000;
-                hora -= Integer.parseInt(tiempo[0]);
-                hora = Math.ceil(hora * 1000) / 1000;
-                min = hora * 60 / 100;
-                min = Math.floor(min * 100) / 100;
-                duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
-                grid.getItems().get(i).setHoraFin(duracion);
-            } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
-                grid.getItems().get(i).setHoraFin("00:00:00");
+            if (grid.getItems().get(i).getHoraFin() != null) {
+                if (!grid.getItems().get(i).getHoraFin().equals("")) {
+                    tiempo = grid.getItems().get(i).getHoraFin().split("[.]");
+                    hora = Double.parseDouble(grid.getItems().get(i).getHoraFin());
+                    hora = Math.ceil(hora * 1000) / 1000;
+                    hora -= Integer.parseInt(tiempo[0]);
+                    hora = Math.ceil(hora * 1000) / 1000;
+                    min = hora * 60 / 100;
+                    min = Math.floor(min * 100) / 100;
+                    duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
+                    grid.getItems().get(i).setHoraFin(duracion);
+                } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                    grid.getItems().get(i).setHoraFin("00:00:00");
+                }
             }
 
             tiempo = String.valueOf(horasTotales).split("[.]");
@@ -672,7 +680,7 @@ public class SPPRYF12Controller implements Initializable {
     }
 
     public static void guardaActividadesAction() {
-        loading.show();
+//        loading.show();
         InsertaSpdReportesActividadesStore storeInsert;
         ActualizaSpdReportesActividadesStore storeUpdate;
         HashMap<String, Object> parametrosHsm;
@@ -710,4 +718,88 @@ public class SPPRYF12Controller implements Initializable {
             GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: guardaActividadesAction");
         }
     }
+
+    public void consultaProyectos() {
+        muestraVentanaLoginWebService();
+    }
+//
+
+    public void SincronizaActividades() throws Exception {
+//        claveUsuario = "ceci";
+//        password = "";
+//     
+//        try {
+//            muestraVentanaLoginWebService();
+////                
+//        } catch (Exception ex) {
+//            Logger.getLogger(SPPRYF12Controller.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        if (tfUser.getText().equals(claveUsuario) && tfPass.getText().equals(password)) {
+//            System.out.print("User loggin ...");
+//
+//        }else{
+//            System.out.println("Loggin failed");
+//    }
+    }
+
+    public void muestraVentanaLoginWebService() {
+        FXMLLoader ventanaInicioSesion = new FXMLLoader(getClass().getResource("/frontEnd/view/SPPRYF12AView.fxml"));
+        AnchorPane root;
+        Stage ventanaInicio;
+        Scene scene;
+        try {
+            root = ventanaInicioSesion.load();
+            ventanaInicio = new Stage();
+            scene = new Scene(root);
+            ventanaInicio.setScene(scene);
+            ventanaInicio.setTitle("SPPRYF12AView. Login a SIAPROY WEB");
+            ventanaInicio.show();
+        } catch (IOException ex) {
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller\nMÉTODO: muestraVentanaLoginWebService");
+        }
+////     
+//        
+//        
+    }
+
+    public void SpProyecto() {
+        HashMap<String, Object> parametrosHsm = new HashMap<>();
+        parametrosHsm.put("cascada", "consultaProyectos");
+        parametrosHsm.put("cveColaborador", "CCORTEZ");
+        ObservableList<String> registros = FXCollections.observableArrayList();
+        ConsultaSpdProyectosStore store = new ConsultaSpdProyectosStore();
+        try {
+            registros = store.consulta(parametrosHsm);
+            datosComboProyecto = registros;
+        } catch (Exception ex) {
+            Logger.getLogger(SPPRYF12Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void SpActividades(String proyecto) {
+        HashMap<String, Object> parametrosHsm = new HashMap<>();
+        parametrosHsm.put("cveColaborador", "CCORTEZ");
+        parametrosHsm.put("cascada", "consultaActividades");
+        if (!proyecto.equals("all")) {
+            parametrosHsm.put("idProyecto", proyecto.split("-")[0].trim());
+        }
+        parametrosHsm.put("allActividades", proyecto.equals("all"));
+        
+
+        ObservableList<String> registros = FXCollections.observableArrayList();
+        ConsultaSpdProyectosStore store = new ConsultaSpdProyectosStore();
+        try {
+            registros = store.consulta(parametrosHsm);
+            datosComboActividades = registros;
+        } catch (Exception ex) {
+            Logger.getLogger(SPPRYF12Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+//    private static String cargaRegistro(java.lang.String parametros, java.lang.String cascada) throws Exception {
+//        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
+//        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
+//        return port.cargaRegistro(parametros, cascada);
+////    
+//}
 }

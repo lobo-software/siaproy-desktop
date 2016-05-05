@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.2.1 (tags/2.2.1-7242; 2012-08-03T12:35:22+0000) JAXWS-RI/2.2.7 JAXWS/2.2 svn-revision#unknown. --><xs:schema xmlns:tns="http://ws.lobos.com.mx/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://ws.lobos.com.mx/">
+
+<xs:element name="LoboException" type="tns:LoboException"/>
+
+<xs:element name="cargaRegistro" type="tns:cargaRegistro"/>
+
+<xs:element name="cargaRegistroResponse" type="tns:cargaRegistroResponse"/>
+
+<xs:complexType name="cargaRegistro">
+<xs:sequence>
+<xs:element name="parametros" type="xs:string" minOccurs="0"/>
+<xs:element name="cascada" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="cargaRegistroResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="LoboException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
