@@ -22,13 +22,14 @@
  *  Document     : SpdReportesActividadesDao.java
  * Created on    : 26 Apr 2016 11:34:47 AM
  * Author           : SVA
- * Modifications : 
+ * Modifications : 05/May/2016 06:53 CCL (LOBO_000076): Se añade la funcionalidad de Insertar, Consultar y Sincronizar a Siaproy web, y función de Sincronizado a BDD Siaproy.
+
  */
 package backEnd.mx.com.lobos.spdreportesactividades.dao;
 
 /**
  *
- * @author Lobo Software
+ * @author Lobo Softwar
  */
 public class SpdReportesActividadesDao {
 
@@ -54,16 +55,36 @@ public class SpdReportesActividadesDao {
         consultaActividades.append("ORDER BY ID_REPORTE_ACTIVIDAD ASC");
         return consultaActividades.toString();
     }
+    
+    public static String consultaActividadesSinSincronizar() {
+        StringBuilder consultaActividadesSinSincronizar = new StringBuilder();
+        consultaActividadesSinSincronizar.append("SELECT ID_REPORTE_ACTIVIDAD, ");
+        consultaActividadesSinSincronizar.append("  ID_PROY_COL_PLAN_ACT, ");
+        consultaActividadesSinSincronizar.append("  ID_REPORTE_COLABORADOR, ");
+        consultaActividadesSinSincronizar.append("  PROYECTO, ");
+        consultaActividadesSinSincronizar.append("  ACTIVIDAD, ");
+        consultaActividadesSinSincronizar.append("  FECHA, ");
+        consultaActividadesSinSincronizar.append("  DESCRIPCION, ");
+        consultaActividadesSinSincronizar.append("  DURACION, ");
+        consultaActividadesSinSincronizar.append("  HORA_INICIO, ");
+        consultaActividadesSinSincronizar.append("  HORA_FIN, ");
+        consultaActividadesSinSincronizar.append("  AVANCE, ");
+        consultaActividadesSinSincronizar.append("  PROYECTO, ");
+        consultaActividadesSinSincronizar.append("  USUARIO, ");
+        consultaActividadesSinSincronizar.append("  FECHA_ACTUALIZACION ");
+        consultaActividadesSinSincronizar.append("FROM SPD_REPORTES_ACTIVIDADES ");
+        consultaActividadesSinSincronizar.append("WHERE SINCRONIZADO_SIAPROY = ? ");
+        return consultaActividadesSinSincronizar.toString();
+    }
 
     public static String insertaActividades() {
         StringBuilder insertaActividades = new StringBuilder();
         insertaActividades.append("INSERT ");
         insertaActividades.append("INTO SPD_REPORTES_ACTIVIDADES VALUES ");
         insertaActividades.append("  ( ");
-        insertaActividades.append("    (SELECT NULLIF(MAX (ID_REPORTE_ACTIVIDAD)+1, 1) FROM SPD_REPORTES_ACTIVIDADES ");
+        insertaActividades.append("    (SELECT COALESCE(MAX (ID_REPORTE_ACTIVIDAD)+1, 1) FROM SPD_REPORTES_ACTIVIDADES ");
         insertaActividades.append("    ) ");
         insertaActividades.append("    , ");
-        insertaActividades.append("    ?, ");
         insertaActividades.append("    ?, ");
         insertaActividades.append("    ?, ");
         insertaActividades.append("    ?, ");
@@ -99,6 +120,14 @@ public class SpdReportesActividadesDao {
         actualizaActividades.append("  FECHA_ACTUALIZACION      = CURRENT_TIMESTAMP ");
         actualizaActividades.append("WHERE ID_REPORTE_ACTIVIDAD = ?");
         return actualizaActividades.toString();
+    }
+    
+    public static String actualizaSincronizadoSiaproy() {
+        StringBuilder actualizaSincronizadoSiaproy = new StringBuilder();
+        actualizaSincronizadoSiaproy.append("UPDATE SPD_REPORTES_ACTIVIDADES ");
+        actualizaSincronizadoSiaproy.append("SET SINCRONIZADO_SIAPROY   = 'S' ");
+        actualizaSincronizadoSiaproy.append("WHERE SINCRONIZADO_SIAPROY = 'N'");
+        return actualizaSincronizadoSiaproy.toString();
     }
 
     public static String eliminaActividades() {

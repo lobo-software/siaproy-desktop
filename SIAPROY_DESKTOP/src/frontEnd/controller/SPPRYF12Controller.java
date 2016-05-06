@@ -34,6 +34,7 @@
    29/Abr/2016 01:17 CCL(LOBO_000076):Se añade un metodo para llevar acabo el conteo de tiempo total de actividades.
    30/Abr/2016 12:50 SVA (LOBO_000076): Se mejora método "setTiempoTotal".
    05/May/2016 09:57 CCL (LOBO_000076): Se crean  métodos para Insertar, Agrear Eliminar y Actilizar enla BDD Local,se añaden 3 clases en el paquete ultil de backEnd (Mongo,Conexion,Encripta)y se crea el webService.
+   05/May/2016 18:55 CCL (LOBO_000076): Se añade la funcionalidad de Insert Siaproy web, y función de Sincronizado a BDD Siaproy.
 
  */
 package frontEnd.controller;
@@ -44,6 +45,7 @@ import backEnd.mx.com.lobos.spdreportesactividades.store.EliminaSpdReportesActiv
 import backEnd.mx.com.lobos.spdreportesactividades.store.InsertaSpdReportesActividadesStore;
 import backEnd.mx.com.lobos.spactividades.store.ConsultaSpdActividadesStore;
 import backEnd.mx.com.lobos.spproyecto.store.ConsultaSpdProyectosStore;
+import backEnd.mx.com.lobos.spproyecto.store.InsertaSpdProyectosStore;
 import backEnd.mx.com.lobos.util.SesionesMongo;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import de.jensd.fx.fontawesome.AwesomeDude;
@@ -138,6 +140,9 @@ public class SPPRYF12Controller implements Initializable {
     @FXML
     private Button btnAgregarActividad;
     @FXML
+    private Button btnConsultaProyectos;
+
+    @FXML
     private Label lbTotalRegistros;
     @FXML
     private Label lbTiempoTotal;
@@ -167,8 +172,13 @@ public class SPPRYF12Controller implements Initializable {
     private int contadorCambioDia;
     private SpdReportesActividadesModel actividadEnEjecucion;
     private static Stage loading = GeneraCuadroMensaje.loading();
-//    private String claveUsuario;
-//    private String password;
+    private String claveUsuario;
+    private String contraseña;
+    private Object tfClaveUsuario;
+    private Object tfContrasena;
+    private String claveUsuarioSiaproy = "CCORTEZ";
+    private String contrasenaSiaproy = "LOPEZCEC";
+    private boolean loginSiaproWeb;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -218,17 +228,18 @@ public class SPPRYF12Controller implements Initializable {
         } catch (Exception ex) {
             GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: initialize");
         }
-//        
-        this.SpProyecto();
-        this.SpActividades("all");
         colProyecto.setCellValueFactory(new PropertyValueFactory<>("proyecto"));
         colProyecto.setCellFactory(comboBoxCell.creaComboBox(datosComboProyecto, true, 1));
+        colProyecto.setOnEditStart((TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
+            comboBoxCellCascade.actualizaListaCombo(datosComboProyecto);
+        });
         colProyecto.setOnEditCommit(
                 (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
                     ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setProyecto(t.getNewValue());
                     ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setActividad("");
                     this.SpActividades(t.getNewValue());
                 });
+        colProyecto.setEditable(false);
         colActividades.setCellValueFactory(new PropertyValueFactory<>("actividad"));
         colActividades.setCellFactory(comboBoxCellCascade.creaComboBoxWithCascade(datosComboProyecto, datosComboActividades, true, 2));
         colActividades.setOnEditStart((TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
@@ -244,6 +255,7 @@ public class SPPRYF12Controller implements Initializable {
                     ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setIdProyColPlanAct(t.getNewValue().split("-")[0]);
                     ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setActividad(t.getNewValue());
                 });
+        colActividades.setEditable(false);
         colTiempo.setCellValueFactory(new PropertyValueFactory<>("duracion"));
         colInicio.setCellValueFactory(new PropertyValueFactory<>("horaInicio"));
         colFin.setCellValueFactory(new PropertyValueFactory<>("horaFin"));
@@ -720,26 +732,43 @@ public class SPPRYF12Controller implements Initializable {
     }
 
     public void consultaProyectos() {
-        muestraVentanaLoginWebService();
+        if (loginSiaproWeb == false) {
+            muestraVentanaLoginWebService();
+        }
     }
-//
 
-    public void SincronizaActividades() throws Exception {
-//        claveUsuario = "ceci";
-//        password = "";
-//     
-//        try {
-//            muestraVentanaLoginWebService();
-////                
-//        } catch (Exception ex) {
-//            Logger.getLogger(SPPRYF12Controller.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        if (tfUser.getText().equals(claveUsuario) && tfPass.getText().equals(password)) {
-//            System.out.print("User loggin ...");
 //
-//        }else{
-//            System.out.println("Loggin failed");
-//    }
+    public void SincronizaActividades() throws Exception {
+        HashMap<String, Object> parametrosHsm;
+        ObservableList<SpdReportesActividadesModel> registros;
+        ObservableList<String> siaproyWeb;
+        try {
+            if (loginSiaproWeb == false) {
+                muestraVentanaLoginWebService();
+            } else {
+                parametrosHsm = new HashMap<>();
+                parametrosHsm.put("cascada", "consultaActividadesSinSincronizar");
+                ConsultaSpdReportesActividadesStore store = new ConsultaSpdReportesActividadesStore();
+                registros = store.consultaActividades(parametrosHsm);
+                if (registros.size() > 0) {
+                    parametrosHsm.put("registrosBDLocal", registros);
+                    InsertaSpdProyectosStore storeSiaproyWeb = new InsertaSpdProyectosStore();
+                    siaproyWeb = storeSiaproyWeb.inserta(parametrosHsm);
+                    if (siaproyWeb != null) {
+                        if (siaproyWeb.get(0).contains("exitosa")) {
+                            ActualizaSpdReportesActividadesStore storeUpdate = new ActualizaSpdReportesActividadesStore();
+                            parametrosHsm.replace("cascada", "actualizaSincronizadoSiaproy");
+                            storeUpdate.actualizaActividades(parametrosHsm);
+                            consultaActividades();
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            Logger.getLogger(SPPRYF12AController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     public void muestraVentanaLoginWebService() {
@@ -749,10 +778,14 @@ public class SPPRYF12Controller implements Initializable {
         Scene scene;
         try {
             root = ventanaInicioSesion.load();
+            SPPRYF12AController controller = ventanaInicioSesion.getController();
+            controller.setCredencialesLogin(claveUsuarioSiaproy, contrasenaSiaproy);
+            controller.setControllerPrincipal(this);
             ventanaInicio = new Stage();
             scene = new Scene(root);
             ventanaInicio.setScene(scene);
             ventanaInicio.setTitle("SPPRYF12AView. Login a SIAPROY WEB");
+            controller.setStage(ventanaInicio);
             ventanaInicio.show();
         } catch (IOException ex) {
             GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller\nMÉTODO: muestraVentanaLoginWebService");
@@ -784,7 +817,6 @@ public class SPPRYF12Controller implements Initializable {
             parametrosHsm.put("idProyecto", proyecto.split("-")[0].trim());
         }
         parametrosHsm.put("allActividades", proyecto.equals("all"));
-        
 
         ObservableList<String> registros = FXCollections.observableArrayList();
         ConsultaSpdProyectosStore store = new ConsultaSpdProyectosStore();
@@ -795,6 +827,14 @@ public class SPPRYF12Controller implements Initializable {
             Logger.getLogger(SPPRYF12Controller.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    public void cargaProyectosActividadesSiaproy(Stage ventana) {
+        ventana.close();
+        this.SpProyecto();
+        colProyecto.setEditable(true);
+        colActividades.setEditable(true);
+        loginSiaproWeb = true;
     }
 //    private static String cargaRegistro(java.lang.String parametros, java.lang.String cascada) throws Exception {
 //        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
