@@ -38,7 +38,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-//05/May/2016 10: CCl(LOBO_0000076):Se les da funcionalidad a los metodos para efectuar la cascada en Consulta Proyecto y Actividades de los combox.
+//05/May/2016 10:35 CCl(LOBO_0000076):Se les da funcionalidad a los metodos para efectuar la cascada en Consulta Proyecto y Actividades de los combox.
+//05/May/2016 19:09 CCl(LOBO_0000076):Se les da funcionalidad a los metodos para efectuar la cascada para efectuar la funcion mesaje exitosoo fallido dependiedo la insersión de datos.
 
 
 /**
@@ -157,4 +158,47 @@ public class SpProyectoService {
         }
         return lista;
     }
+     
+     public ObservableList<String> insertaActividadesSiaproyWeb(HashMap<String, Object> parametrosHsm){
+       Connection con = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        ObservableList<String> lista = null;
+//        SpProyectoModel proyecto;
+//        java.sql.Date fecha = java.sql.Date.valueOf((LocalDate) parametrosHsm.get("fecha"));
+//        Stage mascara = (Stage) parametrosHsm.get("mascara");
+        try {
+            con = Conexion.getConnectionSial();
+            st = con.prepareCall(SpProyectoDao.insertaActividadesFromSiaproyDesktop(parametrosHsm));
+       
+            rs = st.executeQuery();
+            lista = FXCollections.observableArrayList();
+//                proyecto = new SpProyectoModel();
+//                proyecto.setId_proyecto(rs.getString("ID_PROYECTO"));
+//                proyecto.setClave_Referencia(rs.getString("CLAVE_REFERENCIA"));
+//                proyecto.setDescripcion(rs.getString("DESCRIPCION"));
+                lista.add("mensaje: insercion exitosa");
+        } catch (Exception e) {
+            lista.add("mensaje: insercion fallida");
+            GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpProyectoService. \nMÉTODO: insertaActividadesSiaproyWeb");
+//            if(mascara.isShowing()){
+//                mascara.close();
+//            }
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (st != null) {
+                    st.close();
+                }
+                if (con != null) {
+                    con.close();
+                }
+            } catch (SQLException ex) {
+                GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: insertaActividadesSiaproyWeb");
+            }
+        }
+        return lista;
+     }
 }

@@ -19,57 +19,31 @@
  * |(*) Marca registrada por                                               |   
  * |LOBO SOFTWARE, S.A. DE C.V.                                            |  
  * |_______________________________________________________________________|  
- *  Document     : SpdActividadesModel.java
- * Created on    : 03 may 2016 01:18:06 PM
+ *  Document     : InsertaSpdProyectosStore.java
+ * Created on    : 05 may 2016 04:28:32 PM
  * Author        : CCL
  * Modifications : 
  */
-package frontEnd.model;
+package backEnd.mx.com.lobos.spproyecto.store;
+
+import backEnd.mx.com.lobos.spproyecto.service.SpProyectoService;
+import frontEnd.util.GeneraCuadroMensaje;
+import java.util.HashMap;
+import javafx.collections.ObservableList;
 
 /**
  *
  * @author Lobo Software
  */
-public class SpdActividadesModel {
-    private String Id_Actividad;
-    private String Descripcion;
-     private String Clave_Actividad;
-
-    public SpdActividadesModel() {
-         this.Id_Actividad = "";
-        this.Descripcion = "";
-        this.Clave_Actividad = "";
+public class InsertaSpdProyectosStore {
+    public ObservableList<String> inserta(HashMap<String, Object> parametrosHsm) throws Exception {
+        ObservableList<String> registros = null;
+        try {
+            SpProyectoService sras = new SpProyectoService();
+            registros = sras.insertaActividadesSiaproyWeb(parametrosHsm);
+        } catch (Exception ex) {
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: ConsultaSpdProyectosStore. \nMÉTODO: consultaProyectos");
+        }
+        return registros;
     }
-
-    public SpdActividadesModel(String Id_Actividad, String Descripcion, String Clave_Actividad) {
-        this.Id_Actividad = Id_Actividad;
-        this.Descripcion = Descripcion;
-        this.Clave_Actividad = Clave_Actividad;
-    }
-
-    public String getId_Actividad() {
-        return Id_Actividad;
-    }
-
-    public void setId_Actividad(String Id_Actividad) {
-        this.Id_Actividad = Id_Actividad;
-    }
-
-    public String getDescripcion() {
-        return Descripcion;
-    }
-
-    public void setDescripcion(String Descripcion) {
-        this.Descripcion = Descripcion;
-    }
-
-    public String Clave_Actividad() {
-        return Clave_Actividad;
-    }
-
-    public void setClave_Actividad(String Clave_Actividad) {
-        this.Clave_Actividad = Clave_Actividad;
-    }
-     
-
 }
