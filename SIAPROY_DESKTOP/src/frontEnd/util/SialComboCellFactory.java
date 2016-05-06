@@ -23,6 +23,7 @@
  * Created on    : 11 Apr 2016 4:37:13 PM
  * Author           : SVA
  * Modifications : 29/Abr/2016 17:07 SVA (LOBO_000076): Se restructura clase y mejora funcionalidad.
+06/May/2016 09:35 SVA (LOBO_000076): Se modifica la instancia de la clase "AutoCompleteComboBoxListener".
  */
 package frontEnd.util;
 
@@ -175,7 +176,8 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
             StringProperty registro = (StringProperty) ov;
             ((TextField) registro.getBean()).setText(newValue.toUpperCase());
         });
-        AutoCompleteComboBoxListener cbl = new AutoCompleteComboBoxListener(comboBox);
+        new AutoCompleteComboBoxListener(comboBox);
+
     }
 
     private void createComboBoxWithCascade(boolean editable) {
@@ -211,8 +213,7 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
             StringProperty registro = (StringProperty) ov;
             ((TextField) registro.getBean()).setText(newValue.toUpperCase());
         });
-//        AutoCompleteComboBoxListener cbl = new AutoCompleteComboBoxListener(comboBoxWithCascade);
-
+        new AutoCompleteComboBoxListener(comboBoxWithCascade);
     }
 
     private void comboBoxConverter(ComboBox<String> comboBox) {
@@ -243,6 +244,7 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
     private String getTplListCascade() {
         return getItem() == null ? "" : getItem().length() > 0 ? getItem().split("-")[posicionClaveCascada] : "";
     }
+
     private String getTplListComboCascade() {
         return getItem() == null ? "" : getItem();
     }
@@ -308,11 +310,12 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
             return columns;
         }
     }
-    
-    public void actualizaListaCombo(ObservableList<String> lista){
+
+    public void actualizaListaCombo(ObservableList<String> lista) {
         listaCombo = lista;
     }
-    public void actualizaListaComboCascada(ObservableList<String> lista){
+
+    public void actualizaListaComboCascada(ObservableList<String> lista) {
         listaComboCascada = lista;
     }
 }
