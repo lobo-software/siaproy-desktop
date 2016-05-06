@@ -22,7 +22,7 @@
  *  Document     : SpdReportesActividadesService.java
  * Created on    : 26 Apr 2016 11:34:33 AM
  * Author           : SVA
- * Modifications : 
+ * Modifications : 06/May/2016 09:35 SVA (LOBO_000076): Se modifican los métodos "consultaActividadesDiarias" y  "consultaActividadesSinSincronizar" por cambios en la BDD local.
  */
 package backEnd.mx.com.lobos.spdreportesactividades.service;
 
@@ -100,15 +100,14 @@ public class SpdReportesActividadesService {
                 actividades.setIdReporteActividad(rs.getString("ID_REPORTE_ACTIVIDAD"));
                 actividades.setIdProyColPlanAct(rs.getString("ID_PROY_COL_PLAN_ACT"));
                 actividades.setIdReporteColaborador(rs.getString("ID_REPORTE_COLABORADOR"));
-                actividades.setCveActividad(rs.getString("PROYECTO"));
+                actividades.setProyecto(rs.getString("PROYECTO"));
                 actividades.setActividad(rs.getString("ACTIVIDAD"));
                 actividades.setFecha(rs.getString("FECHA"));
                 actividades.setDescripcion(rs.getString("DESCRIPCION"));
                 actividades.setDuracion(rs.getString("DURACION"));
                 actividades.setHoraInicio(rs.getString("HORA_INICIO"));
                 actividades.setHoraFin(rs.getString("HORA_FIN"));
-                actividades.setAvance(rs.getString("AVANCE"));
-                actividades.setProyecto(rs.getString("PROYECTO"));
+                actividades.setAvance(rs.getString("AVANCE").split("[.]")[0] + "." + rs.getString("AVANCE").split("[.]")[1].substring(0, 2));
                 actividades.setUsuario(rs.getString("USUARIO"));
                 actividades.setFechaActualizacion(rs.getTimestamp("FECHA_ACTUALIZACION"));
                 lista.add(actividades);
@@ -155,15 +154,14 @@ public class SpdReportesActividadesService {
                 actividades.setIdReporteActividad(rs.getString("ID_REPORTE_ACTIVIDAD"));
                 actividades.setIdProyColPlanAct(rs.getString("ID_PROY_COL_PLAN_ACT"));
                 actividades.setIdReporteColaborador(rs.getString("ID_REPORTE_COLABORADOR"));
-                actividades.setCveActividad(rs.getString("PROYECTO"));
+                actividades.setProyecto(rs.getString("PROYECTO"));
                 actividades.setActividad(rs.getString("ACTIVIDAD"));
                 actividades.setFecha(rs.getString("FECHA"));
                 actividades.setDescripcion(rs.getString("DESCRIPCION"));
                 actividades.setDuracion(rs.getString("DURACION"));
                 actividades.setHoraInicio(rs.getString("HORA_INICIO"));
                 actividades.setHoraFin(rs.getString("HORA_FIN"));
-                actividades.setAvance(rs.getString("AVANCE"));
-                actividades.setProyecto(rs.getString("PROYECTO"));
+                actividades.setAvance(rs.getString("AVANCE").split("[.]")[0] + "." + rs.getString("AVANCE").split("[.]")[1].substring(0, 2));
                 actividades.setUsuario(rs.getString("USUARIO"));
                 actividades.setFechaActualizacion(rs.getTimestamp("FECHA_ACTUALIZACION"));
                 lista.add(actividades);
