@@ -23,20 +23,24 @@
  * Created on    : 19 Apr 2016 5:45:34 PM
  * Author           : SVA
  * Modifications : 29/Abr/2016 17:07 SVA (LOBO_000076): Se restructura la clase y se mejora la funcionalidad.
+06/May/2016 09:35 SVA (LOBO_000076): Se añaden regex para el textfield.
  */
 package frontEnd.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
+import javafx.util.converter.DoubleStringConverter;
 
 /**
  *
@@ -48,13 +52,22 @@ public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
 
     private TextField textField;
     private int row = 0;
+    private boolean regex;
+    private int operacion;
 
     public SialTextFieldCellFactory() {
     }
 
-    public Callback<TableColumn<E, String>, TableCell<E, String>> creaTextField() {
+    public SialTextFieldCellFactory(int operacion) {
+        this.operacion = operacion;
+        if (operacion > 0) {
+            regex = true;
+        }
+    }
+
+    public Callback<TableColumn<E, String>, TableCell<E, String>> creaTextField(int operacion) {
         Callback<TableColumn<E, String>, TableCell<E, String>> callBack;
-        callBack = (TableColumn<E, String> tableColumn) -> new SialTextFieldCellFactory();
+        callBack = (TableColumn<E, String> tableColumn) -> new SialTextFieldCellFactory(operacion);
         return callBack;
     }
 
@@ -102,6 +115,8 @@ public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
     }
 
     private void createTextField() {
+        Pattern validDoubleText;
+        TextFormatter<Double> textFormatter;
         textField = new TextField(getString());
         textField.selectAll();
         textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
@@ -119,6 +134,25 @@ public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
                 }
             }
         });
+        if (regex) {
+            switch (operacion) {
+                case 1://valores numéricos (double)
+                    validDoubleText = Pattern.compile("-?((\\d*)|(\\d+\\.\\d*))");
+                    textFormatter = new TextFormatter<Double>(new DoubleStringConverter(), 0.0,
+                            change -> {
+                                String newText = change.getControlNewText();
+                                if (validDoubleText.matcher(newText).matches()) {
+                                    return change;
+                                } else {
+                                    return null;
+                                }
+                            });
+                    textField.setTextFormatter(textFormatter);
+                    break;
+                default:
+                    break;
+            }
+        }
         textField.textProperty().addListener((ov, oldValue, newValue) -> {
             StringProperty elemento = (StringProperty) ov;
             ((TextField) elemento.getBean()).setText(newValue.toUpperCase());
@@ -126,7 +160,7 @@ public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
         textField.focusedProperty().addListener((ov, olvPropertyValue, newPropertyValue) -> {
             if (olvPropertyValue) { // pierde el foco
                 commitEdit(getItem());
-            } 
+            }
         });
 //        textField.textProperty().bindBidirectional(textProperty());
     }
@@ -153,11 +187,11 @@ public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
                 nextIndex = 0;
 //                if (contador == 0) {
 //                    contador++;
-                    if (row < getTableView().getItems().size() - 1) {
-                        row += 1;
-                    } else {
-                        row = 0;
-                    }
+                if (row < getTableView().getItems().size() - 1) {
+                    row += 1;
+                } else {
+                    row = 0;
+                }
 //                } else {
 //                    contador = 0;
 //                }
@@ -168,11 +202,11 @@ public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
                 nextIndex = columns.size() - 1;
 //                if (contador == 0) {
 //                    contador++;
-                    if (row > 0) {
-                        row -= 1;
-                    } else {
-                        row = getTableView().getItems().size() - 1;
-                    }
+                if (row > 0) {
+                    row -= 1;
+                } else {
+                    row = getTableView().getItems().size() - 1;
+                }
 //                } else {
 //                    contador = 0;
 //                }

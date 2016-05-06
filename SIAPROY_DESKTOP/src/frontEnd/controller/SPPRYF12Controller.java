@@ -35,7 +35,7 @@
    30/Abr/2016 12:50 SVA (LOBO_000076): Se mejora método "setTiempoTotal".
    05/May/2016 09:57 CCL (LOBO_000076): Se crean  métodos para Insertar, Agrear Eliminar y Actilizar enla BDD Local,se añaden 3 clases en el paquete ultil de backEnd (Mongo,Conexion,Encripta)y se crea el webService.
    05/May/2016 18:55 CCL (LOBO_000076): Se añade la funcionalidad de Insert Siaproy web, y función de Sincronizado a BDD Siaproy.
-
+   06/May/2016 09:35 SVA (LOBO_000076): Se añade parámetro en el método "creaTextField".
  */
 package frontEnd.controller;
 
@@ -43,15 +43,12 @@ import backEnd.mx.com.lobos.spdreportesactividades.store.ActualizaSpdReportesAct
 import backEnd.mx.com.lobos.spdreportesactividades.store.ConsultaSpdReportesActividadesStore;
 import backEnd.mx.com.lobos.spdreportesactividades.store.EliminaSpdReportesActividadesStore;
 import backEnd.mx.com.lobos.spdreportesactividades.store.InsertaSpdReportesActividadesStore;
-import backEnd.mx.com.lobos.spactividades.store.ConsultaSpdActividadesStore;
 import backEnd.mx.com.lobos.spproyecto.store.ConsultaSpdProyectosStore;
 import backEnd.mx.com.lobos.spproyecto.store.InsertaSpdProyectosStore;
 import backEnd.mx.com.lobos.util.SesionesMongo;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import de.jensd.fx.fontawesome.AwesomeDude;
 import de.jensd.fx.fontawesome.AwesomeIcon;
-import frontEnd.model.SpProyectoModel;
-import frontEnd.model.SpdActividadesModel;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -88,7 +85,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.PasswordField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -260,7 +256,7 @@ public class SPPRYF12Controller implements Initializable {
         colInicio.setCellValueFactory(new PropertyValueFactory<>("horaInicio"));
         colFin.setCellValueFactory(new PropertyValueFactory<>("horaFin"));
         colDescripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
-        colDescripcion.setCellFactory(textFieldCell.creaTextField());
+        colDescripcion.setCellFactory(textFieldCell.creaTextField(0));
         colDescripcion.setOnEditCommit(
                 (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
                     ((SpdReportesActividadesModel) t.getTableView().getItems()
@@ -270,7 +266,7 @@ public class SPPRYF12Controller implements Initializable {
                 });
 
         colAvance.setCellValueFactory(new PropertyValueFactory<>("avance"));
-        colAvance.setCellFactory(textFieldCell.creaTextField());
+        colAvance.setCellFactory(textFieldCell.creaTextField(1));
         colAvance.setOnEditCommit(
                 (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
                     ((SpdReportesActividadesModel) t.getTableView().getItems()
