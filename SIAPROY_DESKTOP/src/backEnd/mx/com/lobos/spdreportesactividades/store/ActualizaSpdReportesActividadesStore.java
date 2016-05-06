@@ -39,7 +39,7 @@ public class ActualizaSpdReportesActividadesStore {
     public void actualizaActividades(HashMap<String, Object> parametrosHsm) throws Exception {
         try {
             SpdReportesActividadesService sras = new SpdReportesActividadesService();
-            sras.actualizaActividades(parametrosHsm);
+            sras.actualiza(parametrosHsm);
         } catch (Exception ex) {
             GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: ActualizaSpdReportesActividadesStore. \nMÉTODO: actualizaActividades");
         }

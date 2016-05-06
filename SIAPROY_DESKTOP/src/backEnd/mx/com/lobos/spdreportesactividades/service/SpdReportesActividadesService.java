@@ -50,6 +50,36 @@ import javafx.stage.Stage;
 public class SpdReportesActividadesService {
 
     public ObservableList<SpdReportesActividadesModel> consulta(HashMap<String, Object> parametrosHsm) throws Exception {
+        String cascada;
+        ObservableList<SpdReportesActividadesModel> registros = null;
+        try {
+            cascada = parametrosHsm.containsKey("cascada") ? (String) parametrosHsm.get("cascada") : "";
+            if (cascada.equals("")) {
+                registros = this.consultaActividadesDiarias(parametrosHsm);
+            } else if (cascada.equals("consultaActividadesSinSincronizar")) {
+                registros = this.consultaActividadesSinSincronizar(parametrosHsm);
+            }
+        } catch (Exception e) {
+            GeneraCuadroMensaje.error(e.toString());
+        }
+        return registros;
+    }
+
+    public void actualiza(HashMap<String, Object> parametrosHsm) throws Exception {
+        String cascada;
+        try {
+            cascada = parametrosHsm.containsKey("cascada") ? (String) parametrosHsm.get("cascada") : "";
+            if (cascada.equals("")) {
+                this.actualizaActividadesBDLocal(parametrosHsm);
+            } else if (cascada.equals("actualizaSincronizadoSiaproy")) {
+                this.actualizaSincronizadoSiaproy(parametrosHsm);
+            }
+        } catch (Exception e) {
+            GeneraCuadroMensaje.error(e.toString());
+        }
+    }
+
+    public ObservableList<SpdReportesActividadesModel> consultaActividadesDiarias(HashMap<String, Object> parametrosHsm) throws Exception {
         Connection con = null;
         PreparedStatement st = null;
         ResultSet rs = null;
@@ -71,7 +101,7 @@ public class SpdReportesActividadesService {
                 actividades.setIdProyColPlanAct(rs.getString("ID_PROY_COL_PLAN_ACT"));
                 actividades.setIdReporteColaborador(rs.getString("ID_REPORTE_COLABORADOR"));
                 actividades.setCveActividad(rs.getString("PROYECTO"));
-                actividades.setDescripcionActividad(rs.getString("ACTIVIDAD"));
+                actividades.setActividad(rs.getString("ACTIVIDAD"));
                 actividades.setFecha(rs.getString("FECHA"));
                 actividades.setDescripcion(rs.getString("DESCRIPCION"));
                 actividades.setDuracion(rs.getString("DURACION"));
@@ -84,7 +114,7 @@ public class SpdReportesActividadesService {
                 lista.add(actividades);
             }
         } catch (Exception e) {
-            GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: consulta");
+            GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: consultaActividadesDiarias");
             if (mascara.isShowing()) {
                 mascara.close();
             }
@@ -100,7 +130,62 @@ public class SpdReportesActividadesService {
                     con.close();
                 }
             } catch (SQLException ex) {
-                GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: consulta");
+                GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: consultaActividadesDiarias");
+            }
+        }
+        return lista;
+    }
+
+    public ObservableList<SpdReportesActividadesModel> consultaActividadesSinSincronizar(HashMap<String, Object> parametrosHsm) throws Exception {
+        Connection con = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        ObservableList<SpdReportesActividadesModel> lista = null;
+        SpdReportesActividadesModel actividades;
+        Stage mascara = (Stage) parametrosHsm.get("mascara");
+        try {
+            con = Conexion.creaConexionLocalBD();
+            st = con.prepareCall(SpdReportesActividadesDao.consultaActividadesSinSincronizar());
+            st.setString(1, "N");
+            rs = st.executeQuery();
+            lista = FXCollections.observableArrayList();
+            while (rs.next()) {
+                actividades = new SpdReportesActividadesModel();
+                actividades.setStopWatch(new Stopwatch((TextField) parametrosHsm.get("txtTiempoTotal"), (TextField) parametrosHsm.get("txtTiempoInicio"), (TextField) parametrosHsm.get("txtTiempoFinal")));
+                actividades.setIdReporteActividad(rs.getString("ID_REPORTE_ACTIVIDAD"));
+                actividades.setIdProyColPlanAct(rs.getString("ID_PROY_COL_PLAN_ACT"));
+                actividades.setIdReporteColaborador(rs.getString("ID_REPORTE_COLABORADOR"));
+                actividades.setCveActividad(rs.getString("PROYECTO"));
+                actividades.setActividad(rs.getString("ACTIVIDAD"));
+                actividades.setFecha(rs.getString("FECHA"));
+                actividades.setDescripcion(rs.getString("DESCRIPCION"));
+                actividades.setDuracion(rs.getString("DURACION"));
+                actividades.setHoraInicio(rs.getString("HORA_INICIO"));
+                actividades.setHoraFin(rs.getString("HORA_FIN"));
+                actividades.setAvance(rs.getString("AVANCE"));
+                actividades.setProyecto(rs.getString("PROYECTO"));
+                actividades.setUsuario(rs.getString("USUARIO"));
+                actividades.setFechaActualizacion(rs.getTimestamp("FECHA_ACTUALIZACION"));
+                lista.add(actividades);
+            }
+        } catch (Exception e) {
+            GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: consultaActividadesSinSincronizar");
+            if (mascara.isShowing()) {
+                mascara.close();
+            }
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (st != null) {
+                    st.close();
+                }
+                if (con != null) {
+                    con.close();
+                }
+            } catch (SQLException ex) {
+                GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: consultaActividadesSinSincronizar");
             }
         }
         return lista;
@@ -124,7 +209,6 @@ public class SpdReportesActividadesService {
                 actividades.setHoraInicio(lista.get(a).getHoraInicio());
                 actividades.setHoraFin(lista.get(a).getHoraFin());
                 actividades.setAvance(lista.get(a).getAvance());
-                actividades.setProyecto(lista.get(a).getProyecto());
                 this.inserta(actividades, mascara);
             }
         } catch (Exception e) {
@@ -151,9 +235,8 @@ public class SpdReportesActividadesService {
             ps.setDouble(8, actividades.getHoraInicio() != null ? Double.parseDouble(convierteHoraADecimal(actividades.getHoraInicio().trim())) : Double.parseDouble(convierteHoraADecimal("00:00:00")));
             ps.setDouble(9, actividades.getHoraFin() != null ? Double.parseDouble(convierteHoraADecimal(actividades.getHoraFin().trim())) : Double.parseDouble(convierteHoraADecimal("00:00:00")));
             ps.setDouble(10, Double.parseDouble(actividades.getAvance().trim()));
-            ps.setString(11, actividades.getProyecto().trim());
-            ps.setString(12, "N");
-            ps.setString(13, "SIRH");
+            ps.setString(11, "N");
+            ps.setString(12, "SIRH");
             ps.executeUpdate();
         } catch (Exception e) {
             GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: inserta");
@@ -174,7 +257,7 @@ public class SpdReportesActividadesService {
         }
     }
 
-    public void actualizaActividades(HashMap<String, Object> parametrosHsm) throws Exception {
+    public void actualizaActividadesBDLocal(HashMap<String, Object> parametrosHsm) throws Exception {
         ObservableList<SpdReportesActividadesModel> lista = null;
         SpdReportesActividadesModel actividades;
         Stage mascara = (Stage) parametrosHsm.get("mascara");
@@ -194,17 +277,17 @@ public class SpdReportesActividadesService {
                 actividades.setHoraFin(lista.get(a).getHoraFin());
                 actividades.setAvance(lista.get(a).getAvance());
                 actividades.setProyecto(lista.get(a).getProyecto());
-                this.actualiza(actividades, mascara);
+                this.actualizaActividades(actividades, mascara);
             }
         } catch (Exception e) {
-            GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: actualizaActividades");
+            GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: actualizaActividadesBDLocal");
             if (mascara.isShowing()) {
                 mascara.close();
             }
         }
     }
 
-    public void actualiza(SpdReportesActividadesModel actividades, Stage mascara) throws Exception {
+    public void actualizaActividades(SpdReportesActividadesModel actividades, Stage mascara) throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         try {
@@ -225,7 +308,7 @@ public class SpdReportesActividadesService {
             ps.setBigDecimal(13, BigDecimal.valueOf(Long.parseLong(actividades.getIdReporteActividad().trim())));
             ps.executeUpdate();
         } catch (Exception e) {
-            GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: actualiza");
+            GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: actualizaActividades");
             if (mascara.isShowing()) {
                 mascara.close();
             }
@@ -238,7 +321,35 @@ public class SpdReportesActividadesService {
                     con.close();
                 }
             } catch (SQLException e) {
-                GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: actualiza");
+                GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: actualizaActividades");
+            }
+        }
+    }
+
+    public void actualizaSincronizadoSiaproy(HashMap<String, Object> parametrosHsm) throws Exception {
+        Connection con = null;
+        PreparedStatement ps = null;
+        Stage mascara = null;
+        try {
+            mascara = (Stage) parametrosHsm.get("mascara");
+            con = Conexion.creaConexionLocalBD();
+            ps = con.prepareStatement(SpdReportesActividadesDao.actualizaSincronizadoSiaproy());
+            ps.executeUpdate();
+        } catch (Exception e) {
+            GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: actualizaSincronizadoSiaproy");
+            if (mascara.isShowing()) {
+                mascara.close();
+            }
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (con != null) {
+                    con.close();
+                }
+            } catch (SQLException e) {
+                GeneraCuadroMensaje.error(e.toString() + "\nCLASE: SpdReportesActividadesService. \nMÉTODO: actualizaSincronizadoSiaproy");
             }
         }
     }
