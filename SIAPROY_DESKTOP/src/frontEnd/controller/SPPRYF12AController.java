@@ -36,6 +36,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
   // 06/May/2016 07:27 CCL (LOBO_000076): Se elimina cógiogo inecesario.
+ //07/May/2016 11:05 CCL (LOBO_000076): Se eliminan componentes.
+
 /**
  *
  * @author Lobo Software
@@ -60,7 +62,7 @@ public class SPPRYF12AController implements Initializable {
     }
 
     public void iniciaSesionSiaproy() {
-          controllerPrincipal.cargaProyectosActividadesSiaproy(ventana, tfClaveUsuario.getText());
+        controllerPrincipal.consultaColaboradorSiaproyWeb(ventana, tfClaveUsuario.getText());
     }
     public void setStage(Stage ventana){
         this.ventana = ventana;
