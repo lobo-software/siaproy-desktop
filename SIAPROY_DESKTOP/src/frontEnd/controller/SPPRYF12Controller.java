@@ -39,6 +39,7 @@
    06/May/2016 07:27 CCL (LOBO_000076): Se añade la funcionalidad de los Jason para la interpretación de los registros en la versión web y se eliminan linas innecesarías. .
    07/May/2016 11:02 CCL (LOBO_000076): Se eliminan comoponentes inecesarior y se establece funcionalidad a los componenets pera establecer clave colavorador y potros para genrear consultas si la clave colaborador es correcta.
    07/May/2016 11:31 SVA (LOBO_000076): Se mejora el método "setTiempoTotal".
+   07/May/2016 11:44 SVA (LOBO_000076): Se mejora el cálculo de horas totales en el método "setTiempoTotal".
 
  */
 package frontEnd.controller;
@@ -595,7 +596,7 @@ public class SPPRYF12Controller implements Initializable {
 //        datePicker.setValue(newValue);
 //        registroSeleccionado.get(0).getStopWatch().startStop.fire();
 //    }
-     public void setTiempoTotal() {
+    public void setTiempoTotal() {
         String duracion = "", m = "";
         String[] tiempo;
         double min = 0.0, hora = 0.0, horasTotales = 0.0;
@@ -677,8 +678,16 @@ public class SPPRYF12Controller implements Initializable {
             hora -= Integer.parseInt(tiempo[0]);
             hora = Math.ceil(hora * 1000) / 1000;
             min = hora * 60 / 100;
-            min = Math.floor(min * 100) / 100;
-            duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(min).split("[.]")[1].length() == 1 ? "0" + String.valueOf(min).split("[.]")[1] : String.valueOf(min).split("[.]")[1]) + ":00");
+            min = Math.floor(min * 1000) / 1000;
+            m = String.valueOf(min);
+            if (String.valueOf(min).split("[.]")[1].length() > 2 && Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(2)) > 5) {
+                m = "0." + String.valueOf(Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(0, 2)) + 1);
+            } else if (m.split("[.]")[1].length() > 1) {
+                m = m.substring(0, 4);
+            } else if (m.split("[.]")[1].equals("3")) {
+                m = "0.30";
+            }
+            duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
             lbTiempoTotal.setText(String.valueOf(duracion));
         }
     }
