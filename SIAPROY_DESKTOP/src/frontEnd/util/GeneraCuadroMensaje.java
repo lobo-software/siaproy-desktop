@@ -22,7 +22,7 @@
  *  Document     : GeneraCuadroMensaje.java
  * Created on    : 25 Apr 2016 5:03:22 PM
  * Author           : SVA
- * Modifications : 
+
  */
 package frontEnd.util;
 
@@ -50,7 +50,7 @@ import javafx.stage.StageStyle;
  *
  * @author Lobo Software
  */
-public class GeneraCuadroMensaje {
+    public class GeneraCuadroMensaje {
 
     static boolean respuesta;
 

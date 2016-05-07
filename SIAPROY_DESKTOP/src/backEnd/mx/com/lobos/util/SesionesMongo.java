@@ -54,7 +54,7 @@ public class SesionesMongo {
             sesiones        = mDB.getCollection("sesiones");
             
         }catch(Exception ex){
-            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SesionesMongo. \nMÉTODO: iniciaConexion");
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SesionesMongo. \nMÉTODO: iniciaConexion");  
         }
         return sesiones;
     }
@@ -70,7 +70,6 @@ public class SesionesMongo {
         try{
             
             cveUsuario = "SPRYDSK";
-            
             consulta = new BasicDBObject();
             consulta.put("cveUsuario", cveUsuario);
             

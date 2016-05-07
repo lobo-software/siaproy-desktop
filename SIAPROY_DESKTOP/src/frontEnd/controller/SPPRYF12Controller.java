@@ -36,6 +36,8 @@
    05/May/2016 09:57 CCL (LOBO_000076): Se crean  métodos para Insertar, Agrear Eliminar y Actilizar enla BDD Local,se añaden 3 clases en el paquete ultil de backEnd (Mongo,Conexion,Encripta)y se crea el webService.
    05/May/2016 18:55 CCL (LOBO_000076): Se añade la funcionalidad de Insert Siaproy web, y función de Sincronizado a BDD Siaproy.
    06/May/2016 09:35 SVA (LOBO_000076): Se añade parámetro en el método "creaTextField".
+   06/May/2016 07:27 CCL (LOBO_000076): Se añade la funcionalidad de los Jason para la interpretación de los registros en la versión web y se eliminan linas innecesarías. .
+
  */
 package frontEnd.controller;
 
@@ -46,6 +48,7 @@ import backEnd.mx.com.lobos.spdreportesactividades.store.InsertaSpdReportesActiv
 import backEnd.mx.com.lobos.spproyecto.store.ConsultaSpdProyectosStore;
 import backEnd.mx.com.lobos.spproyecto.store.InsertaSpdProyectosStore;
 import backEnd.mx.com.lobos.util.SesionesMongo;
+import com.google.gson.Gson;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import de.jensd.fx.fontawesome.AwesomeDude;
 import de.jensd.fx.fontawesome.AwesomeIcon;
@@ -172,9 +175,10 @@ public class SPPRYF12Controller implements Initializable {
     private String contraseña;
     private Object tfClaveUsuario;
     private Object tfContrasena;
-    private String claveUsuarioSiaproy = "CCORTEZ";
-    private String contrasenaSiaproy = "LOPEZCEC";
+    private String claveUsuarioSiaproy;
+    private String contrasenaSiaproy;
     private boolean loginSiaproWeb;
+    private Gson gson = new Gson();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -233,7 +237,7 @@ public class SPPRYF12Controller implements Initializable {
                 (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
                     ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setProyecto(t.getNewValue());
                     ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setActividad("");
-                    this.SpActividades(t.getNewValue());
+                    this.consultaActividadesSiaproyWeb(t.getNewValue());
                 });
         colProyecto.setEditable(false);
         colActividades.setCellValueFactory(new PropertyValueFactory<>("actividad"));
@@ -243,7 +247,7 @@ public class SPPRYF12Controller implements Initializable {
                     .get(t.getTablePosition().getRow()))
                     .getProyecto().split("-")[0].trim();
 
-            this.SpActividades(proyecto);
+            this.consultaActividadesSiaproyWeb(proyecto);
             comboBoxCellCascade.actualizaListaComboCascada(datosComboActividades);
         });
         colActividades.setOnEditCommit(
@@ -735,9 +739,11 @@ public class SPPRYF12Controller implements Initializable {
 
 //
     public void SincronizaActividades() throws Exception {
+        HashMap<String, String> parametrosHsmBDDLocal = new HashMap<>();
         HashMap<String, Object> parametrosHsm;
         ObservableList<SpdReportesActividadesModel> registros;
         ObservableList<String> siaproyWeb;
+        String jsonParams, result, records = "";
         try {
             if (loginSiaproWeb == false) {
                 muestraVentanaLoginWebService();
@@ -747,22 +753,42 @@ public class SPPRYF12Controller implements Initializable {
                 ConsultaSpdReportesActividadesStore store = new ConsultaSpdReportesActividadesStore();
                 registros = store.consultaActividades(parametrosHsm);
                 if (registros.size() > 0) {
-                    parametrosHsm.put("registrosBDLocal", registros);
-                    InsertaSpdProyectosStore storeSiaproyWeb = new InsertaSpdProyectosStore();
-                    siaproyWeb = storeSiaproyWeb.inserta(parametrosHsm);
-                    if (siaproyWeb != null) {
-                        if (siaproyWeb.get(0).contains("exitosa")) {
+                    String record;
+                    records = "[";
+                    for (int x = 0; x < registros.size(); x++){
+                        record = "{idProyColPlanAct: '" + registros.get(x).getidProyColPlanAct() + "'," +
+                                "idReporteColaborador: '" + registros.get(x).getIdReporteColaborador()+ "'," +
+                                "fecha: '" + registros.get(x).getFecha()+ "'," +
+                                "descripcion: '" + registros.get(x).getDescripcion()+ "'," +
+                                "duracion: '" + registros.get(x).getDuracion()+ "'," +
+                                "horaInicio: '" + registros.get(x).getHoraInicio()+ "'," +
+                                "horaFin: '" + registros.get(x).getHoraFin()+ "'," +
+                                "avance: '" + registros.get(x).getAvance()+ "'," +
+                                "usuario: '" + registros.get(x).getUsuario()+"'},";
+                        records = records + record;
+                    }
+                    records = records.substring(0, records.length()-1);
+                    records = records + "]";
+                    parametrosHsmBDDLocal.put("registrosBDLocal", records);
+                    jsonParams = gson.toJson(parametrosHsmBDDLocal);
+                    mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
+                    mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
+                    result = port.cargaRegistro(jsonParams, "insertaRegistrosFromSiaproyDesktop");
+                    if (result != null) {
+                        if (result.contains("exitosa")) {
                             ActualizaSpdReportesActividadesStore storeUpdate = new ActualizaSpdReportesActividadesStore();
                             parametrosHsm.replace("cascada", "actualizaSincronizadoSiaproy");
                             storeUpdate.actualizaActividades(parametrosHsm);
                             consultaActividades();
+                        } else {
+                            GeneraCuadroMensaje.error("Ocurrió un error en la sincronización." + "\nCLASE: SPPRYF12Controller. \nMÉTODO: SincronizaActividades");
                         }
                     }
                 }
             }
 
         } catch (Exception ex) {
-            Logger.getLogger(SPPRYF12AController.class.getName()).log(Level.SEVERE, null, ex);
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: SincronizaActividades");
         }
 
     }
@@ -772,15 +798,16 @@ public class SPPRYF12Controller implements Initializable {
         AnchorPane root;
         Stage ventanaInicio;
         Scene scene;
+        String result;
+        String jsonParams = null;
         try {
             root = ventanaInicioSesion.load();
             SPPRYF12AController controller = ventanaInicioSesion.getController();
-            controller.setCredencialesLogin(claveUsuarioSiaproy, contrasenaSiaproy);
             controller.setControllerPrincipal(this);
             ventanaInicio = new Stage();
             scene = new Scene(root);
             ventanaInicio.setScene(scene);
-            ventanaInicio.setTitle("SPPRYF12AView. Login a SIAPROY WEB");
+            ventanaInicio.setTitle("SPPRYF12AView. Consulta usuario");
             controller.setStage(ventanaInicio);
             ventanaInicio.show();
         } catch (IOException ex) {
@@ -791,46 +818,94 @@ public class SPPRYF12Controller implements Initializable {
 //        
     }
 
-    public void SpProyecto() {
-        HashMap<String, Object> parametrosHsm = new HashMap<>();
-        parametrosHsm.put("cascada", "consultaProyectos");
-        parametrosHsm.put("cveColaborador", "CCORTEZ");
-        ObservableList<String> registros = FXCollections.observableArrayList();
-        ConsultaSpdProyectosStore store = new ConsultaSpdProyectosStore();
+    public void consultaProyectosSiaproyWeb() {
+        HashMap<String, String> parametrosHsm = new HashMap<>();
+        String result;
+        String jsonParams;
+        parametrosHsm.put("cveColaborador", claveUsuarioSiaproy);
+        parametrosHsm.put("conexionFromSiaproyDesktop", "true");
+        jsonParams = gson.toJson(parametrosHsm);
+        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
+        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
         try {
-            registros = store.consulta(parametrosHsm);
-            datosComboProyecto = registros;
+            result = port.cargaRegistro(jsonParams, "consultaProyectosPorColaborador");
+            if (result != null) {
+                datosComboProyecto = FXCollections.observableArrayList();
+                String[] proyectos = result.substring(1, result.length() - 1).split(",");
+                for (int x = 0; x < proyectos.length; x++) {
+                    if (!proyectos[x].equals("")) {
+                        datosComboProyecto.add(proyectos[x].substring(1, proyectos[x].length() - 1));
+                    }
+                }
+            }
         } catch (Exception ex) {
-            Logger.getLogger(SPPRYF12Controller.class.getName()).log(Level.SEVERE, null, ex);
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaProyectosSiaproyWeb");
         }
     }
 
-    public void SpActividades(String proyecto) {
-        HashMap<String, Object> parametrosHsm = new HashMap<>();
-        parametrosHsm.put("cveColaborador", "CCORTEZ");
-        parametrosHsm.put("cascada", "consultaActividades");
-        if (!proyecto.equals("all")) {
-            parametrosHsm.put("idProyecto", proyecto.split("-")[0].trim());
-        }
-        parametrosHsm.put("allActividades", proyecto.equals("all"));
-
-        ObservableList<String> registros = FXCollections.observableArrayList();
-        ConsultaSpdProyectosStore store = new ConsultaSpdProyectosStore();
+    public void consultaActividadesSiaproyWeb(String proyecto) {
+        HashMap<String, String> parametrosHsm = new HashMap<>();
+        String result;
+        String jsonParams;
+        parametrosHsm.put("cveColaborador", claveUsuarioSiaproy);
+        parametrosHsm.put("idProyecto", proyecto.split("-")[0].trim());
+        jsonParams = gson.toJson(parametrosHsm);
+        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
+        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
         try {
-            registros = store.consulta(parametrosHsm);
-            datosComboActividades = registros;
+            result = port.cargaRegistro(jsonParams, "consultaActividadesPorColaborador");
+            if (result != null) {
+                datosComboActividades = FXCollections.observableArrayList();
+                String[] actividades = result.substring(1, result.length() - 1).split(",");
+                for (int x = 0; x < actividades.length; x++) {
+                    if (!actividades[x].equals("")) {
+                        datosComboActividades.add(actividades[x].substring(1, actividades[x].length() - 1));
+                    }
+                }
+            }
         } catch (Exception ex) {
-            Logger.getLogger(SPPRYF12Controller.class.getName()).log(Level.SEVERE, null, ex);
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaActividadesSiaproyWeb");
         }
 
     }
 
-    public void cargaProyectosActividadesSiaproy(Stage ventana) {
-        ventana.close();
-        this.SpProyecto();
-        colProyecto.setEditable(true);
-        colActividades.setEditable(true);
-        loginSiaproWeb = true;
+    public void cargaProyectosActividadesSiaproy(Stage ventana, String claveUsuario) {
+        HashMap<String, String> parametrosHsm = new HashMap<>();
+        String jsonParams;
+        String result;
+        claveUsuarioSiaproy = claveUsuario;
+        ObservableList<String> colaborador = FXCollections.observableArrayList();
+        parametrosHsm.put("cveColaborador", claveUsuarioSiaproy);
+        jsonParams = gson.toJson(parametrosHsm);
+        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
+        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
+        try {
+            result = port.cargaRegistro(jsonParams, "consultaColaboradorSiaproyWeb");
+            if (result != null) {
+                String[] col = result.substring(1, result.length() - 1).split(",");
+                for (int x = 0; x < col.length; x++) {
+                    if (!col[x].equals("")) {
+                        colaborador.add(col[x].substring(1, col[x].length() - 1));
+                    }
+                }
+            }
+            if (colaborador.isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("SPPRYF12AView. Login a SIAPROY WEB");
+                alert.setHeaderText("INICIO DE SESION FALLIDO");
+                alert.setContentText("Los datos de sesión son incorrectos. Verifique su información.");
+                alert.showAndWait();
+            } else {
+                ventana.close();
+                this.consultaProyectosSiaproyWeb();
+                colProyecto.setEditable(true);
+                colActividades.setEditable(true);
+                loginSiaproWeb = true;
+            }
+
+        } catch (Exception ex) {
+            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: SpProyecto");
+        }
     }
 //    private static String cargaRegistro(java.lang.String parametros, java.lang.String cascada) throws Exception {
 //        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
