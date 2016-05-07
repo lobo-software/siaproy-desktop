@@ -35,7 +35,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
+  // 06/May/2016 07:27 CCL (LOBO_000076): Se elimina cógiogo inecesario.
 /**
  *
  * @author Lobo Software
@@ -49,7 +49,6 @@ public class SPPRYF12AController implements Initializable {
     @FXML
     private TextField tfContrasena;
     private String claveUsuario;
-    private String contrasena;
     private Stage ventana;
     private SPPRYF12Controller controllerPrincipal;
 
@@ -61,23 +60,8 @@ public class SPPRYF12AController implements Initializable {
     }
 
     public void iniciaSesionSiaproy() {
-      if(tfClaveUsuario.getText().equals(claveUsuario) && tfContrasena.getText().equals(contrasena)){
-          controllerPrincipal.cargaProyectosActividadesSiaproy(ventana);
-      }else{
-          Alert alert = new Alert(Alert.AlertType.INFORMATION);
-          alert.setTitle("SPPRYF12AView. Login a SIAPROY WEB");
-          alert.setHeaderText("INICIO DE SESION FALLIDO");
-          alert.setContentText("Los datos de sesión son incorrectos. Verifique su información.");
-          alert.showAndWait();
-      }
-
+          controllerPrincipal.cargaProyectosActividadesSiaproy(ventana, tfClaveUsuario.getText());
     }
-    
-    public void setCredencialesLogin(String usuario, String contraseña){
-        claveUsuario= usuario;
-        contrasena = contraseña;
-    }
-    
     public void setStage(Stage ventana){
         this.ventana = ventana;
     }
