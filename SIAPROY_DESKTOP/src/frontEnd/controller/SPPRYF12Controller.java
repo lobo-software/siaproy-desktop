@@ -37,6 +37,7 @@
    05/May/2016 18:55 CCL (LOBO_000076): Se añade la funcionalidad de Insert Siaproy web, y función de Sincronizado a BDD Siaproy.
    06/May/2016 09:35 SVA (LOBO_000076): Se añade parámetro en el método "creaTextField".
    06/May/2016 07:27 CCL (LOBO_000076): Se añade la funcionalidad de los Jason para la interpretación de los registros en la versión web y se eliminan linas innecesarías. .
+   07/May/2016 11:02 CCL (LOBO_000076): Se eliminan comoponentes inecesarior y se establece funcionalidad a los componenets pera establecer clave colavorador y potros para genrear consultas si la clave colaborador es correcta.
 
  */
 package frontEnd.controller;
@@ -177,7 +178,7 @@ public class SPPRYF12Controller implements Initializable {
     private Object tfContrasena;
     private String claveUsuarioSiaproy;
     private String contrasenaSiaproy;
-    private boolean loginSiaproWeb;
+    private boolean loginSiaproWeb, loginFromProyecto;
     private Gson gson = new Gson();
 
     @Override
@@ -733,11 +734,14 @@ public class SPPRYF12Controller implements Initializable {
 
     public void consultaProyectos() {
         if (loginSiaproWeb == false) {
+            loginFromProyecto = true;
             muestraVentanaLoginWebService();
+        } else {
+            loginFromProyecto = false;
+            this.consultaProyectosSiaproyWeb();
         }
     }
 
-//
     public void SincronizaActividades() throws Exception {
         HashMap<String, String> parametrosHsmBDDLocal = new HashMap<>();
         HashMap<String, Object> parametrosHsm;
@@ -755,19 +759,19 @@ public class SPPRYF12Controller implements Initializable {
                 if (registros.size() > 0) {
                     String record;
                     records = "[";
-                    for (int x = 0; x < registros.size(); x++){
-                        record = "{idProyColPlanAct: '" + registros.get(x).getidProyColPlanAct() + "'," +
-                                "idReporteColaborador: '" + registros.get(x).getIdReporteColaborador()+ "'," +
-                                "fecha: '" + registros.get(x).getFecha()+ "'," +
-                                "descripcion: '" + registros.get(x).getDescripcion()+ "'," +
-                                "duracion: '" + registros.get(x).getDuracion()+ "'," +
-                                "horaInicio: '" + registros.get(x).getHoraInicio()+ "'," +
-                                "horaFin: '" + registros.get(x).getHoraFin()+ "'," +
-                                "avance: '" + registros.get(x).getAvance()+ "'," +
-                                "usuario: '" + registros.get(x).getUsuario()+"'},";
+                    for (int x = 0; x < registros.size(); x++) {
+                        record = "{idProyColPlanAct: '" + registros.get(x).getidProyColPlanAct() + "',"
+                                + "idReporteColaborador: '" + registros.get(x).getIdReporteColaborador() + "',"
+                                + "fecha: '" + registros.get(x).getFecha() + "',"
+                                + "descripcion: '" + registros.get(x).getDescripcion() + "',"
+                                + "duracion: '" + registros.get(x).getDuracion() + "',"
+                                + "horaInicio: '" + registros.get(x).getHoraInicio() + "',"
+                                + "horaFin: '" + registros.get(x).getHoraFin() + "',"
+                                + "avance: '" + registros.get(x).getAvance() + "',"
+                                + "usuario: '" + registros.get(x).getUsuario() + "'},";
                         records = records + record;
                     }
-                    records = records.substring(0, records.length()-1);
+                    records = records.substring(0, records.length() - 1);
                     records = records + "]";
                     parametrosHsmBDDLocal.put("registrosBDLocal", records);
                     jsonParams = gson.toJson(parametrosHsmBDDLocal);
@@ -837,6 +841,8 @@ public class SPPRYF12Controller implements Initializable {
                         datosComboProyecto.add(proyectos[x].substring(1, proyectos[x].length() - 1));
                     }
                 }
+                colProyecto.setEditable(true);
+                colActividades.setEditable(true);
             }
         } catch (Exception ex) {
             GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaProyectosSiaproyWeb");
@@ -869,19 +875,27 @@ public class SPPRYF12Controller implements Initializable {
 
     }
 
-    public void cargaProyectosActividadesSiaproy(Stage ventana, String claveUsuario) {
+    public void estableceColaboradorSiaproyWeb() {
+        if (!loginFromProyecto) {
+            this.muestraVentanaLoginWebService();
+        }
+
+    }
+
+    public void consultaColaboradorSiaproyWeb(Stage ventana, String claveUsuario) {
         HashMap<String, String> parametrosHsm = new HashMap<>();
         String jsonParams;
         String result;
         claveUsuarioSiaproy = claveUsuario;
         ObservableList<String> colaborador = FXCollections.observableArrayList();
         parametrosHsm.put("cveColaborador", claveUsuarioSiaproy);
+        parametrosHsm.put("conexionFromSiaproyDesktop", "true");
         jsonParams = gson.toJson(parametrosHsm);
         mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
         mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
         try {
             result = port.cargaRegistro(jsonParams, "consultaColaboradorSiaproyWeb");
-            if (result != null) {
+            if (!result.contains("Reportar")) {
                 String[] col = result.substring(1, result.length() - 1).split(",");
                 for (int x = 0; x < col.length; x++) {
                     if (!col[x].equals("")) {
@@ -889,7 +903,11 @@ public class SPPRYF12Controller implements Initializable {
                     }
                 }
             }
+            datosComboProyecto = FXCollections.observableArrayList();
+            datosComboActividades = FXCollections.observableArrayList();
             if (colaborador.isEmpty()) {
+                loginSiaproWeb = false;
+                loginFromProyecto = false;
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("SPPRYF12AView. Login a SIAPROY WEB");
                 alert.setHeaderText("INICIO DE SESION FALLIDO");
@@ -897,20 +915,14 @@ public class SPPRYF12Controller implements Initializable {
                 alert.showAndWait();
             } else {
                 ventana.close();
-                this.consultaProyectosSiaproyWeb();
-                colProyecto.setEditable(true);
-                colActividades.setEditable(true);
                 loginSiaproWeb = true;
+                if (loginFromProyecto) {
+                    this.consultaProyectosSiaproyWeb();
+                }
             }
 
         } catch (Exception ex) {
-            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: SpProyecto");
+            GeneraCuadroMensaje.error("La aplicación SIAPROY WEB no está en línea. Consulte al administrador.\n" + "ERROR:" + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaColaboradorSiaproyWeb");
         }
     }
-//    private static String cargaRegistro(java.lang.String parametros, java.lang.String cascada) throws Exception {
-//        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
-//        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
-//        return port.cargaRegistro(parametros, cascada);
-////    
-//}
 }
