@@ -40,6 +40,7 @@
    07/May/2016 11:02 CCL (LOBO_000076): Se eliminan comoponentes inecesarior y se establece funcionalidad a los componenets pera establecer clave colavorador y potros para genrear consultas si la clave colaborador es correcta.
    07/May/2016 11:31 SVA (LOBO_000076): Se mejora el método "setTiempoTotal".
    07/May/2016 11:44 SVA (LOBO_000076): Se mejora el cálculo de horas totales en el método "setTiempoTotal".
+   10/May/2016 13:07 SVA (LOBO_000076): Se mejoran funciones en general.
 
  */
 package frontEnd.controller;
@@ -48,9 +49,6 @@ import backEnd.mx.com.lobos.spdreportesactividades.store.ActualizaSpdReportesAct
 import backEnd.mx.com.lobos.spdreportesactividades.store.ConsultaSpdReportesActividadesStore;
 import backEnd.mx.com.lobos.spdreportesactividades.store.EliminaSpdReportesActividadesStore;
 import backEnd.mx.com.lobos.spdreportesactividades.store.InsertaSpdReportesActividadesStore;
-import backEnd.mx.com.lobos.spproyecto.store.ConsultaSpdProyectosStore;
-import backEnd.mx.com.lobos.spproyecto.store.InsertaSpdProyectosStore;
-import backEnd.mx.com.lobos.util.SesionesMongo;
 import com.google.gson.Gson;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import de.jensd.fx.fontawesome.AwesomeDude;
@@ -76,19 +74,19 @@ import frontEnd.model.SpdReportesActividadesModel;
 import frontEnd.model.stopWatch.Stopwatch;
 import frontEnd.util.GeneraCuadroMensaje;
 import frontEnd.util.SialComboCellFactory;
-import frontEnd.util.SialDateCellFactory;
 import frontEnd.util.SialTextFieldCellFactory;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
@@ -97,7 +95,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-//import mx.com.lobos.RegistroActividadesWs.LoboException_Exception;
 
 /**
  *
@@ -143,7 +140,6 @@ public class SPPRYF12Controller implements Initializable {
     private Button btnAgregarActividad;
     @FXML
     private Button btnConsultaProyectos;
-
     @FXML
     private Label lbTotalRegistros;
     @FXML
@@ -153,12 +149,8 @@ public class SPPRYF12Controller implements Initializable {
     @FXML
     private TableColumn<SpdReportesActividadesModel, Boolean> colActivo;
     @FXML
-//    private Button btnGuardar;
-//      @FXML
-//    private TextField tfUser;
-//    @FXML
-//    private PasswordField tfPass;
-    // VARIABLES 
+    private TableColumn<SpdReportesActividadesModel, Date> colFechaEditable;
+
     private ObservableList<String> datosComboProyecto;
     private ObservableList<String> datosComboActividades;
     private final Font fuenteReloj = Font.loadFont(Stopwatch.class.getResource("digital-7_mono.ttf").toExternalForm(), 24);
@@ -173,7 +165,7 @@ public class SPPRYF12Controller implements Initializable {
     private static LocalDate fechaSeleccionada;
     private int contadorCambioDia;
     private SpdReportesActividadesModel actividadEnEjecucion;
-    private static Stage loading = GeneraCuadroMensaje.loading();
+    private static Stage loading;
     private String claveUsuario;
     private String contraseña;
     private Object tfClaveUsuario;
@@ -185,7 +177,7 @@ public class SPPRYF12Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-//        loading.show();
+        loading = GeneraCuadroMensaje.loading();
         tfTiempoTotal.setText("00:00:00");
         tfTiempoTotal.setFont(fuenteReloj);
         tfTiempoInicio.setText("00:00:00");
@@ -193,11 +185,8 @@ public class SPPRYF12Controller implements Initializable {
         tfTiempoFin.setText("00:00:00");
         tfTiempoFin.setFont(fuenteReloj);
         AwesomeDude.setIcon(btnStarStop, AwesomeIcon.PLAY);
-//        Stopwatch stopWatch = new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin);
         btnStarStop.setMinWidth(61);
         btnStarStop.setMinHeight(65);
-//        hboxBotonPlayAgregar.getChildren().removeAll(btnStarStop, btnAgragarAtividad);
-//        hboxBotonPlayAgregar.getChildren().addAll(stopWatch, btnAgragarAtividad);
         dtfFechaActual.setValue(LocalDate.now());
         DatePickerSkin datePickerSkin = new DatePickerSkin((dtfFechaActual));
         Node popupContent = datePickerSkin.getPopupContent();
@@ -207,30 +196,13 @@ public class SPPRYF12Controller implements Initializable {
         dtfFechaActual.valueProperty().addListener((ov, oldValue, newValue) -> {
             fechaSeleccionada = newValue;
             consultaActividades();
-//            if (contadorCambioDia == 0) {
-//                SPPRYF12Controller.oldValue = oldValue;
-//                SPPRYF12Controller.newValue = newValue;
-//                this.cambioDia();
-//            } else {
-//                contadorCambioDia = 0;
-//            }
         });
         muestraFecha();
-        //Store actividades.
-
         SialTextFieldCellFactory<SpdReportesActividadesModel, String> textFieldCell = new SialTextFieldCellFactory<>();
         SialComboCellFactory<SpdReportesActividadesModel, String> comboBoxCell = new SialComboCellFactory<>();
         SialComboCellFactory<SpdReportesActividadesModel, String> comboBoxCellCascade = new SialComboCellFactory<>();
-        SialDateCellFactory<SpdReportesActividadesModel, Date> datePickerCell = new SialDateCellFactory<>();
-//        SialCheckBoxCellFactory<SpdReportesActividadesModel, Boolean> checkBoxCell = new SialCheckBoxCellFactory<>();
 
         colTimer.setCellValueFactory(new PropertyValueFactory<>("stopWatch"));
-//        colTimer.setCellFactory(timerCell.creaTimer(tfTotal, tftiempoInicio, tfTiempoFin));
-        try {
-            SesionesMongo.getDataConection();
-        } catch (Exception ex) {
-            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: initialize");
-        }
         colProyecto.setCellValueFactory(new PropertyValueFactory<>("proyecto"));
         colProyecto.setCellFactory(comboBoxCell.creaComboBox(datosComboProyecto, true, 1));
         colProyecto.setOnEditStart((TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
@@ -238,9 +210,16 @@ public class SPPRYF12Controller implements Initializable {
         });
         colProyecto.setOnEditCommit(
                 (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
+                    if (t.getNewValue() != null) {
+                        if (!t.getNewValue().equals("")) {
+                            if (!t.getNewValue().equals(t.getOldValue())) {
+                                ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setActividad("");
+                                ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setIdProyColPlanAct("");
+                                this.consultaActividadesSiaproyWeb(t.getNewValue());
+                            }
+                        }
+                    }
                     ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setProyecto(t.getNewValue());
-                    ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setActividad("");
-                    this.consultaActividadesSiaproyWeb(t.getNewValue());
                 });
         colProyecto.setEditable(false);
         colActividades.setCellValueFactory(new PropertyValueFactory<>("actividad"));
@@ -248,15 +227,23 @@ public class SPPRYF12Controller implements Initializable {
         colActividades.setOnEditStart((TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
             String proyecto = ((SpdReportesActividadesModel) t.getTableView().getItems()
                     .get(t.getTablePosition().getRow()))
-                    .getProyecto().split("-")[0].trim();
+                    .getProyecto();
+            if (proyecto != null) {
+                proyecto = proyecto.split("-")[0].trim();
+            }
 
             this.consultaActividadesSiaproyWeb(proyecto);
             comboBoxCellCascade.actualizaListaComboCascada(datosComboActividades);
         });
         colActividades.setOnEditCommit(
                 (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
-                    ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setIdProyColPlanAct(t.getNewValue().split("-")[0]);
-                    ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setActividad(t.getNewValue());
+                    if (t.getNewValue() != null) {
+                        if (!t.getNewValue().equals("")) {
+                            ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setIdProyColPlanAct(t.getNewValue().split("-")[0]);
+                            ((SpdReportesActividadesModel) t.getTableView().getItems().get(t.getTablePosition().getRow())).setActividad(t.getNewValue());
+                            datosComboActividades = FXCollections.observableArrayList();
+                        }
+                    }
                 });
         colActividades.setEditable(false);
         colTiempo.setCellValueFactory(new PropertyValueFactory<>("duracion"));
@@ -264,29 +251,9 @@ public class SPPRYF12Controller implements Initializable {
         colFin.setCellValueFactory(new PropertyValueFactory<>("horaFin"));
         colDescripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         colDescripcion.setCellFactory(textFieldCell.creaTextField(0));
-        colDescripcion.setOnEditCommit(
-                (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
-                    ((SpdReportesActividadesModel) t.getTableView().getItems()
-                    .get(t.getTablePosition().getRow()))
-                    .setDescripcion(t.getNewValue());
-
-                });
-
         colAvance.setCellValueFactory(new PropertyValueFactory<>("avance"));
-        colAvance.setCellFactory(textFieldCell.creaTextField(1));
-        colAvance.setOnEditCommit(
-                (TableColumn.CellEditEvent<SpdReportesActividadesModel, String> t) -> {
-                    ((SpdReportesActividadesModel) t.getTableView().getItems()
-                    .get(t.getTablePosition().getRow()))
-                    .setAvance(t.getNewValue());
-                });
+        colAvance.setCellFactory(textFieldCell.creaTextField(4));
         colFecha.setCellValueFactory(cellData -> cellData.getValue().fechaProperty());
-//        colFecha.setCellFactory(datePickerCell.creaDatePicker());
-//        colActivo.setGraphic(checkBoxCell.createCheckHeader(colActivo, grdActividades));
-//        colActivo.setCellValueFactory(cellData -> cellData.getValue().activoProperty());
-//        colActivo.setCellFactory(checkBoxCell.creaCheckBoxMultipleSelection());
-
-        //Carga de registros de actividades
         grid = grdActividades;
         duracion = tfTiempoTotal;
         horaInicio = tfTiempoInicio;
@@ -342,13 +309,16 @@ public class SPPRYF12Controller implements Initializable {
                 }
             }
         });
+        tfDescripcion.textProperty().addListener((ov, oldValue, newValue) -> {
+            StringProperty elemento = (StringProperty) ov;
+            ((TextField) elemento.getBean()).setText(newValue.toUpperCase());
+        });
         try {
             consultaActividades();
             setTotalRegistros();
         } catch (Exception ex) {
-            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: initialize");
+            GeneraCuadroMensaje.error("Ocurrió un problema al iniciar la aplicación.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: initialize");
         }
-//        loading.close();
     }
 
     public void muestraFecha() {
@@ -388,7 +358,6 @@ public class SPPRYF12Controller implements Initializable {
                     grdActividades.getItems().get(posicionTimer).horaFinProperty().unbind();
                 }
             }
-//            tfDescripcion.textProperty().unbind();
             tfDescripcion.setText("");
             tfTiempoTotal.textProperty().unbind();
             tfTiempoTotal.setText("00:00:00");
@@ -412,7 +381,6 @@ public class SPPRYF12Controller implements Initializable {
                             posicion = x;
                         }
                     }
-
                     isPhantom = false;
                 }
             }
@@ -428,7 +396,7 @@ public class SPPRYF12Controller implements Initializable {
             setTotalRegistros();
             setTiempoTotal();
         } catch (Exception ex) {
-            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaActividades");
+            GeneraCuadroMensaje.error("Ocurrió un problema al consultar las actividades.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaActividades");
         }
     }
 
@@ -450,23 +418,15 @@ public class SPPRYF12Controller implements Initializable {
             ventana.setTitle(title);
             ventana.setHeaderText(headerText);
             ventana.setContentText("Existe una actividad en ejecución. Si continúa perderá los cambios realizados. ¿Desea continuar?");
-//            if (oldValue != null) {
-//                contadorCambioDia++;
-//                datePicker.setValue(oldValue);
-//            }
             Optional<ButtonType> seleccion = ventana.showAndWait();
             if (seleccion.get() == ButtonType.OK) {
-                if (operacion == 0) {//cerrar ventana
+                if (operacion == 0) {
                     primaryStage.close();
-                } else if (operacion == 1) {//eliminar registro
+                } else if (operacion == 1) {
                     eliminaActividadesAction();
                 } else if (operacion == 2) {
                     guardaActividadesAction();
                 }
-//                else if (operacion == 2) { //cambiar dia
-//                    cambioDiaAction(grid.getItems(), grid.getSelectionModel().getSelectedItems());
-//                    System.out.println("Descarta cambios de: " + oldValue + " Consulta actividades dia: " + newValue);
-//                }
             }
             ventana.close();
         }
@@ -487,7 +447,7 @@ public class SPPRYF12Controller implements Initializable {
     public void agregaActividades() {
         SpdReportesActividadesModel actividades = new SpdReportesActividadesModel();
         actividades.setStopWatch(new Stopwatch(tfTiempoTotal, tfTiempoInicio, tfTiempoFin));
-        actividades.setDescripcion(tfDescripcion.getText());
+        actividades.setDescripcion(!tfDescripcion.getText().equals("") ? tfDescripcion.getText() : "NUEVA ACTIVIDAD");
         if (dtfFechaActual.getValue().equals(LocalDate.now())) {
             actividades.setDuracion("00:00:00");
             actividades.setHoraInicio("00:00:00");
@@ -503,7 +463,7 @@ public class SPPRYF12Controller implements Initializable {
             actividades.setHoraFin(tfTiempoFin.getText());
         }
         actividades.setFecha(dtfFechaActual.getValue().toString());
-        actividades.setAvance("0");
+        actividades.setAvance("0.0");
         grdActividades.getItems().add(0, actividades);
         actividades.getStopWatch().startStop.fire();
         setTotalRegistros();
@@ -513,13 +473,11 @@ public class SPPRYF12Controller implements Initializable {
     public void muestraActividadesFormulario() {
         ObservableList<SpdReportesActividadesModel> muestraInfo = grid.getSelectionModel().getSelectedItems();
         if (grid.getSelectionModel().getSelectedItems().size() > 0 && fechaSeleccionada.equals(LocalDate.now())) {
-//            tfDescripcion.textProperty().bind(muestraInfo.get(0).descripcionProperty());
             tfDescripcion.setText(muestraInfo.get(0).getDescripcion());
             tfTiempoTotal.textProperty().bind(muestraInfo.get(0).duracionProperty());
             tfTiempoInicio.textProperty().bind(muestraInfo.get(0).horaInicioProperty());
             tfTiempoFin.textProperty().bind(muestraInfo.get(0).horaFinProperty());
         } else if (grid.getSelectionModel().getSelectedItems().size() > 0 && !fechaSeleccionada.equals(LocalDate.now())) {
-//            tfDescripcion.textProperty().unbind();
             tfDescripcion.setText(muestraInfo.get(0).getDescripcion());
             tfTiempoTotal.textProperty().unbind();
             tfTiempoTotal.setText(muestraInfo.get(0).getDuracion());
@@ -527,11 +485,7 @@ public class SPPRYF12Controller implements Initializable {
             tfTiempoInicio.setText(muestraInfo.get(0).getHoraInicio());
             tfTiempoFin.textProperty().unbind();
             tfTiempoFin.setText(muestraInfo.get(0).getHoraFin());
-//            muestraInfo.get(0).duracionProperty().bindBidirectional(tfTiempoTotal.textProperty());
-//            muestraInfo.get(0).horaInicioProperty().bindBidirectional(tfTiempoInicio.textProperty());
-//            muestraInfo.get(0).horaFinProperty().bindBidirectional(tfTiempoFin.textProperty());
         }
-//        setPosicionTimer(grdActividades.getSelectionModel().getSelectedIndex());
     }
 
     public void eliminaActividades() {
@@ -543,25 +497,12 @@ public class SPPRYF12Controller implements Initializable {
         setTotalRegistros();
 
     }
-//    public void cambioDia() {
-//        ObservableList<SpdReportesActividadesModel> allRecords = grdActividades.getItems();
-//        ObservableList<SpdReportesActividadesModel> registro = grdActividades.getSelectionModel().getSelectedItems();
-//        List registroSeleccionado = new ArrayList(registro);
-//        if (registro.size() > 0) {
-//            if (registro.get(0).getStopWatch().getCurrentStatus()) {
-//                alertSpdReportesActividadesModel(primaryStage, "SPPRYF12", "CAMBIAR DE DIA", 2);
-//            }
-//        } else {
-//            System.out.println("Consulta actividades dia" + newValue);
-//        }
-//    }
 
     private static void eliminaActividadesAction() {
         if (grid.getSelectionModel().getSelectedItems().get(0).getStopWatch().getCurrentStatus()) {
             grid.getSelectionModel().getSelectedItems().get(0).getStopWatch().startStop.fire();
         }
         grid.getSelectionModel().getSelectedItems().get(0).setDescripcion("");
-//        descripcionAct.textProperty().unbind();
         grid.getSelectionModel().getSelectedItems().get(0).duracionProperty().unbind();
         duracion.textProperty().unbind();
         duracion.setText("00:00:00");
@@ -581,7 +522,7 @@ public class SPPRYF12Controller implements Initializable {
                 store.eliminaActividades(parametrosHsm);
                 loading.close();
             } catch (Exception ex) {
-                GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: eliminaActividadesAction");
+                GeneraCuadroMensaje.error("Ocurrió un problema al eliminar el registro.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: eliminaActividadesAction");
             }
         }
         grid.getItems().removeAll(grid.getSelectionModel().getSelectedItems());
@@ -591,104 +532,103 @@ public class SPPRYF12Controller implements Initializable {
         lbTotalRegistros.setText(String.valueOf(grid.getItems().size()));
     }
 
-//    public static void cambioDiaAction(ObservableList<SpdReportesActividadesModel> allRecords, ObservableList<SpdReportesActividadesModel> registroSeleccionado) {
-//        contadorCambioDia++;
-//        datePicker.setValue(newValue);
-//        registroSeleccionado.get(0).getStopWatch().startStop.fire();
-//    }
     public void setTiempoTotal() {
         String duracion = "", m = "";
-        String[] tiempo;
+        String[] tiempo = null;
         double min = 0.0, hora = 0.0, horasTotales = 0.0;
-        for (int i = 0; i < grid.getItems().size(); i++) {
-            if (grid.getItems().get(i).getDuracion() != null) {
-                if (!grid.getItems().get(i).getDuracion().equals("")) {
-                    tiempo = grid.getItems().get(i).getDuracion().split("[.]");
-                    hora = Double.parseDouble(grid.getItems().get(i).getDuracion());
-                    hora = Math.ceil(hora * 1000) / 1000;
-                    horasTotales += hora;
-                    hora -= Integer.parseInt(tiempo[0]);
-                    hora = Math.ceil(hora * 1000) / 1000;
-                    min = hora * 60 / 100;
-                    min = Math.floor(min * 1000) / 1000;
-                    m = String.valueOf(min);
-                    if (String.valueOf(min).split("[.]")[1].length() > 2 && Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(2)) > 5) {
-                        m = "0." + String.valueOf(Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(0, 2)) + 1);
-                    } else if (m.split("[.]")[1].length() > 1) {
-                        m = m.substring(0, 4);
-                    } else if (m.split("[.]")[1].equals("3")) {
-                        m = "0.30";
+        if (grid.getItems().size() > 0) {
+            for (int i = 0; i < grid.getItems().size(); i++) {
+                if (grid.getItems().get(i).getDuracion() != null) {
+                    if (!grid.getItems().get(i).getDuracion().equals("")) {
+                        tiempo = grid.getItems().get(i).getDuracion().split("[.]");
+                        hora = Double.parseDouble(grid.getItems().get(i).getDuracion());
+                        hora = Math.ceil(hora * 1000) / 1000;
+                        horasTotales += hora;
+                        hora -= Integer.parseInt(tiempo[0]);
+                        hora = Math.ceil(hora * 1000) / 1000;
+                        min = hora * 60 / 100;
+                        min = Math.floor(min * 1000) / 1000;
+                        m = String.valueOf(min);
+                        if (String.valueOf(min).split("[.]")[1].length() > 2 && Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(2)) > 5) {
+                            m = "0." + String.valueOf(Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(0, 2)) + 1);
+                        } else if (m.split("[.]")[1].length() > 1) {
+                            m = m.substring(0, 4);
+                        } else if (m.split("[.]")[1].equals("3")) {
+                            m = "0.30";
+                        }
+                        duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
+                        grid.getItems().get(i).setDuracion(duracion);
+                    } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                        grid.getItems().get(i).setDuracion("00:00:00");
                     }
-                    duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
-                    grid.getItems().get(i).setDuracion(duracion);
-                } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
-                    grid.getItems().get(i).setDuracion("00:00:00");
                 }
-            }
-            if (grid.getItems().get(i).getHoraInicio() != null) {
-                if (!grid.getItems().get(i).getHoraInicio().equals("")) {
-                    tiempo = grid.getItems().get(i).getHoraInicio().split("[.]");
-                    hora = Double.parseDouble(grid.getItems().get(i).getHoraInicio());
-                    hora = Math.ceil(hora * 1000) / 1000;
-                    hora -= Integer.parseInt(tiempo[0]);
-                    hora = Math.ceil(hora * 1000) / 1000;
-                    min = hora * 60 / 100;
-                    min = Math.floor(min * 1000) / 1000;
-                    m = String.valueOf(min);
-                    if (String.valueOf(min).split("[.]")[1].length() > 2 && Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(2)) > 5) {
-                        m = "0." + String.valueOf(Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(0, 2)) + 1);
-                    } else if (m.split("[.]")[1].length() > 1) {
-                        m = m.substring(0, 4);
-                    } else if (m.split("[.]")[1].equals("3")) {
-                        m = "0.30";
+                if (grid.getItems().get(i).getHoraInicio() != null) {
+                    if (!grid.getItems().get(i).getHoraInicio().equals("")) {
+                        tiempo = grid.getItems().get(i).getHoraInicio().split("[.]");
+                        hora = Double.parseDouble(grid.getItems().get(i).getHoraInicio());
+                        hora = Math.ceil(hora * 1000) / 1000;
+                        hora -= Integer.parseInt(tiempo[0]);
+                        hora = Math.ceil(hora * 1000) / 1000;
+                        min = hora * 60 / 100;
+                        min = Math.floor(min * 1000) / 1000;
+                        m = String.valueOf(min);
+                        if (String.valueOf(min).split("[.]")[1].length() > 2 && Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(2)) > 5) {
+                            m = "0." + String.valueOf(Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(0, 2)) + 1);
+                        } else if (m.split("[.]")[1].length() > 1) {
+                            m = m.substring(0, 4);
+                        } else if (m.split("[.]")[1].equals("3")) {
+                            m = "0.30";
+                        }
+                        duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
+                        grid.getItems().get(i).setHoraInicio(duracion);
+                    } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                        grid.getItems().get(i).setHoraInicio("00:00:00");
                     }
-                    duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
-                    grid.getItems().get(i).setHoraInicio(duracion);
-                } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
-                    grid.getItems().get(i).setHoraInicio("00:00:00");
                 }
-            }
-            if (grid.getItems().get(i).getHoraFin() != null) {
-                if (!grid.getItems().get(i).getHoraFin().equals("")) {
-                    tiempo = grid.getItems().get(i).getHoraFin().split("[.]");
-                    hora = Double.parseDouble(grid.getItems().get(i).getHoraFin());
-                    hora = Math.ceil(hora * 1000) / 1000;
-                    hora -= Integer.parseInt(tiempo[0]);
-                    hora = Math.ceil(hora * 1000) / 1000;
-                    min = hora * 60 / 100;
-                    min = Math.floor(min * 1000) / 1000;
-                    m = String.valueOf(min);
-                    if (String.valueOf(min).split("[.]")[1].length() > 2 && Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(2)) > 5) {
-                        m = "0." + String.valueOf(Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(0, 2)) + 1);
-                    } else if (m.split("[.]")[1].length() > 1) {
-                        m = m.substring(0, 4);
-                    } else if (m.split("[.]")[1].equals("3")) {
-                        m = "0.30";
+                if (grid.getItems().get(i).getHoraFin() != null) {
+                    if (!grid.getItems().get(i).getHoraFin().equals("")) {
+                        tiempo = grid.getItems().get(i).getHoraFin().split("[.]");
+                        hora = Double.parseDouble(grid.getItems().get(i).getHoraFin());
+                        hora = Math.ceil(hora * 1000) / 1000;
+                        hora -= Integer.parseInt(tiempo[0]);
+                        hora = Math.ceil(hora * 1000) / 1000;
+                        min = hora * 60 / 100;
+                        min = Math.floor(min * 1000) / 1000;
+                        m = String.valueOf(min);
+                        if (String.valueOf(min).split("[.]")[1].length() > 2 && Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(2)) > 5) {
+                            m = "0." + String.valueOf(Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(0, 2)) + 1);
+                        } else if (m.split("[.]")[1].length() > 1) {
+                            m = m.substring(0, 4);
+                        } else if (m.split("[.]")[1].equals("3")) {
+                            m = "0.30";
+                        }
+                        duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
+                        grid.getItems().get(i).setHoraFin(duracion);
+                    } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                        grid.getItems().get(i).setHoraFin("00:00:00");
                     }
-                    duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
-                    grid.getItems().get(i).setHoraFin(duracion);
-                } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
-                    grid.getItems().get(i).setHoraFin("00:00:00");
                 }
-            }
 
-            tiempo = String.valueOf(horasTotales).split("[.]");
-            hora = horasTotales;
-            hora = Math.ceil(hora * 1000) / 1000;
-            hora -= Integer.parseInt(tiempo[0]);
-            hora = Math.ceil(hora * 1000) / 1000;
-            min = hora * 60 / 100;
-            min = Math.floor(min * 1000) / 1000;
-            m = String.valueOf(min);
-            if (String.valueOf(min).split("[.]")[1].length() > 2 && Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(2)) > 5) {
-                m = "0." + String.valueOf(Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(0, 2)) + 1);
-            } else if (m.split("[.]")[1].length() > 1) {
-                m = m.substring(0, 4);
-            } else if (m.split("[.]")[1].equals("3")) {
-                m = "0.30";
+                tiempo = String.valueOf(horasTotales).split("[.]");
+                hora = horasTotales;
+                hora = Math.ceil(hora * 1000) / 1000;
+                hora -= Integer.parseInt(tiempo[0]);
+                hora = Math.ceil(hora * 1000) / 1000;
+                min = hora * 60 / 100;
+                min = Math.floor(min * 1000) / 1000;
+                m = String.valueOf(min);
+                if (String.valueOf(min).split("[.]")[1].length() > 2 && Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(2)) > 5) {
+                    m = "0." + String.valueOf(Integer.parseInt(String.valueOf(min).split("[.]")[1].substring(0, 2)) + 1);
+                } else if (m.split("[.]")[1].length() > 1) {
+                    m = m.substring(0, 4);
+                } else if (m.split("[.]")[1].equals("3")) {
+                    m = "0.30";
+                }
+                duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
+                lbTiempoTotal.setText(String.valueOf(duracion));
             }
-            duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
-            lbTiempoTotal.setText(String.valueOf(duracion));
+        } else {
+            lbTiempoTotal.setText(String.valueOf("00:00:00"));
         }
     }
 
@@ -718,7 +658,6 @@ public class SPPRYF12Controller implements Initializable {
     }
 
     public static void guardaActividadesAction() {
-//        loading.show();
         InsertaSpdReportesActividadesStore storeInsert;
         ActualizaSpdReportesActividadesStore storeUpdate;
         HashMap<String, Object> parametrosHsm;
@@ -753,7 +692,7 @@ public class SPPRYF12Controller implements Initializable {
             storeUpdate.actualizaActividades(parametrosHsm);
             loading.close();
         } catch (Exception ex) {
-            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: guardaActividadesAction");
+            GeneraCuadroMensaje.error("Ocurrió un problema al guardar la información.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: guardaActividadesAction");
         }
     }
 
@@ -775,49 +714,72 @@ public class SPPRYF12Controller implements Initializable {
         String jsonParams, result, records = "";
         try {
             if (loginSiaproWeb == false) {
-                muestraVentanaLoginWebService();
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("SPPRYF12. Sincronizar actividades");
+                alert.setHeaderText("Información incompleta.");
+                alert.setContentText("Establezca un colaborador.");
+                alert.showAndWait();
             } else {
-                parametrosHsm = new HashMap<>();
-                parametrosHsm.put("cascada", "consultaActividadesSinSincronizar");
                 ConsultaSpdReportesActividadesStore store = new ConsultaSpdReportesActividadesStore();
+                parametrosHsm = new HashMap<>();
+                parametrosHsm.put("cascada", "consultaActividadesSinProyecto");
                 registros = store.consultaActividades(parametrosHsm);
                 if (registros.size() > 0) {
-                    String record;
-                    records = "[";
+                    String fechas = "";
+                    SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+                    LocalDate fecha = LocalDate.now();
                     for (int x = 0; x < registros.size(); x++) {
-                        record = "{idProyColPlanAct: '" + registros.get(x).getidProyColPlanAct() + "',"
-                                + "idReporteColaborador: '" + registros.get(x).getIdReporteColaborador() + "',"
-                                + "fecha: '" + registros.get(x).getFecha() + "',"
-                                + "descripcion: '" + registros.get(x).getDescripcion() + "',"
-                                + "duracion: '" + registros.get(x).getDuracion() + "',"
-                                + "horaInicio: '" + registros.get(x).getHoraInicio() + "',"
-                                + "horaFin: '" + registros.get(x).getHoraFin() + "',"
-                                + "avance: '" + registros.get(x).getAvance() + "',"
-                                + "usuario: '" + registros.get(x).getUsuario() + "'},";
-                        records = records + record;
+                        fecha = fecha.parse(registros.get(x).getFecha());
+                        fechas += format.format(Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant())) + "\n";
                     }
-                    records = records.substring(0, records.length() - 1);
-                    records = records + "]";
-                    parametrosHsmBDDLocal.put("registrosBDLocal", records);
-                    jsonParams = gson.toJson(parametrosHsmBDDLocal);
-                    mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
-                    mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
-                    result = port.cargaRegistro(jsonParams, "insertaRegistrosFromSiaproyDesktop");
-                    if (result != null) {
-                        if (result.contains("exitosa")) {
-                            ActualizaSpdReportesActividadesStore storeUpdate = new ActualizaSpdReportesActividadesStore();
-                            parametrosHsm.replace("cascada", "actualizaSincronizadoSiaproy");
-                            storeUpdate.actualizaActividades(parametrosHsm);
-                            consultaActividades();
-                        } else {
-                            GeneraCuadroMensaje.error("Ocurrió un error en la sincronización." + "\nCLASE: SPPRYF12Controller. \nMÉTODO: SincronizaActividades");
+                    Alert alertFechas = new Alert(AlertType.INFORMATION);
+                    alertFechas.setTitle("SPPRYF12. Sincronizar actividades");
+                    alertFechas.setHeaderText("Información incompleta");
+                    alertFechas.setContentText("Existen registros sin un proyecto y actividad en los siguientes días:\n" + fechas + "\nActualice su información e intente nuevamente.");
+                    alertFechas.showAndWait();
+                } else {
+                    parametrosHsm.replace("cascada", "consultaActividadesSinSincronizar");
+                    registros = store.consultaActividades(parametrosHsm);
+                    if (registros.size() > 0) {
+                        String record;
+                        records = "[";
+                        for (int x = 0; x < registros.size(); x++) {
+                            record = "{idProyColPlanAct: '" + registros.get(x).getidProyColPlanAct() + "',"
+                                    + "idReporteColaborador: '" + registros.get(x).getIdReporteColaborador() + "',"
+                                    + "fecha: '" + registros.get(x).getFecha() + "',"
+                                    + "descripcion: '" + registros.get(x).getDescripcion() + "',"
+                                    + "duracion: '" + registros.get(x).getDuracion() + "',"
+                                    + "horaInicio: '" + registros.get(x).getHoraInicio() + "',"
+                                    + "horaFin: '" + registros.get(x).getHoraFin() + "',"
+                                    + "avance: '" + registros.get(x).getAvance() + "',"
+                                    + "usuario: '" + registros.get(x).getUsuario() + "'},";
+                            records = records + record;
+                        }
+                        records = records.substring(0, records.length() - 1);
+                        records = records + "]";
+                        parametrosHsmBDDLocal.put("registrosBDLocal", records);
+                        jsonParams = gson.toJson(parametrosHsmBDDLocal);
+                        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
+                        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
+                        result = port.cargaRegistro(jsonParams, "insertaRegistrosFromSiaproyDesktop");
+                        if (result != null) {
+                            if (result.contains("exitosa")) {
+                                ActualizaSpdReportesActividadesStore storeUpdate = new ActualizaSpdReportesActividadesStore();
+                                parametrosHsm.replace("cascada", "actualizaSincronizadoSiaproy");
+                                storeUpdate.actualizaActividades(parametrosHsm);
+                                consultaActividades();
+                                loading.close();
+                            } else {
+                                loading.close();
+                                GeneraCuadroMensaje.error("Ocurrió un problema en la sincronización." + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: SincronizaActividades");
+                            }
                         }
                     }
                 }
             }
-
         } catch (Exception ex) {
-            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: SincronizaActividades");
+            loading.close();
+            GeneraCuadroMensaje.error("Ocurrió un problema en la sincronización.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: SincronizaActividades");
         }
 
     }
@@ -827,8 +789,6 @@ public class SPPRYF12Controller implements Initializable {
         AnchorPane root;
         Stage ventanaInicio;
         Scene scene;
-        String result;
-        String jsonParams = null;
         try {
             root = ventanaInicioSesion.load();
             SPPRYF12AController controller = ventanaInicioSesion.getController();
@@ -840,11 +800,8 @@ public class SPPRYF12Controller implements Initializable {
             controller.setStage(ventanaInicio);
             ventanaInicio.show();
         } catch (IOException ex) {
-            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller\nMÉTODO: muestraVentanaLoginWebService");
+            GeneraCuadroMensaje.error("Ocurrió un problema desconocido.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: muestraVentanaLoginWebService");
         }
-////     
-//        
-//        
     }
 
     public void consultaProyectosSiaproyWeb() {
@@ -860,17 +817,23 @@ public class SPPRYF12Controller implements Initializable {
             result = port.cargaRegistro(jsonParams, "consultaProyectosPorColaborador");
             if (result != null) {
                 datosComboProyecto = FXCollections.observableArrayList();
-                String[] proyectos = result.substring(1, result.length() - 1).split(",");
+                String[] proyectos = result.substring(1, result.length() - 1).split("\",");
                 for (int x = 0; x < proyectos.length; x++) {
                     if (!proyectos[x].equals("")) {
-                        datosComboProyecto.add(proyectos[x].substring(1, proyectos[x].length() - 1));
+                        if (x != proyectos.length - 1) {
+                            datosComboProyecto.add(proyectos[x].substring(1, proyectos[x].length()));
+                        } else {
+                            datosComboProyecto.add(proyectos[x].substring(1, proyectos[x].length() - 1));
+                        }
                     }
                 }
                 colProyecto.setEditable(true);
                 colActividades.setEditable(true);
+                loading.close();
             }
         } catch (Exception ex) {
-            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaProyectosSiaproyWeb");
+            loading.close();
+            GeneraCuadroMensaje.error("Ocurrió un problema al consultar los proyectos.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaProyectosSiaproyWeb");
         }
     }
 
@@ -878,33 +841,37 @@ public class SPPRYF12Controller implements Initializable {
         HashMap<String, String> parametrosHsm = new HashMap<>();
         String result;
         String jsonParams;
-        parametrosHsm.put("cveColaborador", claveUsuarioSiaproy);
-        parametrosHsm.put("idProyecto", proyecto.split("-")[0].trim());
-        jsonParams = gson.toJson(parametrosHsm);
-        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
-        mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
-        try {
-            result = port.cargaRegistro(jsonParams, "consultaActividadesPorColaborador");
-            if (result != null) {
-                datosComboActividades = FXCollections.observableArrayList();
-                String[] actividades = result.substring(1, result.length() - 1).split(",");
-                for (int x = 0; x < actividades.length; x++) {
-                    if (!actividades[x].equals("")) {
-                        datosComboActividades.add(actividades[x].substring(1, actividades[x].length() - 1));
+        if (proyecto != null) {
+            if (!proyecto.equals("")) {
+                parametrosHsm.put("cveColaborador", claveUsuarioSiaproy);
+                parametrosHsm.put("idProyecto", proyecto.split("-")[0].trim());
+                jsonParams = gson.toJson(parametrosHsm);
+                mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
+                mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
+                try {
+                    result = port.cargaRegistro(jsonParams, "consultaActividadesPorColaborador");
+                    if (result != null) {
+                        datosComboActividades = FXCollections.observableArrayList();
+                        String[] actividades = result.substring(1, result.length() - 1).split("\",");
+                        for (int x = 0; x < actividades.length; x++) {
+                            if (!actividades[x].equals("")) {
+                                if (x != actividades.length - 1) {
+                                    datosComboActividades.add(actividades[x].substring(1, actividades[x].length()));
+                                } else {
+                                    datosComboActividades.add(actividades[x].substring(1, actividades[x].length() - 1));
+                                }
+                            }
+                        }
                     }
+                } catch (Exception ex) {
+                    GeneraCuadroMensaje.error("Ocurrió un problema al consultar las actividades.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaActividadesSiaproyWeb");
                 }
             }
-        } catch (Exception ex) {
-            GeneraCuadroMensaje.error(ex.toString() + "\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaActividadesSiaproyWeb");
         }
-
     }
 
     public void estableceColaboradorSiaproyWeb() {
-        if (!loginFromProyecto) {
-            this.muestraVentanaLoginWebService();
-        }
-
+        this.muestraVentanaLoginWebService();
     }
 
     public void consultaColaboradorSiaproyWeb(Stage ventana, String claveUsuario) {
@@ -932,7 +899,6 @@ public class SPPRYF12Controller implements Initializable {
             datosComboActividades = FXCollections.observableArrayList();
             if (colaborador.isEmpty()) {
                 loginSiaproWeb = false;
-                loginFromProyecto = false;
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("SPPRYF12AView. Login a SIAPROY WEB");
                 alert.setHeaderText("INICIO DE SESION FALLIDO");
@@ -942,12 +908,12 @@ public class SPPRYF12Controller implements Initializable {
                 ventana.close();
                 loginSiaproWeb = true;
                 if (loginFromProyecto) {
+                    loginFromProyecto = false;
                     this.consultaProyectosSiaproyWeb();
                 }
             }
-
         } catch (Exception ex) {
-            GeneraCuadroMensaje.error("La aplicación SIAPROY WEB no está en línea. Consulte al administrador.\n" + "ERROR:" + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaColaboradorSiaproyWeb");
+            GeneraCuadroMensaje.error("La aplicación SIAPROY WEB no está en línea. Consulte al administrador.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaColaboradorSiaproyWeb");
         }
     }
 }

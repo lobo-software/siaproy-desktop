@@ -28,6 +28,7 @@
  15/Apr/2016 13:24 CCL(LOBO_000076):Se eliminaron objetos innecesarios en la clase.
  15/Apr/2016 13:44 CCL (LOBO_000076): No se modificó nada en este modelo.
  29/Abr/2016 17:07 SVA (LOBO_000076): Se mejora funcionalidad para mostrar las horas.
+10/May/2016 13:07 SVA (LOBO_000076): Se añade validación en el método call para reanudar el tiempo del día actual en caso de existir el registro en la BDD.
  */
 package frontEnd.model.stopWatch;
 
@@ -39,17 +40,17 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.scene.control.TextField;
 
 public class StopwatchWorker extends Task<Void> {
 
-    public StopwatchWorker(long contador, Duration currentTime, LocalDateTime startTime) {
+    public StopwatchWorker(long contador, Duration currentTime, LocalDateTime startTime, String duracion) {
         this.contador = contador;
         this.currentTime = currentTime;
         this.startTime = startTime;
+        this.duracion = duracion;
         this.tfTiempoInicio = new TextField();
         this.tfTiempoFin = new TextField();
         tti = new TimerTiempoInicio();
@@ -62,9 +63,10 @@ public class StopwatchWorker extends Task<Void> {
     private LocalDateTime startTime;
     private final long contador;
     private Duration duration;
-    private final Duration currentTime;
+    private Duration currentTime;
     private final TextField tfTiempoInicio;
     private final TextField tfTiempoFin;
+    private String duracion;
     TimerTiempoInicio tti;
     TimerTiempoFin ttf;
 
@@ -75,17 +77,25 @@ public class StopwatchWorker extends Task<Void> {
         if (contador == 0) {
             startTime = startDateTime;
         }
-         tti.setHoraInicio(startTime);
+        tti.setHoraInicio(startTime);
         while (!stop.getValue()) {
             stopDateTime = LocalDateTime.now();
             duration = Duration.between(startDateTime, stopDateTime);
-            if (contador > 0) {
-                duration = duration.plus(currentTime);
+            if (contador > 0 || !duracion.equals("00:00:00")) {
+                if (currentTime != null) {
+                    duration = duration.plus(currentTime);
+                } else {
+                    int hours = Integer.parseInt(duracion.split(":")[0]);
+                    int minutes = Integer.parseInt(duracion.split(":")[1]);
+                    int seconds = Integer.parseInt(duracion.split(":")[2]);
+                    duration = duration.plusSeconds(3600 * hours + 60 * minutes +  seconds);
+                }
+
             }
             currentHours = Math.max(0, duration.toHours());
             currentMinutes = Math.max(0, duration.toMinutes() - 60 * duration.toHours());
             currentSeconds = Math.max(0, duration.getSeconds() - 60 * duration.toMinutes());
-            if (contador > 0) {
+            if (contador > 0 || !duracion.equals("00:00:00")) {
                 LocalDateTime newTime = LocalDateTime.now();
                 finalHours = newTime.getHour();
                 finalMinutes = newTime.getMinute();
@@ -100,7 +110,7 @@ public class StopwatchWorker extends Task<Void> {
                     finalMinutes = Math.max(0, tempMinutes - 60 * (finalHours - startDateTime.getHour()));
                 }
             }
-             ttf.setHoraFin(finalHours, finalMinutes, finalSeconds);
+            ttf.setHoraFin(finalHours, finalMinutes, finalSeconds);
             //Se agraga  la función  las variables  las cuales  hacen  la imprecion del tiempo Inicio final y total paramostrarse en los textfields de la API.
             System.out.print(String.format("%02d", currentHours) + ":" + String.format("%02d", currentMinutes) + ":" + String.format("%02d", currentSeconds));
             System.out.print("Hora inicio: " + String.format("%02d", startTime.getHour()) + ":" + String.format("%02d", startTime.getMinute()) + ":" + String.format("%02d", startTime.getSecond()));

@@ -22,6 +22,7 @@
  *  Document     : GeneraCuadroMensaje.java
  * Created on    : 25 Apr 2016 5:03:22 PM
  * Author           : SVA
+   Modifications: 10/May/2016 13:07 SVA (LOBO_000076): Se eliminan librerías innecesarias.
 
  */
 package frontEnd.util;
@@ -37,7 +38,6 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -89,7 +89,6 @@ import javafx.stage.StageStyle;
         alert.setContentText("Ha ocurrido un error.");
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 //        stage.getIcons().add(venfi);
-
         Hyperlink link = new Hyperlink("http://soporte.lobos.com.mx/Accesos.asp");
         Label label = new Label("Detalles:");
 
@@ -109,10 +108,6 @@ import javafx.stage.StageStyle;
         expContent.add(link, 0, 2);
         
         DialogPane dialogPane = alert.getDialogPane();
-//        dialogPane.getStylesheets().add("SarreStyleSheet.css");
-        if(loading().isShowing()){
-            loading().close();
-        }
         alert.getDialogPane().setExpandableContent(expContent);
         alert.showAndWait();
 

@@ -24,6 +24,7 @@
  * Author           : SVA
  * Modifications : 29/Abr/2016 17:07 SVA (LOBO_000076): Se restructura clase y mejora funcionalidad.
 06/May/2016 09:35 SVA (LOBO_000076): Se modifica la instancia de la clase "AutoCompleteComboBoxListener".
+10/May/2016 13:07 SVA (LOBO_000076): Se añade funcionalidad en commitEdit para pasar a la siguiente columna editable.
  */
 package frontEnd.util;
 
@@ -153,6 +154,11 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
         comboBox.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         comboBox.setOnAction((e) -> {
             commitEdit(comboBox.getSelectionModel().getSelectedItem());
+            TableColumn nextColumn = getNextColumn(true);
+            if (nextColumn != null) {
+                getTableView().edit(row, nextColumn);
+                getTableView().getSelectionModel().select(row);
+            }
         });
         comboBox.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             if (!newValue) {
@@ -170,6 +176,11 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
             } else if (t.getCode() == KeyCode.ENTER) {
                 setText(comboBox.getValue());
                 setGraphic(null);
+                TableColumn nextColumn = getNextColumn(!t.isShiftDown());
+                if (nextColumn != null) {
+                    getTableView().edit(row, nextColumn);
+                    getTableView().getSelectionModel().select(row);
+                }
             }
         });
         comboBox.getEditor().textProperty().addListener((ov, oldValue, newValue) -> {
@@ -188,6 +199,11 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
         comboBoxWithCascade.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         comboBoxWithCascade.setOnAction((e) -> {
             commitEdit(comboBoxWithCascade.getSelectionModel().getSelectedItem());
+            TableColumn nextColumn = getNextColumn(true);
+            if (nextColumn != null) {
+                getTableView().edit(row, nextColumn);
+                getTableView().getSelectionModel().select(row);
+            }
         });
         comboBoxWithCascade.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
             if (!newValue) {
@@ -206,6 +222,11 @@ public class SialComboCellFactory<E, T> extends TableCell<E, String> {
                 } else if (t.getCode() == KeyCode.ENTER) {
                     setText(comboBoxWithCascade.getValue());
                     setGraphic(null);
+                    TableColumn nextColumn = getNextColumn(!t.isShiftDown());
+                    if (nextColumn != null) {
+                        getTableView().edit(row, nextColumn);
+                        getTableView().getSelectionModel().select(row);
+                    }
                 }
             }
         });
