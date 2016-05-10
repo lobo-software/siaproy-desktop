@@ -23,6 +23,7 @@
  * Created on    : 11 Apr 2016 4:37:26 PM
  * Author           : SVA
  * Modifications : 19/Abr/2016 Se añade funcionalidad para darle el formato 'dd MMM yyyy' a la fecha.
+10/May/2016 13:07 SVA (LOBO_000076): Se añade funcionalidad en commitEdit para pasar a la siguiente columna editable.
  */
 package frontEnd.util;
 
@@ -116,6 +117,11 @@ public class SialDateCellFactory<E, T> extends TableCell<E, Date> {
         datePicker.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         datePicker.setOnAction((e) -> {
             commitEdit(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+             TableColumn nextColumn = getNextColumn(true);
+                if (nextColumn != null) {
+                    getTableView().edit(row, nextColumn);
+                    getTableView().getSelectionModel().select(row);
+                }
         });
         datePicker.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) -> {
             if (event.getCode() == KeyCode.TAB) {

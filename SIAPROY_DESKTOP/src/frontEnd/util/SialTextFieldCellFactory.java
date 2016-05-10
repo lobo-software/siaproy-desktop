@@ -24,6 +24,7 @@
  * Author           : SVA
  * Modifications : 29/Abr/2016 17:07 SVA (LOBO_000076): Se restructura la clase y se mejora la funcionalidad.
 06/May/2016 09:35 SVA (LOBO_000076): Se añaden regex para el textfield.
+10/May/2016 13:07 SVA (LOBO_000076): Se añade funcionalidad en commitEdit para pasar a la siguiente columna editable / Se añaden expresiones regulares en el método "creaTextField".
  */
 package frontEnd.util;
 
@@ -51,11 +52,10 @@ import javafx.util.converter.DoubleStringConverter;
 public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
 
     private TextField textField;
-    private int row = 0;
-    private boolean regex;
-    private int operacion;
+    private int row = 0, operacion, longitud;
+    private boolean regex, tieneLongitudMaxima;
 
-    public SialTextFieldCellFactory() {
+    public SialTextFieldCellFactory() {//Texto sin regex ni longitud máxima
     }
 
     public SialTextFieldCellFactory(int operacion) {
@@ -63,11 +63,33 @@ public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
         if (operacion > 0) {
             regex = true;
         }
+        tieneLongitudMaxima = false;
+    }
+
+    public SialTextFieldCellFactory(int operacion, int longitud) {
+        this.operacion = operacion;
+        if (operacion > 0) {
+            regex = true;
+        }
+        this.longitud = longitud;
+        tieneLongitudMaxima = true;
+    }
+
+    public Callback<TableColumn<E, String>, TableCell<E, String>> creaTextField() {
+        Callback<TableColumn<E, String>, TableCell<E, String>> callBack;
+        callBack = (TableColumn<E, String> tableColumn) -> new SialTextFieldCellFactory();
+        return callBack;
     }
 
     public Callback<TableColumn<E, String>, TableCell<E, String>> creaTextField(int operacion) {
         Callback<TableColumn<E, String>, TableCell<E, String>> callBack;
         callBack = (TableColumn<E, String> tableColumn) -> new SialTextFieldCellFactory(operacion);
+        return callBack;
+    }
+
+    public Callback<TableColumn<E, String>, TableCell<E, String>> creaTextField(int operacion, int longitud) {
+        Callback<TableColumn<E, String>, TableCell<E, String>> callBack;
+        callBack = (TableColumn<E, String> tableColumn) -> new SialTextFieldCellFactory(operacion, longitud);
         return callBack;
     }
 
@@ -115,12 +137,149 @@ public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
     }
 
     private void createTextField() {
-        Pattern validDoubleText;
-        TextFormatter<Double> textFormatter;
-        textField = new TextField(getString());
+        final int maxChars;
+        final String restictTo;
+        if (tieneLongitudMaxima) {
+            maxChars = longitud;
+        } else {
+            maxChars = 0;
+        }
+        if (regex) {
+            switch (operacion) {
+                case 1://Claves de usuario
+                    restictTo = "[a-zA-Z0-9]";
+                    textField = new TextField(getString()) {
+                        @Override
+                        public void replaceText(int start, int end, String text) {
+                            if (matchTest(text)) {
+                                super.replaceText(start, end, text);
+                            }
+                        }
+
+                        @Override
+                        public void replaceSelection(String text) {
+                            if (matchTest(text)) {
+                                super.replaceSelection(text);
+                            }
+                        }
+
+                        private boolean matchTest(String text) {
+                            if (tieneLongitudMaxima) {
+                                return text.isEmpty() || (text.matches(restictTo) && getText().length() < maxChars);
+                            } else {
+                                return text.isEmpty() || (text.matches(restictTo));
+                            }
+                        }
+                    };
+                    break;
+                case 2: //Descripción sin caracteres especiales
+                    restictTo = "[^\"|']";
+                    textField = new TextField(getString()) {
+                        @Override
+                        public void replaceText(int start, int end, String text) {
+                            if (matchTest(text)) {
+                                super.replaceText(start, end, text);
+                            }
+                        }
+
+                        @Override
+                        public void replaceSelection(String text) {
+                            if (matchTest(text)) {
+                                super.replaceSelection(text);
+                            }
+                        }
+
+                        private boolean matchTest(String text) {
+                            if (tieneLongitudMaxima) {
+                                return text.isEmpty() || (text.matches(restictTo) && getText().length() < maxChars);
+                            } else {
+                                return text.isEmpty() || (text.matches(restictTo));
+                            }
+                        }
+                    };
+                    break;
+                case 3: //Descripción con valores númericos (enteros)
+                    restictTo = "[0-9]";
+                    textField = new TextField(getString()) {
+                        @Override
+                        public void replaceText(int start, int end, String text) {
+                            if (matchTest(text)) {
+                                super.replaceText(start, end, text);
+                            }
+                        }
+
+                        @Override
+                        public void replaceSelection(String text) {
+                            if (matchTest(text)) {
+                                super.replaceSelection(text);
+                            }
+                        }
+
+                        private boolean matchTest(String text) {
+                            if (tieneLongitudMaxima) {
+                                return text.isEmpty() || (text.matches(restictTo) && getText().length() < maxChars);
+                            } else {
+                                return text.isEmpty() || (text.matches(restictTo));
+                            }
+                        }
+                    };
+                    break;
+                case 4: //Descripción con valores númericos (dobles)
+                    textField = new TextField(getString());
+                    Pattern validDoubleText = Pattern.compile("^[-+]?\\d{1,10}+(\\.{0,1}(\\d{0,3}))?$");
+                    TextFormatter<Double> textFormatter = new TextFormatter<Double>(new DoubleStringConverter(), 0.0,
+                            change -> {
+                                String newText = getString();
+                                if (validDoubleText.matcher(newText).matches()) {
+                                    return change;
+                                } else {
+                                    return null;
+                                }
+                            });
+                    textField.setTextFormatter(textFormatter);
+                    break;
+                case 5: // Descripcion sin restricción en los caracteres
+                    restictTo = "";
+                    textField = new TextField(getString()) {
+                        @Override
+                        public void replaceText(int start, int end, String text) {
+                            if (matchTest(text)) {
+                                super.replaceText(start, end, text);
+                            }
+                        }
+
+                        @Override
+                        public void replaceSelection(String text) {
+                            if (matchTest(text)) {
+                                super.replaceSelection(text);
+                            }
+                        }
+
+                        private boolean matchTest(String text) {
+                            if (tieneLongitudMaxima) {
+                                return text.isEmpty() || getText().length() < maxChars;
+                            } else {
+                                return true;
+                            }
+                        }
+                    };
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            textField = new TextField(getString());
+        }
         textField.selectAll();
         textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
-        textField.setOnAction((e) -> commitEdit(textField.getText()));
+        textField.setOnAction((e) -> {
+            commitEdit(textField.getText());
+            TableColumn nextColumn = getNextColumn(true);
+            if (nextColumn != null) {
+                getTableView().edit(row, nextColumn);
+                getTableView().getSelectionModel().select(row);
+            }
+        });
         textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent t) {
@@ -134,25 +293,6 @@ public class SialTextFieldCellFactory<E, T> extends TableCell<E, String> {
                 }
             }
         });
-        if (regex) {
-            switch (operacion) {
-                case 1://valores numéricos (double)
-                    validDoubleText = Pattern.compile("-?((\\d*)|(\\d+\\.\\d*))");
-                    textFormatter = new TextFormatter<Double>(new DoubleStringConverter(), 0.0,
-                            change -> {
-                                String newText = change.getControlNewText();
-                                if (validDoubleText.matcher(newText).matches()) {
-                                    return change;
-                                } else {
-                                    return null;
-                                }
-                            });
-                    textField.setTextFormatter(textFormatter);
-                    break;
-                default:
-                    break;
-            }
-        }
         textField.textProperty().addListener((ov, oldValue, newValue) -> {
             StringProperty elemento = (StringProperty) ov;
             ((TextField) elemento.getBean()).setText(newValue.toUpperCase());
