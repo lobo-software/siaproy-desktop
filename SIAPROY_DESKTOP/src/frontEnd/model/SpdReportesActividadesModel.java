@@ -24,6 +24,7 @@
  * Author           : SVA
  * Modifications : 05/May/2016 10:40 CCL (LOBO_000076):  Se la ñade fucnionalidad en este modelo para la concordancia de datos en la bdd local.
 06/May/2016 09:35 SVA (LOBO_000076): Se eliminan fields obsoletos / se da formato al archivo.
+10/May/2016 13:07 SVA (LOBO_000076): Se da formato al archivo.
 .
  */
 package frontEnd.model;
@@ -57,7 +58,6 @@ public class SpdReportesActividadesModel {
     private String usuario;
     private Timestamp fechaActualizacion;
 
-    //Se inicia con el modelado de datos
     public SpdReportesActividadesModel() {
         this.stopWatch = new SimpleObjectProperty();
         this.idReporteActividad = new SimpleStringProperty();
@@ -73,7 +73,6 @@ public class SpdReportesActividadesModel {
         this.avance = new SimpleStringProperty("");
         this.usuario = "";
         this.fechaActualizacion = Timestamp.valueOf(LocalDateTime.now());
-
     }
 
     public SpdReportesActividadesModel(Stopwatch stopWatch, String idReporteActividad, String idProyColPlanAct, String idReporteColaborador, String proyecto, String actividad, String fecha, String descripcion, String duracion, String horaInicio, String horaFin, String avance, String usuario, Timestamp fechaActualizacion) {
@@ -91,7 +90,6 @@ public class SpdReportesActividadesModel {
         this.avance = new SimpleStringProperty(avance);
         this.usuario = usuario;
         this.fechaActualizacion = fechaActualizacion;
-
     }
 
     public void setStopWatch(Stopwatch stopWatch) {

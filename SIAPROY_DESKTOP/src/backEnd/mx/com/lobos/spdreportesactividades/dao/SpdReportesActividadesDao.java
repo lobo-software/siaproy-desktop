@@ -23,13 +23,14 @@
  * Created on    : 26 Apr 2016 11:34:47 AM
  * Author           : SVA
  * Modifications : 05/May/2016 06:53 CCL (LOBO_000076): Se añade la funcionalidad de Insertar, Consultar y Sincronizar a Siaproy web, y función de Sincronizado a BDD Siaproy.
+10/May/2016 13:07 SVA (LOBO_000076): Se crea el método "consultaActividadesSinProyecto".
 
  */
 package backEnd.mx.com.lobos.spdreportesactividades.dao;
 
 /**
  *
- * @author Lobo Softwar
+ * @author Lobo Software
  */
 public class SpdReportesActividadesDao {
 
@@ -55,7 +56,7 @@ public class SpdReportesActividadesDao {
         consultaActividades.append("ORDER BY ID_REPORTE_ACTIVIDAD ASC");
         return consultaActividades.toString();
     }
-    
+
     public static String consultaActividadesSinSincronizar() {
         StringBuilder consultaActividadesSinSincronizar = new StringBuilder();
         consultaActividadesSinSincronizar.append("SELECT ID_REPORTE_ACTIVIDAD, ");
@@ -75,6 +76,16 @@ public class SpdReportesActividadesDao {
         consultaActividadesSinSincronizar.append("FROM SPD_REPORTES_ACTIVIDADES ");
         consultaActividadesSinSincronizar.append("WHERE SINCRONIZADO_SIAPROY = ? ");
         return consultaActividadesSinSincronizar.toString();
+    }
+
+    public static String consultaActividadesSinProyecto() {
+        StringBuilder consultaActividadesSinProyecto = new StringBuilder();
+        consultaActividadesSinProyecto.append("SELECT DISTINCT FECHA ");
+        consultaActividadesSinProyecto.append("FROM SPD_REPORTES_ACTIVIDADES ");
+        consultaActividadesSinProyecto.append("WHERE ID_PROY_COL_PLAN_ACT IS NULL ");
+        consultaActividadesSinProyecto.append("AND SINCRONIZADO_SIAPROY    = ? ");
+        consultaActividadesSinProyecto.append("ORDER BY FECHA ASC");
+        return consultaActividadesSinProyecto.toString();
     }
 
     public static String insertaActividades() {
@@ -121,7 +132,7 @@ public class SpdReportesActividadesDao {
         actualizaActividades.append("WHERE ID_REPORTE_ACTIVIDAD = ?");
         return actualizaActividades.toString();
     }
-    
+
     public static String actualizaSincronizadoSiaproy() {
         StringBuilder actualizaSincronizadoSiaproy = new StringBuilder();
         actualizaSincronizadoSiaproy.append("UPDATE SPD_REPORTES_ACTIVIDADES ");
@@ -135,5 +146,4 @@ public class SpdReportesActividadesDao {
         eliminaActividades.append("DELETE FROM SPD_REPORTES_ACTIVIDADES WHERE ID_REPORTE_ACTIVIDAD = ?");
         return eliminaActividades.toString();
     }
-
 }

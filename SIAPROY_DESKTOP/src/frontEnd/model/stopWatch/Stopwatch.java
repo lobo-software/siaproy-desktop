@@ -28,6 +28,7 @@
  15/Apr/2016 13:44 CCL (LOBO_000076): Se incluye  la llamada al controller para establecer bandera en ciere de aplicación.
  22/Apr/2016 13:41 CCL (LOBO_000076): Se añde validadción para seleccionar  el registro del timer que se agregue.
  29/Abr/2016 17:07 SVA (LOBO_000076): Se modifica el bind para el los textfields de los tiempos total, inicio y final.
+10/May/2016 13:07 SVA (LOBO_000076): Se añade parámetro 'duracion' en el constructor de la clase StopWatchWorker.
  */
 package frontEnd.model.stopWatch;
 
@@ -61,6 +62,7 @@ public class Stopwatch extends Region {
     private long contador = 0;
     private LocalDateTime startTime = LocalDateTime.now();
     private boolean localRunning;
+    private String duracion;
 
     StopwatchWorker stopWatchWorker;
     StopWatchStatus currentStatus = StopWatchStatus.STOPPED;
@@ -109,8 +111,8 @@ public class Stopwatch extends Region {
                 SPPRYF12Controller.setBanderaEjecucion(true);
                 AwesomeDude.setIcon(startStop, AwesomeIcon.STOP);
                 currentStatus = StopWatchStatus.RUNNING;
-                ///Se añaden parametros dentro constructor stpoWatchWorker como los textfield los cuales muestran dentro de la vista la información del tiempo....
-                stopWatchWorker = new StopwatchWorker(contador, currentTime, startTime);
+                duracion = SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).getDuracion();
+                stopWatchWorker = new StopwatchWorker(contador, currentTime, startTime, duracion);
                 Thread t = new Thread(stopWatchWorker);
                 tiempoTotal.textProperty().bind(stopWatchWorker.messageProperty());
                 tiempoInicio.textProperty().bind(stopWatchWorker.tti.messageProperty());
