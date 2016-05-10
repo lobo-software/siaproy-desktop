@@ -29,6 +29,7 @@ Modifications :
     Author     : Lobo Software
 */
 
+
 .root{
  -fx-background-color:radial-gradient(center 50% -40%, radius 200%, WHITE 35%, #006400  50%);
 }

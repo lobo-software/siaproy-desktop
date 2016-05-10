@@ -41,6 +41,8 @@
    07/May/2016 11:31 SVA (LOBO_000076): Se mejora el método "setTiempoTotal".
    07/May/2016 11:44 SVA (LOBO_000076): Se mejora el cálculo de horas totales en el método "setTiempoTotal".
    10/May/2016 13:07 SVA (LOBO_000076): Se mejoran funciones en general.
+   //10/May/2016 15:30 CCL (LOBO_000076): Se elimina código y se ajustan componentes y se restructura la aparicencia visual.
+
 
  */
 package frontEnd.controller;
@@ -89,6 +91,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -150,7 +154,8 @@ public class SPPRYF12Controller implements Initializable {
     private TableColumn<SpdReportesActividadesModel, Boolean> colActivo;
     @FXML
     private TableColumn<SpdReportesActividadesModel, Date> colFechaEditable;
-
+    @FXML
+    private ImageView imgLogo1;
     private ObservableList<String> datosComboProyecto;
     private ObservableList<String> datosComboActividades;
     private final Font fuenteReloj = Font.loadFont(Stopwatch.class.getResource("digital-7_mono.ttf").toExternalForm(), 24);
@@ -177,6 +182,8 @@ public class SPPRYF12Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+         Image image = new Image("SIAPROY1.png");
+        imgLogo1.setImage(image);  
         loading = GeneraCuadroMensaje.loading();
         tfTiempoTotal.setText("00:00:00");
         tfTiempoTotal.setFont(fuenteReloj);
@@ -796,7 +803,8 @@ public class SPPRYF12Controller implements Initializable {
             ventanaInicio = new Stage();
             scene = new Scene(root);
             ventanaInicio.setScene(scene);
-            ventanaInicio.setTitle("SPPRYF12AView. Consulta usuario");
+            ventanaInicio.getIcons().add(new Image("SIAPROY1_icono.jpg"));
+            ventanaInicio.setTitle("SPPRYF12A. Consulta usuario");
             controller.setStage(ventanaInicio);
             ventanaInicio.show();
         } catch (IOException ex) {
@@ -900,7 +908,7 @@ public class SPPRYF12Controller implements Initializable {
             if (colaborador.isEmpty()) {
                 loginSiaproWeb = false;
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("SPPRYF12AView. Login a SIAPROY WEB");
+                alert.setTitle("SPPRYF12A. Login a SIAPROY WEB");
                 alert.setHeaderText("INICIO DE SESION FALLIDO");
                 alert.setContentText("Los datos de sesión son incorrectos. Verifique su información.");
                 alert.showAndWait();

@@ -31,12 +31,15 @@ import java.util.ResourceBundle;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
   // 06/May/2016 07:27 CCL (LOBO_000076): Se elimina cógiogo inecesario.
  //07/May/2016 11:05 CCL (LOBO_000076): Se eliminan componentes.
+ //10/May/2016 15:30 CCL (LOBO_000076): Se Implententan estilos css y se le pone imagenen principal de la aplicación y se redimencionan componentes.
+
 
 /**
  *
@@ -49,12 +52,16 @@ public class SPPRYF12AController implements Initializable {
     @FXML
     private TextField tfClaveUsuario;
     @FXML
+      private ImageView imgLogo;
+    @FXML
     private TextField tfContrasena;
     private String claveUsuario;
     private Stage ventana;
     private SPPRYF12Controller controllerPrincipal;
 
     public void initialize(URL url, ResourceBundle rb) {
+         Image image = new Image("SIAPROY.png");
+        imgLogo.setImage(image);  
         tfClaveUsuario.textProperty().addListener((ov, oldValue, newValue) -> {
             StringProperty elemento = (StringProperty) ov;
             ((TextField) elemento.getBean()).setText(newValue.toUpperCase());

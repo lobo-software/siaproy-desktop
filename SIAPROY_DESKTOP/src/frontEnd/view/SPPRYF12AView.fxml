@@ -25,6 +25,8 @@
  Created on    : 05 May 2016 09:48:00 AM
  Author        : CCL
  Modifications : 06/May/2016 07:27 CCL (LOBO_000076): Se elimina un el TextField Password para mejor practicidad en el logeo de sesión .
+ 10/May/2016 15:30 CCL (LOBO_000076): Se Implententan estilos css y se le da mejor apariencia visual a la escena.
+
 
 -->
 
@@ -32,15 +34,20 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="175.0" prefWidth="310.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontEnd.controller.SPPRYF12AController">
+<AnchorPane id="AnchorPane" prefHeight="175.0" prefWidth="310.0" styleClass="root" stylesheets="@SPPRYF12AStyle.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontEnd.controller.SPPRYF12AController">
    <children>
-      <VBox alignment="CENTER" layoutX="58.0" layoutY="34.0" prefHeight="175.0" prefWidth="310.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox alignment="CENTER" layoutX="58.0" layoutY="34.0" prefHeight="175.0" prefWidth="310.0" stylesheets="@SPPRYF12AStyle.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
+            <ImageView fx:id="imgLogo" fitHeight="97.0" fitWidth="222.0" pickOnBounds="true" preserveRatio="true">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="5.0" />
+               </VBox.margin></ImageView>
             <HBox alignment="CENTER" spacing="2.0">
                <children>
                   <Label fx:id="lblContraActual" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="20.0" prefWidth="88.0" text="Usuario: ">
@@ -56,12 +63,12 @@
             </HBox>
             <HBox alignment="CENTER" spacing="4.0">
                <children>
-                  <Button fx:id="btnInicioSesion" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#iniciaSesionSiaproy" text="Aceptar" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                  <Button fx:id="btnInicioSesion" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#iniciaSesionSiaproy" prefHeight="33.0" prefWidth="111.0" styleClass="boton" stylesheets="@SPPRYF12AStyle.css" text="Aceptar" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                      <padding>
                         <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                      </padding>
                      <HBox.margin>
-                        <Insets top="20.0" />
+                        <Insets bottom="20.0" top="20.0" />
                      </HBox.margin>
                   </Button>
                </children>

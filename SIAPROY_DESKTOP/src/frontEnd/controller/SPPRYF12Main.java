@@ -26,6 +26,8 @@
  14/Apr/2016 17:11 SVA (LOBO_000076): Se elimina código comentado / se da formato al archivo.
  14/Apr/2016 15:16 CCL (LOBO_000076): Se añade una validación para cerrar ventana principal con el atert mandanla llamar desde el   SPPRYF12Controller....
  22/Apr/2016 15:36 CCL (LOBO_000076): Se cambia el nombre del método cierraAplicación por alertActividades.
+ 10/May/2016 15:30 CCL (LOBO_000076): Se Implententan estilos css y se le ponen imagenen principal de la aplicación, se agregaron iconos a la aplicación.
+
 
  */
 package frontEnd.controller;
@@ -35,6 +37,7 @@ import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -55,6 +58,7 @@ public class SPPRYF12Main extends Application {
             SPPRYF12Controller.alertActividades(stage, "SPPRYF12", "CERRAR APLICACIÓN", 0);
         });
         SPPRYF12Controller.setPrimaryStage(stage);
+        stage.getIcons().add(new Image("SIAPROY_icono.jpg"));
         stage.setTitle("SPPRYF12. Reporte de actividades");
         stage.show();
     }

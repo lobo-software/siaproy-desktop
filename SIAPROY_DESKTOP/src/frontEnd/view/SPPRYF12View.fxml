@@ -32,6 +32,8 @@
 29/Abr/2016 17:07 SVA (LOBO_000076): Se añaden métodos para agregar registros y guardar información.
 29/Apr/2016 13:55 CCl(LOBO_0000076):Se hicieron ajustes a todos los componentes dentro de la vista, como el ordemamiento simétrico de los mismos para una mejor estética visual.
 05/May/2016 10:07 CCl(LOBO_0000076):Se añade otro boton para dar funcionalidad al sincronizado de actividades.
+10/May/2016 15:30 CCL (LOBO_000076): Se Implententan estilos css y se le pone imagenen principal de la aplicación y se redimencionan componentes.
+
 
 -->
 
@@ -46,34 +48,39 @@
 <?import javafx.scene.effect.Glow?>
 <?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.effect.Reflection?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane id="SPPRY12.Reporte de actividades" fx:id="layoutPral" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontEnd.controller.SPPRYF12Controller">
+<BorderPane id="SPPRY12.Reporte de actividades" fx:id="layoutPral" styleClass="fondo" stylesheets="@SPPRYF12ViewStyle.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontEnd.controller.SPPRYF12Controller">
     <top>
         <BorderPane cache="true" cacheHint="SPEED" BorderPane.alignment="CENTER">
             <top>
                 <VBox prefHeight="78.0" prefWidth="861.0" BorderPane.alignment="CENTER">
                     <children>
-                        <HBox blendMode="SCREEN" spacing="5.0">
+                        <HBox blendMode="SCREEN" spacing="5.0" stylesheets="@SPPRYF12ViewStyle.css">
                             <children>
-                                <Button fx:id="btnRegistro" mnemonicParsing="false" onAction="#estableceColaboradorSiaproyWeb" text="Establece Colaborador" textFill="#103912">
+                        <ImageView fx:id="imgLogo1" fitHeight="72.0" fitWidth="251.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </HBox.margin></ImageView>
+                                <Button fx:id="btnRegistro" mnemonicParsing="false" onAction="#estableceColaboradorSiaproyWeb" prefHeight="32.0" prefWidth="250.0" text="Establece Colaborador" textFill="#101110">
                                     <font>
-                                        <Font name="Arial Black" size="12.0" />
+                                        <Font name="Arial Black" size="14.0" />
                                     </font>
                            <HBox.margin>
-                              <Insets bottom="5.0" top="10.0" />
+                              <Insets bottom="5.0" top="20.0" />
                            </HBox.margin>
                                 </Button>
-                                <Button fx:id="btnConsultaProyectos" mnemonicParsing="false" onAction="#consultaProyectos" text="Consulta proyectos SIAPROY" textAlignment="CENTER" textFill="#174a20">
+                                <Button fx:id="btnConsultaProyectos" mnemonicParsing="false" onAction="#consultaProyectos" prefHeight="32.0" prefWidth="327.0" text="Consulta proyectos SIAPROY" textAlignment="CENTER" textFill="#212221">
                                     <font>
-                                        <Font name="Arial Black" size="12.0" />
+                                        <Font name="Arial Black" size="14.0" />
                                     </font>
                            <HBox.margin>
-                              <Insets bottom="10.0" top="10.0" />
+                              <Insets bottom="10.0" top="20.0" />
                            </HBox.margin>
                                 </Button>
                             </children>
@@ -128,7 +135,7 @@
                         </Button>
                         <Button fx:id="btnAgregarActividad" mnemonicParsing="false" onAction="#agregaActividades" prefHeight="67.0" prefWidth="73.0" text="+" textFill="#1130e1" HBox.hgrow="ALWAYS">
                             <font>
-                                <Font size="30.0" />
+                                <Font name="Arial Black" size="30.0" />
                             </font>
                      <effect>
                         <InnerShadow />
@@ -140,9 +147,9 @@
                         <Insets bottom="5.0" />
                      </padding>
                         </Button>
-                  <Button fx:id="btnEliminar" mnemonicParsing="false" onAction="#eliminaActividades" prefHeight="69.0" prefWidth="78.0" text="-" textAlignment="CENTER" textFill="#eb5a00" HBox.hgrow="ALWAYS">
+                  <Button fx:id="btnEliminar" mnemonicParsing="false" onAction="#eliminaActividades" prefHeight="69.0" prefWidth="78.0" text="-" textAlignment="CENTER" textFill="#eb2400" HBox.hgrow="ALWAYS">
                      <font>
-                        <Font name="Arial Black" size="24.0" />
+                        <Font name="Arial Black" size="38.0" />
                      </font>
                      <effect>
                         <InnerShadow />
@@ -172,10 +179,7 @@
                <children>
                   <VBox HBox.hgrow="ALWAYS">
                      <children>
-                        <Label fx:id="lblTotal" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" prefHeight="40.0" prefWidth="210.0" text="  Total" textAlignment="CENTER" textFill="#168b94" VBox.vgrow="ALWAYS">
-                           <font>
-                              <Font name="Arial Black" size="27.0" />
-                           </font>
+                        <Label fx:id="lblTotal" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" prefHeight="40.0" prefWidth="210.0" text="  TOTAL" textAlignment="CENTER" textFill="#168b94" VBox.vgrow="ALWAYS">
                            <opaqueInsets>
                               <Insets bottom="15.0" top="20.0" />
                            </opaqueInsets>
@@ -185,6 +189,9 @@
                            <padding>
                               <Insets left="5.0" right="10.0" />
                            </padding>
+                           <font>
+                              <Font name="Tahoma Bold" size="27.0" />
+                           </font>
                         </Label>
                         <TextField fx:id="tfTiempoTotal" alignment="CENTER" blendMode="SOFT_LIGHT" prefHeight="69.0" prefWidth="150.0" VBox.vgrow="ALWAYS">
                            <opaqueInsets>
@@ -207,10 +214,7 @@
                   </VBox>
                   <VBox HBox.hgrow="ALWAYS">
                      <children>
-                        <Label fx:id="lblInicio" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" prefHeight="40.0" prefWidth="210.0" text="  Inicio" textFill="#138756">
-                           <font>
-                              <Font name="Arial Black" size="27.0" />
-                           </font>
+                        <Label fx:id="lblInicio" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" prefHeight="40.0" prefWidth="210.0" text="INICIO" textFill="#0e0eda">
                            <opaqueInsets>
                               <Insets left="20.0" />
                            </opaqueInsets>
@@ -220,6 +224,9 @@
                            <padding>
                               <Insets left="5.0" right="20.0" />
                            </padding>
+                           <font>
+                              <Font name="System Bold" size="27.0" />
+                           </font>
                         </Label>
                         <TextField fx:id="tfTiempoInicio" alignment="CENTER" prefHeight="69.0" prefWidth="150.0" VBox.vgrow="ALWAYS">
                            <VBox.margin>
@@ -231,10 +238,7 @@
                   </VBox>
                   <VBox fx:id="lblfin" alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
                      <children>
-                        <Label fx:id="lblFin" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" prefHeight="40.0" prefWidth="210.0" text="   Fin   " textAlignment="CENTER" textFill="#c44f63" VBox.vgrow="ALWAYS">
-                           <font>
-                              <Font name="Arial Black" size="26.0" />
-                           </font>
+                        <Label fx:id="lblFin" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" prefHeight="40.0" prefWidth="210.0" text="FIN " textAlignment="CENTER" textFill="#168b94" VBox.vgrow="ALWAYS">
                            <opaqueInsets>
                               <Insets left="20.0" />
                            </opaqueInsets>
@@ -244,6 +248,9 @@
                            <padding>
                               <Insets left="10.0" right="30.0" />
                            </padding>
+                           <font>
+                              <Font name="Tahoma Bold" size="27.0" />
+                           </font>
                         </Label>
                         <TextField fx:id="tfTiempoFin" alignment="CENTER" prefHeight="69.0" prefWidth="150.0" VBox.vgrow="ALWAYS">
                            <VBox.margin>
@@ -266,12 +273,12 @@
                <children>
                   <HBox VBox.vgrow="ALWAYS">
                      <children>
-                        <Label fx:id="lbFecha" alignment="CENTER" contentDisplay="CENTER" prefHeight="37.0" prefWidth="200.0" text="12 Ene 2016" textAlignment="CENTER" textFill="#6f1ed6" textOverrun="CENTER_ELLIPSIS">
+                        <Label fx:id="lbFecha" alignment="CENTER" contentDisplay="CENTER" prefHeight="37.0" prefWidth="200.0" text="12 Ene 2016" textAlignment="CENTER" textFill="#0e0eda" textOverrun="CENTER_ELLIPSIS">
                            <padding>
                               <Insets left="5.0" />
                            </padding>
                            <font>
-                              <Font name="Arial Black" size="24.0" />
+                              <Font name="Tahoma Bold" size="27.0" />
                            </font>
                         </Label>
                      </children>
@@ -286,7 +293,7 @@
                               <Insets top="5.0" />
                            </padding>
                            <HBox.margin>
-                              <Insets top="10.0" />
+                              <Insets top="-30.0" />
                            </HBox.margin></DatePicker>
                      </children>
                   </HBox>
@@ -296,7 +303,7 @@
         </BorderPane>
     </top>
     <bottom>
-        <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0" spacing="20.0" BorderPane.alignment="CENTER">
+        <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0" spacing="20.0" styleClass="hbox" BorderPane.alignment="CENTER">
             <children>
                 <Label fx:id="lblTotalActividades" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="22.0" prefWidth="240.0" text="Total de Actividades:" textFill="#1a0dae">
                     <font>
@@ -372,7 +379,7 @@
       <Insets bottom="5.0" />
    </padding>
    <center>
-        <TableView fx:id="grdActividades" editable="true" fixedCellSize="0.0" prefHeight="260.0" prefWidth="1253.0" BorderPane.alignment="CENTER">
+        <TableView fx:id="grdActividades" editable="true" fixedCellSize="0.0" prefHeight="260.0" prefWidth="1253.0" stylesheets="@SPPRYF12ViewStyle.css" BorderPane.alignment="CENTER">
             <columns>
                 <TableColumn fx:id="colTimer" maxWidth="1100.0" minWidth="-Infinity" prefWidth="62.0" />
                 <TableColumn fx:id="colProyecto" minWidth="0.0" prefWidth="262.0" text="PROYECTO" />
