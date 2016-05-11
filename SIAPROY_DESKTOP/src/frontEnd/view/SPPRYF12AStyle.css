@@ -1,0 +1,57 @@
+/*
+ _______________________________________________________________________
+|                    COPYRIGHT (C) BY                                   |
+|               DERECHOS RESERVADOS (C) POR                             |
+|                LOBO SOFTWARE S.A. DE  C.V.                            |
+|                                                                       |
+|Ninguna parte de esta obra, parcial o total puede                      | 
+|ser reproducida o transmitida, mediante ningun sistema                 |
+|o metodo electronico o mecanico (incluyendo el                         |   
+|fotocopiado, la grabacion, o cualquier sistema de                      |  
+|recuperacion y almacenamiento de informacion),                         |  
+|SIN LA AUTORIZACION POR ESCRITO DEL AUTOR.                             |  
+|                                                                       |  
+|Derechos reservados                                                    |  
+|(C) 2012, LOBO SOFTWARE, S.A. DE C.V. (*)                              |  
+|                                                                       |  
+|Esta obra forma parte del SIAL-CH (C) "CAPITAL HUMANO"                 |  
+|                                                                       |  
+|(*) Marca registrada por                                               |   
+|LOBO SOFTWARE, S.A. DE C.V.                                            |  
+|_______________________________________________________________________|  
+ Document     : Style1.css.css
+Created on    : 09 may 2016 10:25:25 AM
+Author        : CCL
+Modifications : 
+*/
+/* 
+    Created on : 9/05/2016, 10:25:25 AM
+    Author     : Lobo Software
+*/
+
+
+.root{
+ -fx-background-color:radial-gradient(center 50% -40%, radius 200%, WHITE 35%, #006400  50%);
+}
+.fondo{
+    -fx-background-color: #1d1d1d;
+   
+}
+.label{
+     -fx-font-family:"Tahoma";
+    -fx-font-size:18px;
+    -fx-text-fill: #FFFFFF;
+  
+}
+.boton{
+   
+     -fx-border-color: #ffff00;
+    -fx-border-width: 2;
+    -fx-background-radius: 3;
+    -fx-background-color: #006400;
+    -fx-font-family: "Tahoma";
+    -fx-font-size: 18px;
+    -fx-text-fill: #d8d8d8;
+    -fx-background-insets: 0 0 0 0, 0, 1, 2;
+}
+
