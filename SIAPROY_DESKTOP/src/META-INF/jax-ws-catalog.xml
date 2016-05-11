@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
     <system systemId="http://localhost:7734/SIAPROY_DESA/RegistroActividadesWs?wsdl" uri="wsdl/localhost_7734/SIAPROY_DESA/RegistroActividadesWs.wsdl"/>
-    <system systemId="http://localhost:7734/SIAPROY_DESA/RegistroActividadesWs?xsd=1" uri="wsdl/localhost_7734/SIAPROY_DESA/RegistroActividadesWs.xsd_1.xsd"/>
     <system systemId="http://localhost:7734/SIAPROY_DESA/RegistroActividadesWs?WSDL" uri="wsdl/localhost_7734/SIAPROY_DESA/RegistroActividadesWs.wsdl"/>
+    <system systemId="http://localhost:7734/SIAPROY_DESA/RegistroActividadesWs?xsd=1" uri="wsdl/localhost_7734/SIAPROY_DESA/RegistroActividadesWs.xsd_1.xsd"/>
+    <system systemId="http://localhost:8084/Siaproy_DESA_SVA/RegistroActividadesWs?wsdl" uri="wsdl/localhost_8084/Siaproy_DESA_SVA/RegistroActividadesWs.wsdl"/>
+    <system systemId="http://localhost:8084/Siaproy_DESA_SVA/RegistroActividadesWs?xsd=1" uri="wsdl/localhost_8084/Siaproy_DESA_SVA/RegistroActividadesWs.xsd_1.xsd"/>
+    <system systemId="https://sialweb.lobos.com.mx/siapry/RegistroActividadesWs?wsdl" uri="wsdl/sialweb.lobos.com.mx/siapry/RegistroActividadesWs.wsdl"/>
+    <system systemId="https://sialweb.lobos.com.mx:443/siapry/RegistroActividadesWs?xsd=1" uri="wsdl/sialweb.lobos.com.mx_443/siapry/RegistroActividadesWs.xsd_1.xsd"/>
 </catalog>
