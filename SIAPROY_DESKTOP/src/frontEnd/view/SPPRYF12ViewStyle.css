@@ -29,6 +29,68 @@ Modifications :
     Author     : Lobo Software
 */
 
+.fondo{
+    -fx-background-color:radial-gradient(center 50% -40%, radius 180%, WHITE 50%,#FFA500  50%);
+     -fx-background-repeat: stretch;
+}   
+     .label{
+     -fx-background-color: #0O99cc; 
+     -fx-background-repeat: stretch;   
+     }
+     .label
+     {
+      -fx-background-color: #0O99cc; 
+     -fx-background-repeat: stretch;  
+     }  
+     .label{
+     -fx-background-color: #0O99cc; 
+     -fx-background-repeat: stretch; 
+     }
+       
+.split-pane:horizontal > .split-pane-divider {
+    -fx-border-color: transparent #1d1d1d transparent #1d1d1d;
+    -fx-background-color: transparent, derive(#1d1d1d,20%);
+}
+
+.hbox {
+        -fx-background-color:radial-gradient(center 40% -20%, radius 90%, WHITE 35%,#FFA500 40%, #006400 25%);
+        -fx-background-radius: 5.0; 
+        -o-border-color:2;
+}
+.vbox{
+ 
+        -fx-background-color:radial-gradient(center 50% -40%, radius 180%, WHITE 50%,#32CD32  50%);
+    }
+ 
+.pane {
+
+   -fx-background-color:radial-gradient(center 50% -40%, radius 180%, WHITE 50%, button 50% -40% #32CD32 50%);
+
+}
+
+.table-view *.column-header { 
+-fx-background-color: #198129;
+-fx-background-insets: 0px, 0px 1px 1px 0px, 1px 2px 2px 1px;
+-fx-padding: 0.166667em;
+-fx-size: 2em;
+}
+.table-view .column-header .label {
+    -fx-text-fill: WHITE;
+    -fx-alignment: center-left;
+    -fx-opacity: 1;
+}
+.table-view:focused .table-row-cell:filled:focused:selected {
+    -fx-background-color: #0000FF;
+}
+h1, h2, h3 {
+  background-image: url("escitorio/course-716198_640.png");
+  -fx-background-size: 310,175;
+}
+
+
+
+
+
 
 
 
