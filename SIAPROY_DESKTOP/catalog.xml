@@ -5,4 +5,6 @@
     <system systemId="http://localhost:7734/SIAPROY_DESA/RegistroActividadesWs?xsd=1" uri="xml-resources/web-service-references/RegistroActividadesWs/wsdl/localhost_7734/SIAPROY_DESA/RegistroActividadesWs.xsd_1.xsd"/>
     <system systemId="http://localhost:8084/Siaproy_DESA_SVA/RegistroActividadesWs?wsdl" uri="xml-resources/web-service-references/RegistroActividadesWs/wsdl/localhost_8084/Siaproy_DESA_SVA/RegistroActividadesWs.wsdl"/>
     <system systemId="http://localhost:8084/Siaproy_DESA_SVA/RegistroActividadesWs?xsd=1" uri="xml-resources/web-service-references/RegistroActividadesWs/wsdl/localhost_8084/Siaproy_DESA_SVA/RegistroActividadesWs.xsd_1.xsd"/>
+    <system systemId="https://sialweb.lobos.com.mx/siapry/RegistroActividadesWs?wsdl" uri="xml-resources/web-service-references/RegistroActividadesWs/wsdl/sialweb.lobos.com.mx/siapry/RegistroActividadesWs.wsdl"/>
+    <system systemId="https://sialweb.lobos.com.mx:443/siapry/RegistroActividadesWs?xsd=1" uri="xml-resources/web-service-references/RegistroActividadesWs/wsdl/sialweb.lobos.com.mx_443/siapry/RegistroActividadesWs.xsd_1.xsd"/>
 </catalog>
