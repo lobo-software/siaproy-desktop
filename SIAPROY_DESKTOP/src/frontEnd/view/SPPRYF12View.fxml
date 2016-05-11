@@ -33,7 +33,7 @@
 29/Apr/2016 13:55 CCl(LOBO_0000076):Se hicieron ajustes a todos los componentes dentro de la vista, como el ordemamiento simétrico de los mismos para una mejor estética visual.
 05/May/2016 10:07 CCl(LOBO_0000076):Se añade otro boton para dar funcionalidad al sincronizado de actividades.
 10/May/2016 15:30 CCL (LOBO_000076): Se Implententan estilos css y se le pone imagenen principal de la aplicación y se redimencionan componentes.
-
+11/May/2016 10:58 SVA (LOBO_000076): Se ajusta calendario para que sea visible en monitores con menor resolución.
 
 -->
 
@@ -112,7 +112,7 @@
                      </VBox.margin></HBox>
                     </children>
                <BorderPane.margin>
-                  <Insets right="250.0" />
+                  <Insets right="330.0" />
                </BorderPane.margin>
                 </VBox>
             </top>
@@ -261,19 +261,19 @@
                   </VBox>
                </children>
                <BorderPane.margin>
-                  <Insets right="25.0" />
+                  <Insets right="45.0" />
                </BorderPane.margin>
             </HBox>
          </center>
          <right>
-            <VBox alignment="CENTER" BorderPane.alignment="TOP_CENTER">
+            <VBox alignment="CENTER" prefHeight="264.0" prefWidth="255.0" BorderPane.alignment="TOP_CENTER">
                <BorderPane.margin>
                   <Insets right="10.0" top="-100.0" />
                </BorderPane.margin>
                <children>
                   <HBox VBox.vgrow="ALWAYS">
                      <children>
-                        <Label fx:id="lbFecha" alignment="CENTER" contentDisplay="CENTER" text="12 Ene 2016" textAlignment="CENTER" textFill="#0e0eda" textOverrun="CENTER_ELLIPSIS">
+                        <Label fx:id="lbFecha" alignment="CENTER" contentDisplay="CENTER" prefHeight="34.0" prefWidth="264.0" text="12 Ene 2016" textAlignment="CENTER" textFill="#0e0eda" textOverrun="CENTER_ELLIPSIS">
                            <padding>
                               <Insets left="5.0" />
                            </padding>
