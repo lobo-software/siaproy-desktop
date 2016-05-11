@@ -182,7 +182,7 @@ public class SPPRYF12Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-         Image image = new Image("SIAPROY1.png");
+         Image image = new Image("/frontEnd/images/SIAPROY1.png");
         imgLogo1.setImage(image);  
         loading = GeneraCuadroMensaje.loading();
         tfTiempoTotal.setText("00:00:00");
@@ -803,7 +803,7 @@ public class SPPRYF12Controller implements Initializable {
             ventanaInicio = new Stage();
             scene = new Scene(root);
             ventanaInicio.setScene(scene);
-            ventanaInicio.getIcons().add(new Image("SIAPROY1_icono.jpg"));
+            ventanaInicio.getIcons().add(new Image("/frontEnd/images/SIAPROY1_icono.jpg"));
             ventanaInicio.setTitle("SPPRYF12A. Consulta usuario");
             controller.setStage(ventanaInicio);
             ventanaInicio.show();

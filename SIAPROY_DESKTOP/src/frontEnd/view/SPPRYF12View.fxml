@@ -68,20 +68,20 @@
                               <Insets bottom="5.0" top="5.0" />
                            </HBox.margin></ImageView>
                                 <Button fx:id="btnRegistro" mnemonicParsing="false" onAction="#estableceColaboradorSiaproyWeb" prefHeight="32.0" prefWidth="250.0" text="Establece Colaborador" textFill="#101110">
-                                    <font>
-                                        <Font name="Arial Black" size="14.0" />
-                                    </font>
                            <HBox.margin>
                               <Insets bottom="5.0" top="20.0" />
                            </HBox.margin>
+                           <font>
+                              <Font name="Tahoma Bold" size="14.0" />
+                           </font>
                                 </Button>
                                 <Button fx:id="btnConsultaProyectos" mnemonicParsing="false" onAction="#consultaProyectos" prefHeight="32.0" prefWidth="327.0" text="Consulta proyectos SIAPROY" textAlignment="CENTER" textFill="#212221">
-                                    <font>
-                                        <Font name="Arial Black" size="14.0" />
-                                    </font>
                            <HBox.margin>
                               <Insets bottom="10.0" top="20.0" />
                            </HBox.margin>
+                           <font>
+                              <Font name="Tahoma Bold" size="14.0" />
+                           </font>
                                 </Button>
                             </children>
                             <effect>
@@ -268,12 +268,12 @@
          <right>
             <VBox alignment="CENTER" BorderPane.alignment="TOP_CENTER">
                <BorderPane.margin>
-                  <Insets right="10.0" top="-50.0" />
+                  <Insets right="10.0" top="-100.0" />
                </BorderPane.margin>
                <children>
                   <HBox VBox.vgrow="ALWAYS">
                      <children>
-                        <Label fx:id="lbFecha" alignment="CENTER" contentDisplay="CENTER" prefHeight="37.0" prefWidth="200.0" text="12 Ene 2016" textAlignment="CENTER" textFill="#0e0eda" textOverrun="CENTER_ELLIPSIS">
+                        <Label fx:id="lbFecha" alignment="CENTER" contentDisplay="CENTER" text="12 Ene 2016" textAlignment="CENTER" textFill="#0e0eda" textOverrun="CENTER_ELLIPSIS">
                            <padding>
                               <Insets left="5.0" />
                            </padding>
@@ -293,7 +293,7 @@
                               <Insets top="5.0" />
                            </padding>
                            <HBox.margin>
-                              <Insets top="-30.0" />
+                              <Insets top="-0.0" />
                            </HBox.margin></DatePicker>
                      </children>
                   </HBox>
@@ -305,38 +305,38 @@
     <bottom>
         <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0" spacing="20.0" styleClass="hbox" BorderPane.alignment="CENTER">
             <children>
-                <Label fx:id="lblTotalActividades" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="22.0" prefWidth="240.0" text="Total de Actividades:" textFill="#1a0dae">
-                    <font>
-                        <Font name="Arial Black" size="14.0" />
-                    </font>
+                <Label fx:id="lblTotalActividades" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="22.0" prefWidth="240.0" text="Total de Actividades:" textFill="WHITE">
                <HBox.margin>
                   <Insets bottom="20.0" top="20.0" />
                </HBox.margin>
                <padding>
                   <Insets left="60.0" />
                </padding>
+               <font>
+                  <Font name="Tahoma Bold" size="14.0" />
+               </font>
                 </Label>
-                <Label fx:id="lbTotalRegistros" alignment="TOP_LEFT" contentDisplay="CENTER" prefHeight="17.0" prefWidth="36.0" text="3" textAlignment="CENTER" textFill="#1b0a79">
+                <Label fx:id="lbTotalRegistros" alignment="TOP_LEFT" contentDisplay="CENTER" prefHeight="17.0" prefWidth="36.0" text="3" textAlignment="CENTER" textFill="WHITE">
                <HBox.margin>
                   <Insets bottom="20.0" top="23.0" />
                </HBox.margin>
                <font>
                   <Font name="Arial" size="14.0" />
                </font></Label>
-                <Label fx:id="lblTiempoTotal" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="22.0" prefWidth="186.0" text="Tiempo Total:" textAlignment="CENTER" textFill="#0d1b86">
-                    <font>
-                        <Font name="Arial Black" size="14.0" />
-                    </font>
+                <Label fx:id="lblTiempoTotal" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="22.0" prefWidth="186.0" text="Tiempo total" textAlignment="CENTER" textFill="WHITE">
                <HBox.margin>
                   <Insets top="20.0" />
                </HBox.margin>
                <padding>
                   <Insets left="50.0" />
                </padding>
+               <font>
+                  <Font name="Tahoma Bold" size="14.0" />
+               </font>
                 </Label>
-                <Label fx:id="lbTiempoTotal" alignment="TOP_LEFT" contentDisplay="CENTER" prefHeight="21.0" prefWidth="62.0" text="00:00:00" textAlignment="CENTER" textFill="#080f57" textOverrun="CLIP">
+                <Label fx:id="lbTiempoTotal" alignment="TOP_LEFT" contentDisplay="CENTER" prefHeight="21.0" prefWidth="62.0" text="00:00:00" textAlignment="CENTER" textFill="WHITE" textOverrun="CLIP">
                     <font>
-                        <Font name="Arial" size="14.0" />
+                        <Font name="Tahoma" size="14.0" />
                     </font>
                <padding>
                   <Insets bottom="5.0" />
@@ -349,17 +349,14 @@
                </opaqueInsets>
                 </Label>
             <Region prefHeight="64.0" prefWidth="345.0" />
-                <Button fx:id="btnGuardar" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#guardaActividades" prefHeight="30.0" prefWidth="85.0" text="Guardar " textAlignment="CENTER" HBox.hgrow="ALWAYS">
-               <font>
-                  <Font name="Arial Black" size="13.0" />
-               </font>
+                <Button fx:id="btnGuardar" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#guardaActividades" prefHeight="30.0" prefWidth="89.0" text="Guardar " HBox.hgrow="ALWAYS">
                <HBox.margin>
                   <Insets bottom="10.0" top="22.0" />
-               </HBox.margin></Button>
-                <Button fx:id="btnSincronizar" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#SincronizaActividades" prefHeight="30.0" prefWidth="140.0" text="Sincronizar" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+               </HBox.margin>
                <font>
-                  <Font name="Arial Black" size="14.0" />
-               </font>
+                  <Font name="Tahoma Bold" size="14.0" />
+               </font></Button>
+                <Button fx:id="btnSincronizar" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#SincronizaActividades" prefHeight="30.0" prefWidth="140.0" text="Sincronizar" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                <opaqueInsets>
                   <Insets top="2.0" />
                </opaqueInsets>
@@ -368,7 +365,10 @@
                </rotationAxis>
                <HBox.margin>
                   <Insets bottom="10.0" right="10.0" top="22.0" />
-               </HBox.margin></Button>
+               </HBox.margin>
+               <font>
+                  <Font name="Tahoma Bold" size="14.0" />
+               </font></Button>
             </children>
          <padding>
             <Insets bottom="5.0" />
@@ -383,12 +383,12 @@
             <columns>
                 <TableColumn fx:id="colTimer" maxWidth="1100.0" minWidth="-Infinity" prefWidth="62.0" />
                 <TableColumn fx:id="colProyecto" minWidth="0.0" prefWidth="262.0" text="PROYECTO" />
-                <TableColumn fx:id="colActividades" minWidth="-1.0" prefWidth="215.0" text="ACTIVIDADADES" />
+                <TableColumn fx:id="colActividades" minWidth="-1.0" prefWidth="215.0" text="ACTIVIDADES" />
                 <TableColumn fx:id="colTiempo" editable="false" prefWidth="145.0" text="TIEMPO" />
             <TableColumn fx:id="colInicio" editable="false" prefWidth="145.0" text="INICIO" visible="false" />
             <TableColumn fx:id="colFin" editable="false" prefWidth="145.0" text="FIN" visible="false" />
                 <TableColumn fx:id="colDescripcion" prefWidth="224.0" text="DESCRIPCIÓN" />
-                <TableColumn fx:id="colAvance" prefWidth="132.0" text="AVANCE %" />
+                <TableColumn fx:id="colAvance" prefWidth="132.0" text="\% AVANCE" />
             <TableColumn fx:id="colFecha" prefWidth="75.0" text="FECHA" visible="false" />
             </columns>
             <columnResizePolicy>

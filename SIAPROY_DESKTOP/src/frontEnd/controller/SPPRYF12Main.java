@@ -58,7 +58,7 @@ public class SPPRYF12Main extends Application {
             SPPRYF12Controller.alertActividades(stage, "SPPRYF12", "CERRAR APLICACIÓN", 0);
         });
         SPPRYF12Controller.setPrimaryStage(stage);
-        stage.getIcons().add(new Image("SIAPROY_icono.jpg"));
+        stage.getIcons().add(new Image("/frontEnd/images/SIAPROY_icono.jpg"));
         stage.setTitle("SPPRYF12. Reporte de actividades");
         stage.show();
     }

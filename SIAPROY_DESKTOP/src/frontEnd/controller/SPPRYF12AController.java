@@ -60,7 +60,7 @@ public class SPPRYF12AController implements Initializable {
     private SPPRYF12Controller controllerPrincipal;
 
     public void initialize(URL url, ResourceBundle rb) {
-         Image image = new Image("SIAPROY.png");
+         Image image = new Image("/frontEnd/images/SIAPROY.png");
         imgLogo.setImage(image);  
         tfClaveUsuario.textProperty().addListener((ov, oldValue, newValue) -> {
             StringProperty elemento = (StringProperty) ov;
