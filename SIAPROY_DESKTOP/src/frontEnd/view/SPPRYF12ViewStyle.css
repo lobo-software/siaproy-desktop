@@ -79,13 +79,7 @@ Modifications :
     -fx-alignment: center-left;
     -fx-opacity: 1;
 }
-.table-view:focused .table-row-cell:filled:focused:selected {
-    -fx-background-color: #0000FF;
-}
-h1, h2, h3 {
-  background-image: url("escitorio/course-716198_640.png");
-  -fx-background-size: 310,175;
-}
+
 
 
 
