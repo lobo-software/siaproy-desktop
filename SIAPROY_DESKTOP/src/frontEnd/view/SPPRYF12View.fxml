@@ -34,7 +34,7 @@
 05/May/2016 10:07 CCl(LOBO_0000076):Se añade otro boton para dar funcionalidad al sincronizado de actividades.
 10/May/2016 15:30 CCL (LOBO_000076): Se Implententan estilos css y se le pone imagenen principal de la aplicación y se redimencionan componentes.
 11/May/2016 10:58 SVA (LOBO_000076): Se ajusta calendario para que sea visible en monitores con menor resolución.
-
+12/May/2016 09:29 SVA (LOBO_000076): Se hacen no editables las columnas "colTimer" y "colFecha".
 -->
 
 <?import javafx.geometry.Insets?>
@@ -381,7 +381,7 @@
    <center>
         <TableView fx:id="grdActividades" editable="true" fixedCellSize="0.0" prefHeight="260.0" prefWidth="1253.0" stylesheets="@SPPRYF12ViewStyle.css" BorderPane.alignment="CENTER">
             <columns>
-                <TableColumn fx:id="colTimer" maxWidth="1100.0" minWidth="-Infinity" prefWidth="62.0" />
+                <TableColumn fx:id="colTimer" editable="false" maxWidth="1100.0" minWidth="-Infinity" prefWidth="62.0" />
                 <TableColumn fx:id="colProyecto" minWidth="0.0" prefWidth="262.0" text="PROYECTO" />
                 <TableColumn fx:id="colActividades" minWidth="-1.0" prefWidth="215.0" text="ACTIVIDADES" />
                 <TableColumn fx:id="colTiempo" editable="false" prefWidth="145.0" text="TIEMPO" />
@@ -389,7 +389,7 @@
             <TableColumn fx:id="colFin" editable="false" prefWidth="145.0" text="FIN" visible="false" />
                 <TableColumn fx:id="colDescripcion" prefWidth="224.0" text="DESCRIPCIÓN" />
                 <TableColumn fx:id="colAvance" prefWidth="132.0" text="\% AVANCE" />
-            <TableColumn fx:id="colFecha" prefWidth="75.0" text="FECHA" visible="false" />
+            <TableColumn fx:id="colFecha" editable="false" prefWidth="75.0" text="FECHA" visible="false" />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
