@@ -29,6 +29,7 @@
  22/Apr/2016 13:41 CCL (LOBO_000076): Se añde validadción para seleccionar  el registro del timer que se agregue.
  29/Abr/2016 17:07 SVA (LOBO_000076): Se modifica el bind para el los textfields de los tiempos total, inicio y final.
 10/May/2016 13:07 SVA (LOBO_000076): Se añade parámetro 'duracion' en el constructor de la clase StopWatchWorker.
+ 24/Ene/2017 BEFL: Se agrega opcion para guardar localmente con el boton play
  */
 package frontEnd.model.stopWatch;
 
@@ -39,6 +40,7 @@ package frontEnd.model.stopWatch;
 import de.jensd.fx.fontawesome.AwesomeDude;
 import de.jensd.fx.fontawesome.AwesomeIcon;
 import frontEnd.controller.SPPRYF12Controller;
+import static frontEnd.controller.SPPRYF12Controller.guardaActividades;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -82,50 +84,50 @@ public class Stopwatch extends Region {
         vBox.getChildren().addAll(hBox);
         hBox.prefWidthProperty().bind(vBox.widthProperty());
         this.getChildren().add(vBox);
-        if(!SPPRYF12Controller.datePicker.getValue().equals(LocalDate.now())){
+        if (!SPPRYF12Controller.datePicker.getValue().equals(LocalDate.now())) {
             startStop.setDisable(true);
         }
         startStop.setOnAction(new EventHandler() {
             @Override
-            public void handle(Event event){
+            public void handle(Event event) {
                 for (int x = 0; x < SPPRYF12Controller.getTableView().getItems().size(); x++) {
-                if (SPPRYF12Controller.getTableView().getItems().get(x).getStopWatch().startStop.equals(startStop)) {
-                    if (currentStatus == StopWatchStatus.STOPPED) {
-                        for (int y = 0; y < SPPRYF12Controller.getTableView().getItems().size(); y++) {
-                            if (!SPPRYF12Controller.getTableView().getItems().get(y).equals(SPPRYF12Controller.getTableView().getItems().get(x))) {
-                                if (SPPRYF12Controller.getTableView().getItems().get(y).getStopWatch().currentStatus == StopWatchStatus.RUNNING) {
-                                    int posicion = SPPRYF12Controller.getPosicionTimer();
-                                    SPPRYF12Controller.getTableView().getItems().get(posicion).getStopWatch().detenSelectedTimer();
+                    if (SPPRYF12Controller.getTableView().getItems().get(x).getStopWatch().startStop.equals(startStop)) {
+                        if (currentStatus == StopWatchStatus.STOPPED) {
+                            for (int y = 0; y < SPPRYF12Controller.getTableView().getItems().size(); y++) {
+                                if (!SPPRYF12Controller.getTableView().getItems().get(y).equals(SPPRYF12Controller.getTableView().getItems().get(x))) {
+                                    if (SPPRYF12Controller.getTableView().getItems().get(y).getStopWatch().currentStatus == StopWatchStatus.RUNNING) {
+                                        int posicion = SPPRYF12Controller.getPosicionTimer();
+                                        SPPRYF12Controller.getTableView().getItems().get(posicion).getStopWatch().detenSelectedTimer();
+                                    }
                                 }
                             }
+                            SPPRYF12Controller.getTableView().getSelectionModel().select(x);
+                            SPPRYF12Controller.setPosicionTimer(x);
+                            localRunning = true;
                         }
-                        SPPRYF12Controller.getTableView().getSelectionModel().select(x);
-                        SPPRYF12Controller.setPosicionTimer(x);
-                        localRunning = true;
                     }
-                }
 
-            }
-            if (currentStatus == StopWatchStatus.STOPPED) {
-                localRunning = true;
-                SPPRYF12Controller.setBanderaEjecucion(true);
-                AwesomeDude.setIcon(startStop, AwesomeIcon.STOP);
-                currentStatus = StopWatchStatus.RUNNING;
-                duracion = SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).getDuracion();
-                stopWatchWorker = new StopwatchWorker(contador, currentTime, startTime, duracion);
-                Thread t = new Thread(stopWatchWorker);
-                tiempoTotal.textProperty().bind(stopWatchWorker.messageProperty());
-                tiempoInicio.textProperty().bind(stopWatchWorker.tti.messageProperty());
-                tiempoFinal.textProperty().bind(stopWatchWorker.ttf.messageProperty());
-                SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).duracionProperty().bind(stopWatchWorker.messageProperty());
-                SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).horaInicioProperty().bind(stopWatchWorker.tti.messageProperty());
-                SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).horaFinProperty().bind(stopWatchWorker.ttf.messageProperty());
-                t.setDaemon(true);
-                t.start();
-                return;
-            }
-            if (currentStatus == StopWatchStatus.RUNNING) {
-                detenSelectedTimer();
+                }
+                if (currentStatus == StopWatchStatus.STOPPED) {
+                    localRunning = true;
+                    SPPRYF12Controller.setBanderaEjecucion(true);
+                    AwesomeDude.setIcon(startStop, AwesomeIcon.STOP);
+                    currentStatus = StopWatchStatus.RUNNING;
+                    duracion = SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).getDuracion();
+                    stopWatchWorker = new StopwatchWorker(contador, currentTime, startTime, duracion);
+                    Thread t = new Thread(stopWatchWorker);
+                    tiempoTotal.textProperty().bind(stopWatchWorker.messageProperty());
+                    tiempoInicio.textProperty().bind(stopWatchWorker.tti.messageProperty());
+                    tiempoFinal.textProperty().bind(stopWatchWorker.ttf.messageProperty());
+                    SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).duracionProperty().bind(stopWatchWorker.messageProperty());
+                    SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).horaInicioProperty().bind(stopWatchWorker.tti.messageProperty());
+                    SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).horaFinProperty().bind(stopWatchWorker.ttf.messageProperty());
+                    t.setDaemon(true);
+                    t.start();
+                    return;
+                }
+                if (currentStatus == StopWatchStatus.RUNNING) {
+                    detenSelectedTimer();
             }
             }
         });
@@ -145,11 +147,19 @@ public class Stopwatch extends Region {
         contador++;
         stopWatchWorker = null;
         currentStatus = StopWatchStatus.STOPPED;
+        SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).duracionProperty().unbind();
+        SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).horaInicioProperty().unbind();
+        SPPRYF12Controller.getTableView().getItems().get(SPPRYF12Controller.getPosicionTimer()).horaFinProperty().unbind();
+        SPPRYF12Controller.getTfDuracion().textProperty().unbind();
+        SPPRYF12Controller.getTfHoraInicio().textProperty().unbind();
+        SPPRYF12Controller.getTfHoraFin().textProperty().unbind();
+        if (currentStatus == StopWatchStatus.STOPPED) {
+        guardaActividades();
+        }
     }
-    
-   public boolean getCurrentStatus(){
-       return localRunning;
-      
- 
+
+    public boolean getCurrentStatus() {
+        return localRunning;
+
     }
 }
