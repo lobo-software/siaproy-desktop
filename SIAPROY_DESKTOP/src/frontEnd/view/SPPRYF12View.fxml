@@ -35,6 +35,7 @@
 10/May/2016 15:30 CCL (LOBO_000076): Se Implententan estilos css y se le pone imagenen principal de la aplicación y se redimencionan componentes.
 11/May/2016 10:58 SVA (LOBO_000076): Se ajusta calendario para que sea visible en monitores con menor resolución.
 12/May/2016 09:29 SVA (LOBO_000076): Se hacen no editables las columnas "colTimer" y "colFecha".
+24/Ene/2017 11:23 BEFL: Se cambia la opcion onAction del boton guardar al controlador
 -->
 
 <?import javafx.geometry.Insets?>
@@ -349,7 +350,7 @@
                </opaqueInsets>
                 </Label>
             <Region prefHeight="64.0" prefWidth="345.0" />
-                <Button fx:id="btnGuardar" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#guardaActividades" prefHeight="30.0" prefWidth="89.0" text="Guardar " HBox.hgrow="ALWAYS">
+                <Button fx:id="btnGuardar" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" prefHeight="30.0" prefWidth="89.0" text="Guardar " HBox.hgrow="ALWAYS">
                <HBox.margin>
                   <Insets bottom="10.0" top="22.0" />
                </HBox.margin>

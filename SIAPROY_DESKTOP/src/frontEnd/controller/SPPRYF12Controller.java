@@ -42,6 +42,7 @@
    07/May/2016 11:44 SVA (LOBO_000076): Se mejora el cálculo de horas totales en el método "setTiempoTotal".
    10/May/2016 13:07 SVA (LOBO_000076): Se mejoran funciones en general.
    //10/May/2016 15:30 CCL (LOBO_000076): Se elimina código y se ajustan componentes y se restructura la aparicencia visual.
+   24/Ene/2017 11:13 BEFL: Se corrige error al consultar actividades  y se validan las horas.
 
 
  */
@@ -81,6 +82,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Optional;
+import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -145,6 +147,8 @@ public class SPPRYF12Controller implements Initializable {
     @FXML
     private Button btnConsultaProyectos;
     @FXML
+    private Button btnGuardar;
+    @FXML
     private Label lbTotalRegistros;
     @FXML
     private Label lbTiempoTotal;
@@ -161,16 +165,20 @@ public class SPPRYF12Controller implements Initializable {
     private final Font fuenteReloj = Font.loadFont(Stopwatch.class.getResource("digital-7_mono.ttf").toExternalForm(), 24);
     private static boolean running, insertaDiaActual;
     private static TableView<SpdReportesActividadesModel> grid;
+    private static DatePicker dfFecha;
     private static int posicionTimer;
     private static Stage primaryStage;
     public static DatePicker datePicker;
     public static int posicionTimerRunning;
     private static ObservableList<SpdReportesActividadesModel> registrosNuevos, registrosActualizados;
-    private static TextField duracion, horaInicio, horaFin;
+    private static TextField descripcion, duracion, horaInicio, horaFin;
+    private static Button btStarStop, btAgregarActividad;
     private static LocalDate fechaSeleccionada;
-    private int contadorCambioDia;
-    private SpdReportesActividadesModel actividadEnEjecucion;
+    private static Label lblTotal, lblTiempoTotal;
+    private static int contadorCambioDia;
+    private static SpdReportesActividadesModel actividadEnEjecucion;
     private static Stage loading;
+    private String valorAnterior;
     private String claveUsuario;
     private String contraseña;
     private Object tfClaveUsuario;
@@ -182,8 +190,8 @@ public class SPPRYF12Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-         Image image = new Image("/frontEnd/images/SIAPROY1.png");
-        imgLogo1.setImage(image);  
+        Image image = new Image("/frontEnd/images/SIAPROY1.png");
+        imgLogo1.setImage(image);
         loading = GeneraCuadroMensaje.loading();
         tfTiempoTotal.setText("00:00:00");
         tfTiempoTotal.setFont(fuenteReloj);
@@ -261,59 +269,124 @@ public class SPPRYF12Controller implements Initializable {
         colAvance.setCellValueFactory(new PropertyValueFactory<>("avance"));
         colAvance.setCellFactory(textFieldCell.creaTextField(4));
         colFecha.setCellValueFactory(cellData -> cellData.getValue().fechaProperty());
-        grid = grdActividades;
+        descripcion = tfDescripcion;
         duracion = tfTiempoTotal;
         horaInicio = tfTiempoInicio;
         horaFin = tfTiempoFin;
         fechaSeleccionada = dtfFechaActual.getValue();
-        grdActividades.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+        lblTotal = lbTotalRegistros;
+        lblTiempoTotal = lbTiempoTotal;
+        btStarStop = btnStarStop;
+        btAgregarActividad = btnAgregarActividad;
+        btnGuardar.setOnAction(e -> {
+            guardaActividades();
+        });
+
+        grid = grdActividades;
+        grid.setPlaceholder(new Label("No hay datos que mostrar"));
+        grid.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
             public void changed(ObservableValue muestra, Object valorViejo, Object valorNuevo) {
                 muestraActividadesFormulario();
             }
         });
-        tfTiempoTotal.setOnAction(e -> {
-            if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
-                grdActividades.getSelectionModel().getSelectedItem().setDuracion(tfTiempoTotal.getText());
-            }
-        });
-        tfTiempoTotal.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent t) {
-                if (t.getCode() == KeyCode.TAB) {
-                    if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
-                        grdActividades.getSelectionModel().getSelectedItem().setDuracion(tfTiempoTotal.getText());
+        duracion.setOnKeyPressed((KeyEvent t) -> {
+            if (t.getCode() == KeyCode.TAB || t.getCode() == KeyCode.ENTER) {
+                if (grid.getSelectionModel().getSelectedItems().size() > 0) {
+                    valorAnterior = grid.getSelectionModel().getSelectedItem().getDuracion();
+                    if (!duracion.getText().matches("[0-2][0-9]:[0-5][0-9]:[0-5][0-9]")) {
+                        duracion.setText(valorAnterior);
                     }
+                    grid.getSelectionModel().getSelectedItem().setDuracion(duracion.getText());
                 }
             }
         });
-        tfTiempoInicio.setOnAction(e -> {
-            if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
-                grdActividades.getSelectionModel().getSelectedItem().setHoraInicio(tfTiempoInicio.getText());
+        duracion.focusedProperty().addListener((ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) -> {
+            if (oldPropertyValue && grid.getSelectionModel().getSelectedItems().size() > 0) {
+                valorAnterior = grid.getSelectionModel().getSelectedItem().getDuracion();
+                if (!duracion.getText().matches("[0-2][0-9]:[0-5][0-9]:[0-5][0-9]")) {
+                    duracion.setText(valorAnterior);
+                }
+                grid.getSelectionModel().getSelectedItem().setDuracion(duracion.getText());
             }
         });
-        tfTiempoInicio.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent t) {
-                if (t.getCode() == KeyCode.TAB) {
-                    if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
-                        grdActividades.getSelectionModel().getSelectedItem().setHoraInicio(tfTiempoInicio.getText());
+        duracion.textProperty().addListener((ov, oldValue, newValue) -> {
+            if (newValue.length() == 8) {
+                if (!duracion.getText().matches("[0-2][0-9]:[0-5][0-9]:[0-5][0-9]")) {
+                    duracion.setText(oldValue);
+                }
+            }
+            if (duracion.getText().length() > 8) {
+                duracion.setText(oldValue);
+            }
+        });
+        tfTiempoInicio.setOnKeyPressed((KeyEvent t) -> {
+            if (t.getCode() == KeyCode.TAB || t.getCode() == KeyCode.ENTER) {
+                if (grid.getSelectionModel().getSelectedItems().size() > 0) {
+                    valorAnterior = grid.getSelectionModel().getSelectedItem().getHoraInicio();
+                    if (!tfTiempoInicio.getText().matches("[0-2][0-9]:[0-5][0-9]:[0-5][0-9]")) {
+                        tfTiempoInicio.setText(valorAnterior);
                     }
+                    grid.getSelectionModel().getSelectedItem().setHoraInicio(tfTiempoInicio.getText());
                 }
             }
         });
-        tfTiempoFin.setOnAction(e -> {
-            if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
-                grdActividades.getSelectionModel().getSelectedItem().setHoraFin(tfTiempoFin.getText());
+        tfTiempoInicio.focusedProperty().addListener((ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) -> {
+            if (oldPropertyValue && grid.getSelectionModel().getSelectedItems().size() > 0) {
+                valorAnterior = grid.getSelectionModel().getSelectedItem().getHoraInicio();
+                if (!tfTiempoInicio.getText().matches("[0-2][0-9]:[0-5][0-9]:[0-5][0-9]")) {
+                    tfTiempoInicio.setText(valorAnterior);
+                }
+                grid.getSelectionModel().getSelectedItem().setHoraInicio(tfTiempoInicio.getText());
+            }
+        });
+        tfTiempoInicio.textProperty().addListener((ov, oldValue, newValue) -> {
+            if (newValue.length() == 8) {
+                if (!tfTiempoInicio.getText().matches("[0-2][0-9]:[0-5][0-9]:[0-5][0-9]")) {
+                    tfTiempoInicio.setText(oldValue);
+                }
+            }
+            if (tfTiempoInicio.getText().length() > 8) {
+                tfTiempoInicio.setText(oldValue);
+            }
+        });
+        tfTiempoFin.setOnKeyPressed((KeyEvent t) -> {
+            if (t.getCode() == KeyCode.TAB || t.getCode() == KeyCode.ENTER) {
+                if (grid.getSelectionModel().getSelectedItems().size() > 0) {
+                    valorAnterior = grid.getSelectionModel().getSelectedItem().getHoraFin();
+                    if (!tfTiempoFin.getText().matches("[0-2][0-9]:[0-5][0-9]:[0-5][0-9]")) {
+                        tfTiempoFin.setText(valorAnterior);
+                    }
+                    grid.getSelectionModel().getSelectedItem().setHoraFin(tfTiempoFin.getText());
+                }
             }
         });
         tfTiempoFin.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent t) {
-                if (t.getCode() == KeyCode.TAB) {
-                    if (grdActividades.getSelectionModel().getSelectedItems().size() > 0) {
-                        grdActividades.getSelectionModel().getSelectedItem().setHoraFin(tfTiempoFin.getText());
+                if (t.getCode() == KeyCode.TAB || t.getCode() == KeyCode.ENTER) {
+                    if (grid.getSelectionModel().getSelectedItems().size() > 0) {
+                        grid.getSelectionModel().getSelectedItem().setHoraFin(tfTiempoFin.getText());
                     }
                 }
+            }
+        });
+        tfTiempoFin.focusedProperty().addListener((ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) -> {
+            if (oldPropertyValue && grid.getSelectionModel().getSelectedItems().size() > 0) {
+                valorAnterior = grid.getSelectionModel().getSelectedItem().getHoraFin();
+                if (!tfTiempoFin.getText().matches("[0-2][0-9]:[0-5][0-9]:[0-5][0-9]")) {
+                    tfTiempoFin.setText(valorAnterior);
+                }
+                grid.getSelectionModel().getSelectedItem().setHoraFin(tfTiempoFin.getText());
+            }
+        });
+        tfTiempoFin.textProperty().addListener((ov, oldValue, newValue) -> {
+            if (newValue.length() == 8) {
+                if (!tfTiempoFin.getText().matches("[0-2][0-9]:[0-5][0-9]:[0-5][0-9]")) {
+                    tfTiempoFin.setText(oldValue);
+                }
+            }
+            if (tfTiempoFin.getText().length() > 8) {
+                tfTiempoFin.setText(oldValue);
             }
         });
         tfDescripcion.textProperty().addListener((ov, oldValue, newValue) -> {
@@ -336,44 +409,44 @@ public class SPPRYF12Controller implements Initializable {
         lbFecha.setText(fechaFormateada.toUpperCase());
     }
 
-    public void consultaActividades() {
+    public static void consultaActividades() {
         ObservableList<SpdReportesActividadesModel> registros = FXCollections.observableArrayList();
         boolean isPhantom = false;
         int posicion = 0;
         if (!fechaSeleccionada.equals(LocalDate.now())) {
-            btnStarStop.setDisable(true);
-            btnAgregarActividad.setDisable(false);
+            btStarStop.setDisable(true);
+            btAgregarActividad.setDisable(false);
             if (!running) {
                 setPosicionTimer(0);
             }
         } else {
-            btnStarStop.setDisable(false);
-            btnAgregarActividad.setDisable(true);
+            btStarStop.setDisable(false);
+            btAgregarActividad.setDisable(true);
         }
         HashMap<String, Object> parametrosHsm = new HashMap<>();
         parametrosHsm.put("fecha", fechaSeleccionada);
-        parametrosHsm.put("txtTiempoTotal", tfTiempoTotal);
-        parametrosHsm.put("txtTiempoInicio", tfTiempoInicio);
-        parametrosHsm.put("txtTiempoFinal", tfTiempoFin);
+        parametrosHsm.put("txtTiempoTotal", duracion);
+        parametrosHsm.put("txtTiempoInicio", horaInicio);
+        parametrosHsm.put("txtTiempoFinal", horaFin);
         try {
             ConsultaSpdReportesActividadesStore store = new ConsultaSpdReportesActividadesStore();
             registros = store.consultaActividades(parametrosHsm);
             if (contadorCambioDia == 0) {
-                if (grdActividades.getItems().size() > 0) {
-                    grdActividades.getItems().get(posicionTimer).duracionProperty().unbind();
-                    grdActividades.getItems().get(posicionTimer).horaInicioProperty().unbind();
-                    grdActividades.getItems().get(posicionTimer).horaFinProperty().unbind();
+                if (grid.getItems().size() > 0) {
+                    grid.getItems().get(posicionTimer).duracionProperty().unbind();
+                    grid.getItems().get(posicionTimer).horaInicioProperty().unbind();
+                    grid.getItems().get(posicionTimer).horaFinProperty().unbind();
                 }
             }
-            tfDescripcion.setText("");
-            tfTiempoTotal.textProperty().unbind();
-            tfTiempoTotal.setText("00:00:00");
-            tfTiempoInicio.textProperty().unbind();
-            tfTiempoInicio.setText("00:00:00");
-            tfTiempoFin.textProperty().unbind();
-            tfTiempoFin.setText("00:00:00");
+            descripcion.setText("");
+            duracion.textProperty().unbind();
+            duracion.setText("00:00:00");
+            horaInicio.textProperty().unbind();
+            horaInicio.setText("00:00:00");
+            horaFin.textProperty().unbind();
+            horaFin.setText("00:00:00");
             if (!fechaSeleccionada.equals(LocalDate.now()) && running && contadorCambioDia == 0) {
-                actividadEnEjecucion = grdActividades.getItems().get(posicionTimer);
+                actividadEnEjecucion = grid.getItems().get(posicionTimer);
                 contadorCambioDia++;
             } else if (fechaSeleccionada.equals(LocalDate.now()) && actividadEnEjecucion != null && running && contadorCambioDia > 0) {
                 contadorCambioDia = 0;
@@ -391,14 +464,14 @@ public class SPPRYF12Controller implements Initializable {
                     isPhantom = false;
                 }
             }
-            grdActividades.setItems(registros);
-            if (isPhantom && running && grdActividades.getItems().size() > 0) {
-                grdActividades.getItems().get(0).getStopWatch().startStop.fire();
-                grdActividades.getItems().get(0).getStopWatch().startStop.fire();
+            grid.setItems(registros);
+            if (isPhantom && running && grid.getItems().size() > 0) {
+                grid.getItems().get(0).getStopWatch().startStop.fire();
+                grid.getItems().get(0).getStopWatch().startStop.fire();
                 contadorCambioDia = 0;
-            } else if (!isPhantom && running && grdActividades.getItems().size() > 0) {
-                grdActividades.getItems().get(posicion).getStopWatch().startStop.fire();
-                grdActividades.getItems().get(posicion).getStopWatch().startStop.fire();
+            } else if (!isPhantom && running && grid.getItems().size() > 0) {
+                grid.getItems().get(posicion).getStopWatch().startStop.fire();
+                grid.getItems().get(posicion).getStopWatch().startStop.fire();
             }
             setTotalRegistros();
             setTiempoTotal();
@@ -429,6 +502,7 @@ public class SPPRYF12Controller implements Initializable {
             if (seleccion.get() == ButtonType.OK) {
                 if (operacion == 0) {
                     primaryStage.close();
+                    System.exit(-1);
                 } else if (operacion == 1) {
                     eliminaActividadesAction();
                 } else if (operacion == 2) {
@@ -441,6 +515,18 @@ public class SPPRYF12Controller implements Initializable {
 
     public static TableView<SpdReportesActividadesModel> getTableView() {
         return grid;
+    }
+
+    public static TextField getTfDuracion() {
+        return duracion;
+    }
+
+    public static TextField getTfHoraInicio() {
+        return horaInicio;
+    }
+
+    public static TextField getTfHoraFin() {
+        return horaFin;
     }
 
     public static void setPosicionTimer(int posicion) {
@@ -465,7 +551,7 @@ public class SPPRYF12Controller implements Initializable {
                 }
             }
         } else {
-            actividades.setDuracion(tfTiempoTotal.getText());
+            actividades.setDuracion(duracion.getText());
             actividades.setHoraInicio(tfTiempoInicio.getText());
             actividades.setHoraFin(tfTiempoFin.getText());
         }
@@ -478,21 +564,24 @@ public class SPPRYF12Controller implements Initializable {
     }
 
     public void muestraActividadesFormulario() {
-        ObservableList<SpdReportesActividadesModel> muestraInfo = grid.getSelectionModel().getSelectedItems();
-        if (grid.getSelectionModel().getSelectedItems().size() > 0 && fechaSeleccionada.equals(LocalDate.now())) {
-            tfDescripcion.setText(muestraInfo.get(0).getDescripcion());
-            tfTiempoTotal.textProperty().bind(muestraInfo.get(0).duracionProperty());
-            tfTiempoInicio.textProperty().bind(muestraInfo.get(0).horaInicioProperty());
-            tfTiempoFin.textProperty().bind(muestraInfo.get(0).horaFinProperty());
-        } else if (grid.getSelectionModel().getSelectedItems().size() > 0 && !fechaSeleccionada.equals(LocalDate.now())) {
-            tfDescripcion.setText(muestraInfo.get(0).getDescripcion());
-            tfTiempoTotal.textProperty().unbind();
-            tfTiempoTotal.setText(muestraInfo.get(0).getDuracion());
-            tfTiempoInicio.textProperty().unbind();
-            tfTiempoInicio.setText(muestraInfo.get(0).getHoraInicio());
-            tfTiempoFin.textProperty().unbind();
-            tfTiempoFin.setText(muestraInfo.get(0).getHoraFin());
+        ObservableList<SpdReportesActividadesModel> seleccion = grid.getSelectionModel().getSelectedItems();
+        if (seleccion.size() < 1) {
+            return;
         }
+//        if (fechaSeleccionada.equals(LocalDate.now())) {
+//            tfTiempoTotal.textProperty().bind(seleccion.get(0).duracionProperty());
+//            tfTiempoInicio.textProperty().bind(seleccion.get(0).horaInicioProperty());
+//            tfTiempoFin.textProperty().bind(seleccion.get(0).horaFinProperty());
+
+//        } else {
+        tfDescripcion.setText(seleccion.get(0).getDescripcion());
+        duracion.textProperty().unbind();
+        duracion.setText(seleccion.get(0).getDuracion());
+        tfTiempoInicio.textProperty().unbind();
+        tfTiempoInicio.setText(seleccion.get(0).getHoraInicio());
+        tfTiempoFin.textProperty().unbind();
+        tfTiempoFin.setText(seleccion.get(0).getHoraFin());
+//        }
     }
 
     public void eliminaActividades() {
@@ -509,6 +598,7 @@ public class SPPRYF12Controller implements Initializable {
         if (grid.getSelectionModel().getSelectedItems().get(0).getStopWatch().getCurrentStatus()) {
             grid.getSelectionModel().getSelectedItems().get(0).getStopWatch().startStop.fire();
         }
+        descripcion.setText("");
         grid.getSelectionModel().getSelectedItems().get(0).setDescripcion("");
         grid.getSelectionModel().getSelectedItems().get(0).duracionProperty().unbind();
         duracion.textProperty().unbind();
@@ -535,11 +625,11 @@ public class SPPRYF12Controller implements Initializable {
         grid.getItems().removeAll(grid.getSelectionModel().getSelectedItems());
     }
 
-    public void setTotalRegistros() {
-        lbTotalRegistros.setText(String.valueOf(grid.getItems().size()));
+    public static void setTotalRegistros() {
+        lblTiempoTotal.setText(String.valueOf(grid.getItems().size()));
     }
 
-    public void setTiempoTotal() {
+    public static void setTiempoTotal() {
         String duracion = "", m = "";
         String[] tiempo = null;
         double min = 0.0, hora = 0.0, horasTotales = 0.0;
@@ -565,7 +655,7 @@ public class SPPRYF12Controller implements Initializable {
                         }
                         duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
                         grid.getItems().get(i).setDuracion(duracion);
-                    } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                    } else if (!fechaSeleccionada.equals(LocalDate.now())) {
                         grid.getItems().get(i).setDuracion("00:00:00");
                     }
                 }
@@ -588,7 +678,7 @@ public class SPPRYF12Controller implements Initializable {
                         }
                         duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
                         grid.getItems().get(i).setHoraInicio(duracion);
-                    } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                    } else if (!fechaSeleccionada.equals(LocalDate.now())) {
                         grid.getItems().get(i).setHoraInicio("00:00:00");
                     }
                 }
@@ -611,7 +701,7 @@ public class SPPRYF12Controller implements Initializable {
                         }
                         duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
                         grid.getItems().get(i).setHoraFin(duracion);
-                    } else if (!dtfFechaActual.getValue().equals(LocalDate.now())) {
+                    } else if (!fechaSeleccionada.equals(LocalDate.now())) {
                         grid.getItems().get(i).setHoraFin("00:00:00");
                     }
                 }
@@ -632,24 +722,24 @@ public class SPPRYF12Controller implements Initializable {
                     m = "0.30";
                 }
                 duracion = tiempo[0].length() > 1 ? tiempo[0] + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00") : ("0" + tiempo[0]) + (":" + (String.valueOf(m).split("[.]")[1].length() == 1 ? "0" + String.valueOf(m).split("[.]")[1] : String.valueOf(m).split("[.]")[1].length() > 2 ? String.valueOf(m).split("[.]")[1].substring(0, 2) : String.valueOf(m).split("[.]")[1]) + ":00");
-                lbTiempoTotal.setText(String.valueOf(duracion));
+                lblTiempoTotal.setText(String.valueOf(duracion));
             }
         } else {
-            lbTiempoTotal.setText(String.valueOf("00:00:00"));
+            lblTiempoTotal.setText(String.valueOf("00:00:00"));
         }
     }
 
-    public void guardaActividades() {
+    public static void guardaActividades() {
         registrosNuevos = FXCollections.observableArrayList();
         registrosActualizados = FXCollections.observableArrayList();
-        for (int x = 0; x < grdActividades.getItems().size(); x++) {
-            if (grdActividades.getItems().get(x).getIdReporteActividad() == null) { //REGISTROS NUEVOS
-                registrosNuevos.add(grdActividades.getItems().get(x));
+        for (int x = 0; x < grid.getItems().size(); x++) {
+            if (grid.getItems().get(x).getIdReporteActividad() == null) { //REGISTROS NUEVOS
+                registrosNuevos.add(grid.getItems().get(x));
             } else {
-                registrosActualizados.add(grdActividades.getItems().get(x));
+                registrosActualizados.add(grid.getItems().get(x));
             }
-            if (dtfFechaActual.getValue().equals(LocalDate.now())) {
-                if (grdActividades.getItems().get(x).getStopWatch().getCurrentStatus()) {//SI EL REGISTRO ACTUAL ESTA CORRIENDO
+            if (fechaSeleccionada.equals(LocalDate.now())) {
+                if (grid.getItems().get(x).getStopWatch().getCurrentStatus()) {//SI EL REGISTRO ACTUAL ESTA CORRIENDO
                     posicionTimerRunning = x;
                     insertaDiaActual = true;
                 }
@@ -657,7 +747,7 @@ public class SPPRYF12Controller implements Initializable {
                 insertaDiaActual = false;
             }
         }
-        if (running && dtfFechaActual.getValue().equals(LocalDate.now())) {
+        if (running && fechaSeleccionada.equals(LocalDate.now())) {
             alertActividades(primaryStage, "SPPRYF12", "GUARDAR ACTIVIDADES", 2);
         } else {
             guardaActividadesAction();
@@ -697,6 +787,7 @@ public class SPPRYF12Controller implements Initializable {
         try {
             storeInsert.insertaActividades(parametrosHsm);
             storeUpdate.actualizaActividades(parametrosHsm);
+            consultaActividades();
             loading.close();
         } catch (Exception ex) {
             GeneraCuadroMensaje.error("Ocurrió un problema al guardar la información.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: guardaActividadesAction");
@@ -766,6 +857,7 @@ public class SPPRYF12Controller implements Initializable {
                         records = records + "]";
                         parametrosHsmBDDLocal.put("registrosBDLocal", records);
                         jsonParams = gson.toJson(parametrosHsmBDDLocal);
+
                         mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
                         mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
                         result = port.cargaRegistro(jsonParams, "insertaRegistrosFromSiaproyDesktop");
@@ -852,6 +944,7 @@ public class SPPRYF12Controller implements Initializable {
         if (proyecto != null) {
             if (!proyecto.equals("")) {
                 parametrosHsm.put("cveColaborador", claveUsuarioSiaproy);
+                parametrosHsm.put("conexionFromSiaproyDesktop", "true");
                 parametrosHsm.put("idProyecto", proyecto.split("-")[0].trim());
                 jsonParams = gson.toJson(parametrosHsm);
                 mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
@@ -891,6 +984,7 @@ public class SPPRYF12Controller implements Initializable {
         parametrosHsm.put("cveColaborador", claveUsuarioSiaproy);
         parametrosHsm.put("conexionFromSiaproyDesktop", "true");
         jsonParams = gson.toJson(parametrosHsm);
+
         mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service service = new mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs_Service();
         mx.com.lobos.RegistroActividadesWs.RegistroActividadesWs port = service.getRegistroActividadesWsPort();
         try {
@@ -924,4 +1018,5 @@ public class SPPRYF12Controller implements Initializable {
             GeneraCuadroMensaje.error("La aplicación SIAPROY WEB no está en línea. Consulte al administrador.\n" + "\nERROR: " + ex.toString() + "\n\nCLASE: SPPRYF12Controller. \nMÉTODO: consultaColaboradorSiaproyWeb");
         }
     }
+
 }
